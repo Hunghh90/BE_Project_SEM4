@@ -1,2 +1,4 @@
-package com.example.beprojectsem4.service;public interface PartnerProgramService {
+package com.example.beprojectsem4.service;
+
+public interface PartnerProgramService {
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -22,7 +23,9 @@ public class UserEntity {
     private String email;
     private String password;
     @Column(name = "birthday")
-    private String bod;
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy/MM/dd")
+    private Date bod;
     @Column(name = "phone_number")
     private String phoneNumber;
     private String status;
@@ -44,12 +47,12 @@ public class UserEntity {
     protected void onUpdate() {
         updatedAt = new Date();
     }
-    public UserEntity(String email,String password,String bod,String phoneNumber,String status){
+    public UserEntity(String email,String password,Date bod,String phoneNumber){
         this.email = email;
         this.password = password;
         this.bod = bod;
         this.phoneNumber = phoneNumber;
-        this.status = status;
+        this.status = "Deactivate";
     }
 
 

@@ -25,6 +25,7 @@ public class DonationEntity {
     private Date createAt;
     @Column(name = "updated_at")
     private Date updatedAt;
+    private String paymentMethod;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;

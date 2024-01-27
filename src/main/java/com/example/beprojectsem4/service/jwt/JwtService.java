@@ -1,7 +1,10 @@
 package com.example.beprojectsem4.service.jwt;
 
+import com.example.beprojectsem4.entities.UserEntity;
+import com.example.beprojectsem4.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +13,8 @@ import java.util.Date;
 
 @Service
 public class JwtService {
+    @Autowired
+    private UserRepository userRepository;
     private static final String secret_key = "1234567890";
     private static final Long expired_time = 1234567832L;
 
@@ -35,6 +40,11 @@ public class JwtService {
 
     public String getUsernameFromToken(String token) {
         return  Jwts.parser().setSigningKey(secret_key).parseClaimsJws(token).getBody().getSubject();
+    }
+    public UserEntity getMeFromToken(String token){
+        String email = getUsernameFromToken(token);
+        UserEntity user = userRepository.findUserByEmail(email);
+        return user;
     }
 
 }

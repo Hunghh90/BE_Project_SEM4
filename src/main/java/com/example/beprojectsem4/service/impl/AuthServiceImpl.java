@@ -1,6 +1,7 @@
 package com.example.beprojectsem4.service.impl;
 
 import com.example.beprojectsem4.dtos.authDtos.*;
+import com.example.beprojectsem4.dtos.userDtos.ResetPassword;
 import com.example.beprojectsem4.entities.UserEntity;
 import com.example.beprojectsem4.service.AuthService;
 import com.example.beprojectsem4.service.SendEmailService;
@@ -44,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
                 return ResponseEntity.badRequest().body("Email is exists or an error occurred");
             }
             String hashedEmail = bCryptPasswordEncoder.encode(registerDto.getEmail());
-            sendEmailService.sendActivationEmail(registerDto.getEmail(),
+            sendEmailService.sendEmail(registerDto.getEmail(),
                     "Link Activate account",
                     "http://www.localhost:8081/auth/active?code=" + hashedEmail + "&email=" + URLEncoder.encode(registerDto.getEmail(), StandardCharsets.UTF_8));
             return ResponseEntity.ok().body("Check Email to activate account");
@@ -77,6 +78,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
+    @Override
     public void logout(HttpServletRequest request) {
         String token = jwtAuthenticationFilter.getToken(request);
         String email = jwtService.getUsernameFromToken(token);
@@ -102,4 +104,35 @@ public class AuthServiceImpl implements AuthService {
             return ResponseEntity.internalServerError().body(ex.getMessage());
         }
     }
+
+    @Override
+    public ResponseEntity<?> forgotPassword(String email) {
+        try {
+            UserEntity user = userService.checkUser(email);
+            if (user == null) {
+                return ResponseEntity.badRequest().body("Email not exists");
+            } else {
+                sendEmailService.sendEmail(email, "Reset password", "http://www.localhost:8081/auth/reset-password?email="+email);
+                return ResponseEntity.ok().body("Check email to reset password");
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.internalServerError().body("An error");
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> resetPassword(String email,ResetPassword resetPassword) {
+        try {
+           if(userService.resetPassword(email,resetPassword)){
+               return ResponseEntity.ok("Change password success");
+           }else {
+               return ResponseEntity.badRequest().body("Check password and confirm password");
+           }
+        }catch (Exception ex){
+            System.out.println(ex.getMessage());
+            return ResponseEntity.internalServerError().body("Error");
+        }
+    }
+
 }

@@ -11,7 +11,7 @@ public class SendEmailServiceImpl implements SendEmailService {
     @Autowired
     private JavaMailSender mailSender;
     @Override
-    public void sendActivationEmail(String email, String subject, String body) {
+    public void sendEmail(String email, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("Hunghh");
         message.setTo(email);

@@ -4,5 +4,5 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 
 public interface SendEmailService {
-    void sendActivationEmail(String email,String subject,String body);
+    void sendEmail(String email,String subject,String body);
 }

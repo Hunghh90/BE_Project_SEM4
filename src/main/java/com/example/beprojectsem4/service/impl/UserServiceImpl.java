@@ -5,6 +5,7 @@ import com.example.beprojectsem4.dtos.authDtos.JwtResponseDto;
 import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
 import com.example.beprojectsem4.dtos.authDtos.TokenResponseDto;
 import com.example.beprojectsem4.dtos.userDtos.GetMeDto;
+import com.example.beprojectsem4.dtos.userDtos.ResetPassword;
 import com.example.beprojectsem4.dtos.userDtos.UpdateUserDto;
 import com.example.beprojectsem4.entities.RoleEntity;
 import com.example.beprojectsem4.entities.UserEntity;
@@ -136,13 +137,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity checkUser(String email) {
-        UserEntity user = null;
+
         try {
-            user = repository.findUserByEmail(email);
+            return repository.findUserByEmail(email);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
+            return null;
         }
-        return user;
     }
 
     @Override
@@ -241,6 +242,28 @@ public class UserServiceImpl implements UserService {
             }
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
+        }
+    }
+
+    @Override
+    public boolean resetPassword(String email,ResetPassword resetPassword) {
+        try{
+            UserEntity user = checkUser(email);
+            if(user == null){
+                return false;
+            }else{
+                if(resetPassword.getNewPassword().equals(resetPassword.getConfirmPassword())){
+                    String hashPassword = bCryptPasswordEncoder.encode(resetPassword.getNewPassword());
+                    user.setPassword(hashPassword);
+                    repository.save(user);
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        }catch (Exception ex){
+            System.out.println(ex.getMessage());
+            return false;
         }
     }
 }

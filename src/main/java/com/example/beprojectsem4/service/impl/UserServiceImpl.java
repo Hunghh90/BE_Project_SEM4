@@ -18,12 +18,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -49,13 +54,7 @@ public class UserServiceImpl implements UserService {
             }
             UserEntity user = EntityDtoConverter.convertToEntity(registerDto, UserEntity.class);
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            RoleEntity userRole = roleRepository.findRoleByRoleName("USER");
-            if (userRole == null) {
-                userRole = new RoleEntity();
-                userRole.setRoleName("USER");
-                roleRepository.save(userRole);
-            }
-            user.getRoles().add(userRole);
+
             user.setStatus("DeActivate");
             repository.save(user);
             return true;
@@ -182,7 +181,7 @@ public class UserServiceImpl implements UserService {
             if(user == null){
                 return ResponseEntity.badRequest().body("Email not exists");
             }else{
-                user.setStatus("DeActivate");
+                user.setStatus("Block");
                 repository.save(user);
                 return ResponseEntity.ok().body("Block user success");
             }
@@ -200,6 +199,13 @@ public class UserServiceImpl implements UserService {
             if (user == null) {
                 return ResponseEntity.badRequest().body("Email not exists");
             } else {
+                RoleEntity userRole = roleRepository.findRoleByRoleName("USER");
+                if (userRole == null) {
+                    userRole = new RoleEntity();
+                    userRole.setRoleName("USER");
+                    roleRepository.save(userRole);
+                }
+                user.getRoles().add(userRole);
                 user.setStatus("Activate");
                 repository.save(user);
                 return ResponseEntity.ok().body("Active success");
@@ -219,6 +225,22 @@ public class UserServiceImpl implements UserService {
         }catch (Exception ex){
             System.out.println(ex.getMessage());
             return null;
+        }
+    }
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void deleteAccount() {
+        try {
+            List<UserEntity> users = repository.findAllByStatus("DeActivate");
+            Date currentDate = new Date();
+            for (UserEntity user : users) {
+                long diffInMillies = Math.abs(currentDate.getTime() - user.getCreateAt().getTime());
+                long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+                if (diff > 7) {
+                    repository.delete(user);
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
     }
 }

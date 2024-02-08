@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -35,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private SendEmailService sendEmailService;
+
     @Override
     public ResponseEntity<?> register(RegisterDto registerDto) {
         try {
@@ -54,48 +56,48 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<?> login(LoginDto login) {
-        try{
+        try {
             UserEntity user = userService.checkUser(login.getEmail());
-            if(user != null && user.getStatus().equals("Activate")){
+            if (user != null && user.getStatus().equals("Activate")) {
                 Authentication authentication = authenticationManager.authenticate(new
-                        UsernamePasswordAuthenticationToken(login.getEmail(),login.getPassword()));
+                        UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword()));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 TokenResponseDto tokenResponseDto = jwtService.generateToken(authentication);
                 String refreshToken = jwtService.generateRefreshToken(authentication);
-                userService.saveRefreshToken(login.getEmail(),refreshToken);
-                return ResponseEntity.ok(new JwtResponseDto(login.getEmail(),tokenResponseDto.getToken(),tokenResponseDto.getExpired()));
-            }else{
+                userService.saveRefreshToken(login.getEmail(), refreshToken);
+                return ResponseEntity.ok(new JwtResponseDto(login.getEmail(), tokenResponseDto.getToken(), tokenResponseDto.getExpired()));
+            } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account not Activate or Block");
 
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             System.out.println((ex.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email or password not correct");
     }
 
 
-
     public void logout(HttpServletRequest request) {
         String token = jwtAuthenticationFilter.getToken(request);
         String email = jwtService.getUsernameFromToken(token);
-        userService.saveRefreshToken(email,"");
+        userService.saveRefreshToken(email, "");
         SecurityContextHolder.clearContext();
     }
 
     @Override
-    public ResponseEntity<?> activeAccount(String code,String email) {
-        try{
-            boolean isMatch = bCryptPasswordEncoder.matches(email,code);
-            if(isMatch){
-                UserEntity user = userService.checkUser(email);
-                user.setStatus("Activate");
-
-                return ResponseEntity.ok("Success");
-            }else {
+    public ResponseEntity<?> activeAccount(String code, String email) {
+        try {
+            boolean isMatch = bCryptPasswordEncoder.matches(email, code);
+            if (isMatch) {
+                if (Objects.equals(userService.activeUser(email), ResponseEntity.ok())) {
+                    return ResponseEntity.ok("Success");
+                }else {
+                    return ResponseEntity.badRequest().body("Not Success");
+                }
+            } else {
                 return ResponseEntity.badRequest().body("Not Success");
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseEntity.internalServerError().body(ex.getMessage());
         }

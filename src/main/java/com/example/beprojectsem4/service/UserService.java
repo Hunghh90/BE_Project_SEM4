@@ -1,12 +1,23 @@
 package com.example.beprojectsem4.service;
 
-import com.example.beprojectsem4.dtos.ChangePassword;
-import com.example.beprojectsem4.dtos.RegisterDto;
+import com.example.beprojectsem4.dtos.userDtos.ChangePassword;
+import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
+import com.example.beprojectsem4.dtos.userDtos.GetMeDto;
+import com.example.beprojectsem4.dtos.userDtos.UpdateUserDto;
 import com.example.beprojectsem4.entities.UserEntity;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
 public interface UserService {
-    ResponseEntity<?> createAccount(RegisterDto registerDto);
+    boolean createAccountUser(RegisterDto registerDto);
+    ResponseEntity<?> createAccountAdmin(RegisterDto registerDto);
     ResponseEntity<?> changePassword(HttpServletRequest request, ChangePassword changePassword);
+    void saveRefreshToken(String email,String refreshToken);
+    ResponseEntity<?> refreshToken(HttpServletRequest request);
+    GetMeDto getMe(HttpServletRequest request);
+    ResponseEntity<?> updateUser(HttpServletRequest request,UpdateUserDto updateUserDto);
+    ResponseEntity<?> blockUser(String email);
+    ResponseEntity<?> activeUser(String email);
+    UserEntity checkUser(String email);
+    UserEntity findUserByToken(HttpServletRequest request);
 }

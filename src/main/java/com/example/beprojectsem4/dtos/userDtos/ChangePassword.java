@@ -1,4 +1,4 @@
-package com.example.beprojectsem4.dtos;
+package com.example.beprojectsem4.dtos.userDtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

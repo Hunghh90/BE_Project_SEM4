@@ -1,4 +1,4 @@
-package com.example.beprojectsem4.dtos;
+package com.example.beprojectsem4.dtos.authDtos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Temporal;

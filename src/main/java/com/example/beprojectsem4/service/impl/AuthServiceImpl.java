@@ -1,11 +1,13 @@
 package com.example.beprojectsem4.service.impl;
 
-import com.example.beprojectsem4.dtos.JwtResponseDto;
-import com.example.beprojectsem4.dtos.LoginDto;
-import com.example.beprojectsem4.dtos.RegisterDto;
+import com.example.beprojectsem4.dtos.authDtos.*;
 import com.example.beprojectsem4.entities.UserEntity;
 import com.example.beprojectsem4.service.AuthService;
+import com.example.beprojectsem4.service.SendEmailService;
+import com.example.beprojectsem4.service.UserService;
+import com.example.beprojectsem4.service.jwt.JwtAuthenticationFilter;
 import com.example.beprojectsem4.service.jwt.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,66 +18,88 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+
 @Service
 public class AuthServiceImpl implements AuthService {
     @Autowired
     private JwtService jwtService;
     @Autowired
-    private UserServiceImpl service;
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Autowired
+    private UserService userService;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private SendEmailService sendEmailService;
+
     @Override
     public ResponseEntity<?> register(RegisterDto registerDto) {
-        try{
-            UserEntity u = checkUser(registerDto.getEmail());
-            if(u != null){
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is exists, please choose an other email");
+        try {
+            if (!userService.createAccountUser(registerDto)) {
+                return ResponseEntity.badRequest().body("Email is exists or an error occurred");
             }
-            registerDto.setPassword(bCryptPasswordEncoder.encode(registerDto.getPassword()));
-            service.createAccount(registerDto);
-//            Authentication authentication = authenticationManager.authenticate(new
-//                    UsernamePasswordAuthenticationToken(registerDto.getEmail(),registerDto.getPassword()));
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//            String token = jwtService.generateToken(authentication);
-            return ResponseEntity.ok(new JwtResponseDto(registerDto.getEmail(), "token"));
-        }catch (Exception ex){
+            String hashedEmail = bCryptPasswordEncoder.encode(registerDto.getEmail());
+            sendEmailService.sendActivationEmail(registerDto.getEmail(),
+                    "Link Activate account",
+                    "http://www.localhost:8081/auth/active?code=" + hashedEmail + "&email=" + URLEncoder.encode(registerDto.getEmail(), StandardCharsets.UTF_8));
+            return ResponseEntity.ok().body("Check Email to activate account");
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("register not success");
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("register not success");
     }
 
     @Override
     public ResponseEntity<?> login(LoginDto login) {
-        try{
-            Authentication authentication = authenticationManager.authenticate(new
-                    UsernamePasswordAuthenticationToken(login.getEmail(),login.getPassword()));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String token = jwtService.generateToken(authentication);
-            return ResponseEntity.ok(new JwtResponseDto(login.getEmail(), token));
-        }catch (Exception ex){
+        try {
+            UserEntity user = userService.checkUser(login.getEmail());
+            if (user != null && user.getStatus().equals("Activate")) {
+                Authentication authentication = authenticationManager.authenticate(new
+                        UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword()));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                TokenResponseDto tokenResponseDto = jwtService.generateToken(authentication);
+                String refreshToken = jwtService.generateRefreshToken(authentication);
+                userService.saveRefreshToken(login.getEmail(), refreshToken);
+                return ResponseEntity.ok(new JwtResponseDto(login.getEmail(), tokenResponseDto.getToken(), tokenResponseDto.getExpired()));
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account not Activate or Block");
+
+            }
+        } catch (Exception ex) {
             System.out.println((ex.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email or password not correct");
     }
 
-    public UserEntity checkUser(String email){
-        UserEntity u = null;
-        try{
-            u = service.findUserByEmail(email);
-            if (u != null) {
-                return u;
-            } else {
-                return null;
-            }
-        } catch (Exception ex){
-            System.out.println(ex.getMessage());
-            return null;
-        }
+
+    public void logout(HttpServletRequest request) {
+        String token = jwtAuthenticationFilter.getToken(request);
+        String email = jwtService.getUsernameFromToken(token);
+        userService.saveRefreshToken(email, "");
+        SecurityContextHolder.clearContext();
     }
 
-    public void logout() {
-        SecurityContextHolder.clearContext();
+    @Override
+    public ResponseEntity<?> activeAccount(String code, String email) {
+        try {
+            boolean isMatch = bCryptPasswordEncoder.matches(email, code);
+            if (isMatch) {
+                if (Objects.equals(userService.activeUser(email), ResponseEntity.ok())) {
+                    return ResponseEntity.ok("Success");
+                }else {
+                    return ResponseEntity.badRequest().body("Not Success");
+                }
+            } else {
+                return ResponseEntity.badRequest().body("Not Success");
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.internalServerError().body(ex.getMessage());
+        }
     }
 }

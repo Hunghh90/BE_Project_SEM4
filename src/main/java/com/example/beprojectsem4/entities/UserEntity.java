@@ -29,6 +29,8 @@ public class UserEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
     private String status;
+    @Column(name = "refresh_token")
+    private String refreshToken;
     @Column(name = "created_at")
     private Date createAt;
     @Column(name = "updated_at")

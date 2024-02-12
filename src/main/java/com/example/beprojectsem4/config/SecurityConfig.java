@@ -43,7 +43,7 @@ public class SecurityConfig  {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         httpSecurity.authorizeHttpRequests(httpRequest->httpRequest
-                .requestMatchers("/auth/**", "/api/v1/**").permitAll()
+                .requestMatchers("/auth/**", "/api/v1/**","/**").permitAll()
                 .anyRequest().authenticated());
         httpSecurity.addFilterBefore(jwtAuthenticationFilter(), BasicAuthenticationFilter.class);
 //                .exceptionHandling().accessDeniedHandler(new AcessDenied());

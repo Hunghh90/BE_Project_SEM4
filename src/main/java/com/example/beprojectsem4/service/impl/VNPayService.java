@@ -2,7 +2,11 @@ package com.example.beprojectsem4.service.impl;
 
 import com.example.beprojectsem4.config.VNPayConfig;
 import com.example.beprojectsem4.dto.request.RequestDonate;
+import com.example.beprojectsem4.entities.ProgramEntity;
+import com.example.beprojectsem4.exception.NotFoundException;
+import com.example.beprojectsem4.repository.ProgramRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -13,7 +17,13 @@ import java.util.*;
 
 @Service
 public class VNPayService {
+    @Autowired
+    DonationServiceImpl donationService;
+    @Autowired
+    ProgramRepository programRepository;
     public  String createOrder(RequestDonate requestDonate){
+        Optional<ProgramEntity> findProgramId =  programRepository.findById(requestDonate.getProgramId());
+
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
@@ -31,12 +41,13 @@ public class VNPayService {
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
         vnp_Params.put("vnp_OrderInfo", requestDonate.getDescription());
         vnp_Params.put("vnp_OrderType", orderType);
+//        vnp_Params.put("vnp_BankTranNo", String.valueOf(requestDonate.getProgramId()));
 
         String locate = "en";
         vnp_Params.put("vnp_Locale", locate);
 
 //        String urlReturn += VNPayConfig.vnp_ReturnUrl;
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
+        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl+ "?ProgramId=" + requestDonate.getProgramId());
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
@@ -79,6 +90,9 @@ public class VNPayService {
         String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.secretKey, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
+        if(!findProgramId.isPresent()){
+            throw new NotFoundException("Not found Program");
+        }
         return paymentUrl;
     }
 
@@ -108,8 +122,11 @@ public class VNPayService {
         String signValue = VNPayConfig.hashAllFields(fields);
         if (signValue.equals(vnp_SecureHash)) {
             if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
+                System.out.println("GD THANH CONG");
                 return 1;
             } else {
+                System.out.println("GD KHONG THANH CONG");
+
                 return 0;
             }
         } else {

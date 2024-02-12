@@ -32,6 +32,8 @@ public class ProgramEntity {
     private Date createAt;
     @Column(name = "updated_at")
     private Date updatedAt;
+    @Column(name = "total")
+    private Double totalMoney;
 
     @PrePersist
     protected void onCreate() {

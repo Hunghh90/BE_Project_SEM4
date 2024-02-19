@@ -1,29 +1,53 @@
 package com.example.beprojectsem4.config;
 
-import org.springdoc.core.models.GroupedOpenApi;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-//import springfox.documentation.builders.PathSelectors;
-//import springfox.documentation.builders.RequestHandlerSelectors;
-//import springfox.documentation.spring.web.plugins.Docket;
-//import springfox.documentation.swagger2.annotations.EnableSwagger2;
-//import springfox.documentation.spi.DocumentationType;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.servers.Server;
 
-@Configuration
-//@EnableSwagger2
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Project-SEM4",
+                description = "DESCRIPTION",
+                summary = "SUMMARY",
+                termsOfService = "FPT",
+                contact = @Contact(
+                        name = "FPT",
+                        email = "hanhnxth2202040@fpt.edu.vn"
+                ),
+                license = @License(
+                        name = "LICENSE"
+                ),
+                version = "ver1"
+        ),
+        servers = {
+                @Server(
+                        description = "Dev",
+                        url = "http://localhost:8080"
+                ),
+                @Server(
+                        description = "Product",
+                        url="http://localhost:8080"
+                )
+        },
+        security = @SecurityRequirement(
+                name = "auth"
+        )
+)
+
+@SecurityScheme(
+        name = "auth",
+        in = SecuritySchemeIn.HEADER,
+        type = SecuritySchemeType.HTTP,
+        bearerFormat = "JWT",
+        scheme = "bearer",
+        description = "security desc"
+)
 public class SwagerConfig {
-    @Bean
-    public GroupedOpenApi controllerApi() {
-        return GroupedOpenApi.builder()
-                .group("controller-api")
-                .packagesToScan("com.example.beprojectsem4.controller") // Specify the package to scan
-                .build();
-    }
-//    public Docket api() {
-//        return new Docket(DocumentationType.SWAGGER_2)
-//                .select()
-//                .apis(RequestHandlerSelectors.basePackage("com.example.beprojectsem4.controller"))
-//                .paths(PathSelectors.any())
-//                .build();
-//    }
+
 }

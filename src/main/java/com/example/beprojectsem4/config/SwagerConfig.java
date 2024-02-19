@@ -45,7 +45,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
         in = SecuritySchemeIn.HEADER,
         type = SecuritySchemeType.HTTP,
         bearerFormat = "JWT",
-        scheme = "basic",
+        scheme = "bearer",
         description = "security desc"
 )
 public class SwagerConfig {

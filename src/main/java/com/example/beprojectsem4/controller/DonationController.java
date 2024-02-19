@@ -46,17 +46,21 @@ public class DonationController {
             ResponseDonate responseDonate = new ResponseDonate();
             responseDonate.setMessageCode("200");
             responseDonate.setUrl(vnPayService.createOrder(paymentRequest));
-
+            responseDonate.setMessage("Request successfully fulfilled");
             return ResponseEntity.status(HttpStatus.OK).body(responseDonate);
 
         } else if ("Paypal".equals(paymentMethod)) {
             // Chuyển hướng đến PaypalService
             ResponseDonate responseDonate = new ResponseDonate();
             responseDonate.setMessageCode("200");
+            responseDonate.setMessage("Request successfully fulfilled");
             responseDonate.setUrl(paypalService.getLinksPayment(paymentRequest));
             return ResponseEntity.status(HttpStatus.OK).body(responseDonate);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Payment Method");
+            ResponseDonate responseDonate = new ResponseDonate();
+            responseDonate.setMessageCode("400");
+            responseDonate.setMessage("Invalid Payment Method");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDonate);
         }
     }
 

@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class ResponseDonate {
     private String messageCode;
     private String url;
+    private String message;
 
 }

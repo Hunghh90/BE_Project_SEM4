@@ -24,6 +24,10 @@ public class VNPayService {
     public  String createOrder(RequestDonate requestDonate){
         Optional<ProgramEntity> findProgramId =  programRepository.findById(requestDonate.getProgramId());
 
+        if(!findProgramId.isPresent()){
+            throw new NotFoundException("Not found Program");
+        }
+
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
@@ -90,9 +94,7 @@ public class VNPayService {
         String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.secretKey, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
-        if(!findProgramId.isPresent()){
-            throw new NotFoundException("Not found Program");
-        }
+
         return paymentUrl;
     }
 

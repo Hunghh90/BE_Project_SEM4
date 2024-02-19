@@ -43,7 +43,20 @@ public class SecurityConfig  {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         httpSecurity.authorizeHttpRequests(httpRequest->httpRequest
-                .requestMatchers("/auth/**", "/api/v1/**","/**").permitAll()
+                .requestMatchers(
+                        "/auth/**",
+                        "/v2/api-docs",
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/swagger-resources",
+                        "/swagger-resources/**",
+                        "/configuration/ui",
+                        "/configuration/security",
+                        "/swagger-ui/**",
+                        "/webjars/**",
+                        "/swagger-ui.html"
+                ).permitAll()
+//                .requestMatchers("/api/v1/**").authenticated()
                 .anyRequest().authenticated());
         httpSecurity.addFilterBefore(jwtAuthenticationFilter(), BasicAuthenticationFilter.class);
 //                .exceptionHandling().accessDeniedHandler(new AcessDenied());

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "partners")
@@ -22,6 +23,8 @@ public class PartnerEntity {
     private String email;
     private String description;
     private String status;
+    @OneToMany(mappedBy = "partner")
+    private List<PartnerEntity> attachment;
     @Column(name = "created_at")
     private Date createAt;
     @Column(name = "updated_at")

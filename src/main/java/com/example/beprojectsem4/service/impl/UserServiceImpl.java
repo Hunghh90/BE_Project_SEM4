@@ -1,11 +1,11 @@
 package com.example.beprojectsem4.service.impl;
 
-import com.example.beprojectsem4.dtos.userDtos.ChangePassword;
+import com.example.beprojectsem4.dtos.userDtos.ChangePasswordDto;
 import com.example.beprojectsem4.dtos.authDtos.JwtResponseDto;
 import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
 import com.example.beprojectsem4.dtos.authDtos.TokenResponseDto;
 import com.example.beprojectsem4.dtos.userDtos.GetMeDto;
-import com.example.beprojectsem4.dtos.userDtos.ResetPassword;
+import com.example.beprojectsem4.dtos.userDtos.ResetPasswordDto;
 import com.example.beprojectsem4.dtos.userDtos.UpdateUserDto;
 import com.example.beprojectsem4.entities.RoleEntity;
 import com.example.beprojectsem4.entities.UserEntity;
@@ -90,25 +90,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<?> changePassword(HttpServletRequest request, ChangePassword changePassword) {
+    public ResponseEntity<?> changePassword(HttpServletRequest request, ChangePasswordDto changePasswordDto) {
         try {
             String token = jwtAuthenticationFilter.getToken(request);
             UserEntity user = jwtService.getMeFromToken(token);
-            boolean checkPassword = bCryptPasswordEncoder.matches(changePassword.getOldPassword(), user.getPassword());
+            boolean checkPassword = bCryptPasswordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword());
             if (!checkPassword) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password not correct");
             }
-            if (!changePassword.getNewPassword().equals(changePassword.getConfirmPassword())) {
+            if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())) {
                 return ResponseEntity.status(HttpStatus.OK).body("Confirm password not correct");
 
             }
-            user.setPassword(bCryptPasswordEncoder.encode(changePassword.getNewPassword()));
+            user.setPassword(bCryptPasswordEncoder.encode(changePasswordDto.getNewPassword()));
             repository.save(user);
+            return ResponseEntity.status(HttpStatus.OK).body("Change password success");
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Change password not success " + ex.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Change password success");
+
     }
 
     @Override
@@ -246,14 +247,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean resetPassword(String email,ResetPassword resetPassword) {
+    public boolean resetPassword(String email, ResetPasswordDto resetPasswordDto) {
         try{
             UserEntity user = checkUser(email);
             if(user == null){
                 return false;
             }else{
-                if(resetPassword.getNewPassword().equals(resetPassword.getConfirmPassword())){
-                    String hashPassword = bCryptPasswordEncoder.encode(resetPassword.getNewPassword());
+                if(resetPasswordDto.getNewPassword().equals(resetPasswordDto.getConfirmPassword())){
+                    String hashPassword = bCryptPasswordEncoder.encode(resetPasswordDto.getNewPassword());
                     user.setPassword(hashPassword);
                     repository.save(user);
                     return true;

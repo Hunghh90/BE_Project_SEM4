@@ -2,10 +2,8 @@ package com.example.beprojectsem4.controller;
 
 import com.example.beprojectsem4.dtos.authDtos.LoginDto;
 import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
-import com.example.beprojectsem4.dtos.userDtos.ResetPassword;
-import com.example.beprojectsem4.entities.UserEntity;
+import com.example.beprojectsem4.dtos.userDtos.ResetPasswordDto;
 import com.example.beprojectsem4.service.AuthService;
-import com.example.beprojectsem4.service.impl.AuthServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +40,8 @@ public class AuthController {
         return authService.forgotPassword(email);
     }
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestParam("email") String email, @RequestBody ResetPassword resetPassword){
-        return authService.resetPassword(email,resetPassword);
+    public ResponseEntity<?> resetPassword(@RequestParam("email") String email, @RequestBody ResetPasswordDto resetPasswordDto){
+        return authService.resetPassword(email, resetPasswordDto);
     }
 
 }

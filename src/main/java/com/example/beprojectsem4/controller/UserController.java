@@ -1,6 +1,6 @@
 package com.example.beprojectsem4.controller;
 
-import com.example.beprojectsem4.dtos.userDtos.ChangePassword;
+import com.example.beprojectsem4.dtos.userDtos.ChangePasswordDto;
 import com.example.beprojectsem4.service.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +19,8 @@ public class UserController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(HttpServletRequest request,@RequestBody ChangePassword changePassword) {
-        return userService.changePassword(request,changePassword);
+    public ResponseEntity<?> changePassword(HttpServletRequest request,@RequestBody ChangePasswordDto changePasswordDto) {
+        return userService.changePassword(request, changePasswordDto);
     }
 
     @GetMapping("/refresh-token")

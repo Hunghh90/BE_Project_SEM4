@@ -1,7 +1,7 @@
 package com.example.beprojectsem4.service.impl;
 
 import com.example.beprojectsem4.dtos.authDtos.*;
-import com.example.beprojectsem4.dtos.userDtos.ResetPassword;
+import com.example.beprojectsem4.dtos.userDtos.ResetPasswordDto;
 import com.example.beprojectsem4.entities.UserEntity;
 import com.example.beprojectsem4.service.AuthService;
 import com.example.beprojectsem4.service.SendEmailService;
@@ -122,9 +122,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<?> resetPassword(String email,ResetPassword resetPassword) {
+    public ResponseEntity<?> resetPassword(String email, ResetPasswordDto resetPasswordDto) {
         try {
-           if(userService.resetPassword(email,resetPassword)){
+           if(userService.resetPassword(email, resetPasswordDto)){
                return ResponseEntity.ok("Change password success");
            }else {
                return ResponseEntity.badRequest().body("Check password and confirm password");

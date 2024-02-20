@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.catalina.User;
 
-import java.math.BigDecimal;
 import java.util.Date;
 @Entity
 @Table(name = "donations")
@@ -19,7 +17,7 @@ public class DonationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long donationId;
-    private BigDecimal amount;
+    private double amount;
     private String description;
     @Column(name = "created_at")
     private Date createAt;
@@ -43,10 +41,11 @@ public class DonationEntity {
         updatedAt = new Date();
     }
 
-    public DonationEntity(BigDecimal amount, String description,UserEntity user,ProgramEntity program){
+    public DonationEntity(double amount, String description,UserEntity user,ProgramEntity program){
         this.amount = amount;
         this.description = description;
         this.user = user;
         this.program = program;
     }
+
 }

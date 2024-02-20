@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 
 @Data
 public class RequestDonate {
-    private Integer amount;
+    private Long amount;
     private String description;
     @Pattern(regexp = "^(VNPay|Paypal)$", message = "Invalid payment method. Allowed values are 'VNPay' or 'Paypal'")
     private String paymentMethod;
-//    private ProgramEntity programId;
+    private Long programId;
 }

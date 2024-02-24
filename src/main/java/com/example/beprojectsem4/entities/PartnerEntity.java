@@ -1,16 +1,15 @@
 package com.example.beprojectsem4.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "partners")
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PartnerEntity {
@@ -23,8 +22,8 @@ public class PartnerEntity {
     private String email;
     private String description;
     private String status;
-    @OneToMany(mappedBy = "partner")
-    private List<PartnerEntity> attachment;
+    @OneToMany(mappedBy = "partnerId")
+    private List<PartnerAttachmentEntity> attachment;
     @Column(name = "created_at")
     private Date createAt;
     @Column(name = "updated_at")

@@ -15,7 +15,7 @@ public class ProgramAttachmentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     @ManyToOne
-    @Column(name = "program_id")
+    @JoinColumn(name = "program_id")
     ProgramEntity programId;
     String type;
     String url;

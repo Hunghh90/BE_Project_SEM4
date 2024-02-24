@@ -29,7 +29,7 @@ public class ProgramEntity {
     private Date finishDate;
     private String description;
     private String status;
-    @OneToMany(mappedBy = "program")
+    @OneToMany(mappedBy = "programId")
     private List<ProgramAttachmentEntity> attachment;
     @Column(name = "created_at")
     private Date createAt;

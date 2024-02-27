@@ -1,8 +1,6 @@
-package com.example.beprojectsem4.dtos.partner;
+package com.example.beprojectsem4.dtos.partnerDtos;
 
 import com.example.beprojectsem4.entities.PartnerAttachmentEntity;
-import com.example.beprojectsem4.entities.PartnerEntity;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

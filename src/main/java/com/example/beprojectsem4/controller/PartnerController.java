@@ -1,29 +1,36 @@
 package com.example.beprojectsem4.controller;
 
-import com.example.beprojectsem4.dtos.partner.CreatePartnerDto;
-import com.example.beprojectsem4.dtos.partner.PartnerDto;
-import com.example.beprojectsem4.dtos.partner.UpdatePartnerDto;
+import com.example.beprojectsem4.dtos.partnerDtos.CreatePartnerDto;
+import com.example.beprojectsem4.dtos.partnerDtos.PartnerDto;
+import com.example.beprojectsem4.dtos.partnerDtos.UpdatePartnerDto;
 import com.example.beprojectsem4.entities.PartnerEntity;
 import com.example.beprojectsem4.service.ImageUploadService;
 import com.example.beprojectsem4.service.PartnerService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/partner")
 public class PartnerController {
     @Autowired
     private PartnerService partnerService;
+    @Autowired
+    private ImageUploadService imageUploadService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+    @PostMapping("/upload")
+    public String upload(@RequestParam("files") MultipartFile files){
+        return imageUploadService.imageUpload(files);
+    }
     @PostMapping("/create-partner")
-    public void createPartner(@Nullable @RequestParam("files") List<MultipartFile> files, CreatePartnerDto createPartnerDto){
-        partnerService.createPartner(files,createPartnerDto);
+    public void createPartner(@Nullable @RequestBody CreatePartnerDto createPartnerDto) {
+        partnerService.createPartner(createPartnerDto);
     }
 
     @GetMapping("/get-all-partner")
@@ -37,6 +44,11 @@ public class PartnerController {
 
     @PostMapping("/update-partner")
     public void updatepartner(@Nullable List<MultipartFile> files,@RequestParam("id")Long id, UpdatePartnerDto updatePartnerDto){
-        partnerService.updatepartner(files,id,updatePartnerDto);
+        partnerService.updatePartner(files,id,updatePartnerDto);
+    }
+
+    @GetMapping("/block-partner")
+    public void blockPartner(@RequestParam("id") Long id){
+        partnerService.blockPartner(id);
     }
 }

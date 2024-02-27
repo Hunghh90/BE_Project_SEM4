@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -29,6 +30,8 @@ public class UserEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
     private String status;
+    @OneToMany(mappedBy = "user")
+    private List<ProgramEntity> programs;
     @Column(name = "refresh_token")
     private String refreshToken;
     @Column(name = "created_at")

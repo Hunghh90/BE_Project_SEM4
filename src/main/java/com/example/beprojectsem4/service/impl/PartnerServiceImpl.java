@@ -1,8 +1,8 @@
 package com.example.beprojectsem4.service.impl;
 
-import com.example.beprojectsem4.dtos.partner.CreatePartnerDto;
-import com.example.beprojectsem4.dtos.partner.PartnerDto;
-import com.example.beprojectsem4.dtos.partner.UpdatePartnerDto;
+import com.example.beprojectsem4.dtos.partnerDtos.CreatePartnerDto;
+import com.example.beprojectsem4.dtos.partnerDtos.PartnerDto;
+import com.example.beprojectsem4.dtos.partnerDtos.UpdatePartnerDto;
 import com.example.beprojectsem4.entities.PartnerAttachmentEntity;
 import com.example.beprojectsem4.entities.PartnerEntity;
 import com.example.beprojectsem4.helper.EntityDtoConverter;
@@ -13,7 +13,6 @@ import com.example.beprojectsem4.repository.PartnerRepository;
 import com.example.beprojectsem4.service.ImageUploadService;
 import com.example.beprojectsem4.service.PartnerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -32,18 +31,14 @@ public class PartnerServiceImpl implements PartnerService {
     @Autowired
     private PartnerAttachmentRepository attachmentRepository;
     @Override
-    public void createPartner(@Nullable List<MultipartFile> files, CreatePartnerDto createPartnerDto) {
+    public void createPartner( CreatePartnerDto createPartnerDto) {
         try {
             if(!checkPartnertByEmail(createPartnerDto.getEmail()) && !checkPartnertByPartnerName(createPartnerDto.getPartnerName())){
                 PartnerEntity partner = EntityDtoConverter.convertToEntity(createPartnerDto, PartnerEntity.class);
                 partner.setStatus("Active");
                 PartnerEntity pn = partnerRepository.save(partner);
-                List<String> urls = imageUploadService.imageUpload(files);
-                for(String url : urls){
-                    PartnerAttachmentEntity attachment = new PartnerAttachmentEntity(pn,"Logo",url);
+                    PartnerAttachmentEntity attachment = new PartnerAttachmentEntity(pn,"Logo", createPartnerDto.getUrlLogo());
                     attachmentRepository.save(attachment);
-                }
-
             }
         }catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -68,7 +63,7 @@ public class PartnerServiceImpl implements PartnerService {
 
 
     @Override
-    public void updatepartner(@Nullable List<MultipartFile> files,Long id, UpdatePartnerDto updatePartnerDto) {
+    public void updatePartner(@Nullable List<MultipartFile> files,Long id, UpdatePartnerDto updatePartnerDto) {
         try {
             Optional<PartnerEntity> partner = partnerRepository.findById(id);
             if (partner.isPresent()) {

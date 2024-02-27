@@ -29,6 +29,16 @@ public class ProgramEntity {
     private Date finishDate;
     private String description;
     private String status;
+    @Column(name = "finish_soon")
+    private boolean finishSoon;
+    @Column(name = "recruit_collaborators")
+    private boolean recruitCollaborators;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private UserEntity user;
+    @ManyToOne
+    @JoinColumn(name = "partner_id", referencedColumnName = "id")
+    private PartnerEntity partner;
     @OneToMany(mappedBy = "programId")
     private List<ProgramAttachmentEntity> attachment;
     @Column(name = "created_at")

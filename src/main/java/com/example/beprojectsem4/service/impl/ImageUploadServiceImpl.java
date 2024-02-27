@@ -17,16 +17,17 @@ public class ImageUploadServiceImpl implements ImageUploadService {
     private Cloudinary cloudinary;
 
     @Override
-    public List<String> imageUpload(List<MultipartFile> files) {
-        List<String> imageUrls = new ArrayList<>();
+    public String imageUpload(MultipartFile files) {
         try {
-            for (MultipartFile file : files) {
-                Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
-                imageUrls.add(uploadResult.get("url").toString());
-            }
+
+                Map uploadResult = cloudinary.uploader().upload(files.getBytes(), ObjectUtils.emptyMap());
+                String imageUrl = uploadResult.get("url").toString();
+                return imageUrl;
+
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
-        return imageUrls;
+
     }
 }

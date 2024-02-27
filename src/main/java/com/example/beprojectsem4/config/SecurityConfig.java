@@ -17,6 +17,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -42,6 +45,13 @@ public class SecurityConfig  {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
+        httpSecurity.cors(cors -> cors.configurationSource(request -> {
+            CorsConfiguration configuration = new CorsConfiguration();
+            configuration.setAllowedOrigins(Arrays.asList("*"));
+            configuration.setAllowedMethods(Arrays.asList("*"));
+            configuration.setAllowedHeaders(Arrays.asList("*"));
+            return configuration;
+        }));
         httpSecurity.authorizeHttpRequests(httpRequest->httpRequest
                 .requestMatchers(
                         "/auth/**",
@@ -57,11 +67,10 @@ public class SecurityConfig  {
                         "/swagger-ui.html"
                 ).permitAll()
 //                .requestMatchers("/api/v1/**").authenticated()
-                .anyRequest().authenticated());
+                .anyRequest().permitAll());
         httpSecurity.addFilterBefore(jwtAuthenticationFilter(), BasicAuthenticationFilter.class);
 //                .exceptionHandling().accessDeniedHandler(new AcessDenied());
 //        httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        httpSecurity.cors(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }
 }

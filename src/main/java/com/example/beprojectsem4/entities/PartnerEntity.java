@@ -22,6 +22,8 @@ public class PartnerEntity {
     private String email;
     private String description;
     private String status;
+    @OneToMany(mappedBy = "partner")
+    private List<ProgramEntity> programs;
     @OneToMany(mappedBy = "partnerId")
     private List<PartnerAttachmentEntity> attachment;
     @Column(name = "created_at")

@@ -1,5 +1,6 @@
 package com.example.beprojectsem4.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class PartnerAttachmentEntity {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "partner_id")
+    @JsonIgnore
     private PartnerEntity partnerId;
     private String type;
     private String url;

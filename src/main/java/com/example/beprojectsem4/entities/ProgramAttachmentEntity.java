@@ -1,5 +1,6 @@
 package com.example.beprojectsem4.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class ProgramAttachmentEntity {
     Long id;
     @ManyToOne
     @JoinColumn(name = "program_id")
+    @JsonIgnore
     ProgramEntity programId;
     String type;
     String url;

@@ -19,17 +19,9 @@ import java.util.List;
 public class PartnerController {
     @Autowired
     private PartnerService partnerService;
-    @Autowired
-    private ImageUploadService imageUploadService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-    @PostMapping("/upload")
-    public String upload(@RequestParam("files") MultipartFile files){
-        return imageUploadService.imageUpload(files);
-    }
     @PostMapping("/create-partner")
-    public void createPartner(@Nullable @RequestBody CreatePartnerDto createPartnerDto) {
+    public void createPartner(@RequestBody CreatePartnerDto createPartnerDto) {
         partnerService.createPartner(createPartnerDto);
     }
 

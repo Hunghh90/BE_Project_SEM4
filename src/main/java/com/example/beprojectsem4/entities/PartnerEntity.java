@@ -20,6 +20,7 @@ public class PartnerEntity {
     @Column(name = "partner_name")
     private String partnerName;
     private String email;
+    @Column(columnDefinition = "LONGTEXT")
     private String description;
     private String status;
     @OneToMany(mappedBy = "partner")

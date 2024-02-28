@@ -128,4 +128,14 @@ public class PartnerServiceImpl implements PartnerService {
             return null;
         }
     }
+
+    @Override
+    public PartnerEntity getPartner(Long id) {
+        try {
+            return partnerRepository.findById(id).get();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 }

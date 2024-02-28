@@ -8,11 +8,12 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PartnerService {
 
     void createPartner( CreatePartnerDto createPartnerDto);
-
+    PartnerEntity getPartner(Long id);
     List<PartnerDto> listPartner();
     void updatePartner(@Nullable List<MultipartFile> files,Long id,UpdatePartnerDto updatePartnerDto);
     void blockPartner(Long id);

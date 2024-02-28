@@ -32,9 +32,7 @@ public class UpdateProgramDto {
         @Nullable
         private boolean recruitCollaborators;
         @Nullable
-        private List<ProgramAttachmentEntity> attachment;
-        @Nullable
-        private PartnerEntity partner;
+        private List<String> imageUrl;
 
 
 

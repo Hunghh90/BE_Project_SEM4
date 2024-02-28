@@ -14,14 +14,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateProgramDto {
-    private String programName;
-    private Long target;
-    private Date startDonateDate;
-    private Date endDonateDate;
-    private Date finishDate;
-    private String description;
-    private boolean finishSoon;
-    private boolean recruitCollaborators;
-    private List<ProgramAttachmentEntity> attachment;
-    private PartnerEntity partner;
+    public String programName;
+    public Long target;
+    public Date startDonateDate;
+    public Date endDonateDate;
+    public Date finishDate;
+    public String description;
+    public boolean finishSoon;
+    public boolean recruitCollaborators;
+    public Long partnerId;
+    public List<String> imageUrl;
 }

@@ -17,6 +17,7 @@ public class FeedBackEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long feedBackId;
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
     @ManyToOne
     @JoinColumn(name = "user_id")

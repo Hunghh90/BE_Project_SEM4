@@ -27,6 +27,7 @@ public class ProgramEntity {
     private Date endDonateDate;
     @Column(name = "finish_date")
     private Date finishDate;
+    @Column(columnDefinition = "LONGTEXT")
     private String description;
     private String status;
     @Column(name = "finish_soon")

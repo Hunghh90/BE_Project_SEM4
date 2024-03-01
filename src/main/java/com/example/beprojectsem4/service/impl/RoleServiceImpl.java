@@ -83,7 +83,12 @@ public class RoleServiceImpl implements RoleService {
             if(role == null){
                 return ResponseEntity.badRequest().body("Role is not exists");
             }else {
-                RoleEntity userRole = repository.findRoleByRoleName("USER");
+                RoleEntity userRole = repository.findRoleByRoleName("OTHER");
+                if (userRole == null) {
+                    userRole = new RoleEntity();
+                    userRole.setRoleName("ADMIN");
+                    repository.save(userRole);
+                }
                 List<UserEntity> users = userRepository.findAllByRoles_RoleName(roleName);
                 for (UserEntity user : users) {
                     user.getRoles().clear();

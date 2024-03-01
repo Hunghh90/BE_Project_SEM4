@@ -31,7 +31,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -78,7 +80,7 @@ public class UserServiceImpl implements UserService {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is exists, please choose an other email");
             }
             UserEntity user = EntityDtoConverter.convertToEntity(registerDto, UserEntity.class);
-            RoleEntity userRole = roleRepository.findRoleByRoleName("USER");
+            RoleEntity userRole = roleRepository.findRoleByRoleName("ADMIN");
             if (userRole == null) {
                 userRole = new RoleEntity();
                 userRole.setRoleName("ADMIN");
@@ -156,7 +158,9 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<?> getMe(HttpServletRequest request) {
         try{
             UserEntity user = findUserByToken(request);
+            String userRole = user.getRoles().iterator().next().getRoleName();
             GetMeDto gm = EntityDtoConverter.convertToDto(user, GetMeDto.class);
+            gm.setRole(userRole);
             return ResponseEntity.ok().body(gm);
         }catch (Exception ex){
             System.out.println(ex.getMessage());

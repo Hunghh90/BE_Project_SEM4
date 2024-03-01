@@ -22,4 +22,5 @@ public class GetMeDto {
     private String phoneNumber;
     private UserAttachmentEntity avatarUrl;
     private String status;
+    private String role;
 }

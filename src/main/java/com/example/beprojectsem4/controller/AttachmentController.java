@@ -2,6 +2,7 @@ package com.example.beprojectsem4.controller;
 
 import com.example.beprojectsem4.service.ImageUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,7 +17,7 @@ public class AttachmentController {
     @Autowired
     private ImageUploadService imageUploadService;
     @PostMapping("/upload")
-    public List<String> upload(@RequestParam("files") List<MultipartFile> files){
+    public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files){
         return imageUploadService.imageUpload(files);
     }
 }

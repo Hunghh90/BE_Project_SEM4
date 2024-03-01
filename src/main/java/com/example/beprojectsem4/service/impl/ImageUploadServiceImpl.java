@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.beprojectsem4.service.ImageUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +19,7 @@ public class ImageUploadServiceImpl implements ImageUploadService {
     private Cloudinary cloudinary;
 
     @Override
-    public List<String> imageUpload(List<MultipartFile> files) {
+    public ResponseEntity<?> imageUpload(List<MultipartFile> files) {
         try {
             List<String> urls = new ArrayList<>();
             for (MultipartFile file : files) {
@@ -26,11 +27,10 @@ public class ImageUploadServiceImpl implements ImageUploadService {
                 String url = uploadResult.get("url").toString();
                 urls.add(url);
             }
-            return urls;
+            return ResponseEntity.ok().body(urls);
 
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
 
     }

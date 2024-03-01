@@ -1,7 +1,7 @@
 package com.example.beprojectsem4.service.impl;
 
 import com.example.beprojectsem4.dtos.partnerDtos.CreatePartnerDto;
-import com.example.beprojectsem4.dtos.partnerDtos.GetPartnerDto;
+import com.example.beprojectsem4.dtos.partnerDtos.GetPartnersDto;
 import com.example.beprojectsem4.dtos.partnerDtos.PartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.UpdatePartnerDto;
 import com.example.beprojectsem4.entities.PartnerAttachmentEntity;
@@ -16,10 +16,11 @@ import com.example.beprojectsem4.service.PartnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.lang.Nullable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Autowired
     private PartnerAttachmentRepository attachmentRepository;
     @Override
-    public void createPartner( CreatePartnerDto createPartnerDto) {
+    public ResponseEntity<?> createPartner(CreatePartnerDto createPartnerDto) {
         try {
             if(!checkPartnertByEmail(createPartnerDto.getEmail()) && !checkPartnertByPartnerName(createPartnerDto.getPartnerName())){
                 PartnerEntity partner = EntityDtoConverter.convertToEntity(createPartnerDto, PartnerEntity.class);
@@ -42,56 +43,68 @@ public class PartnerServiceImpl implements PartnerService {
                 PartnerEntity pn = partnerRepository.save(partner);
                     PartnerAttachmentEntity attachment = new PartnerAttachmentEntity(pn,"Logo", createPartnerDto.getUrlLogo());
                     attachmentRepository.save(attachment);
+                    return ResponseEntity.status(HttpStatus.CREATED).body("Create partner success");
             }
+            return ResponseEntity.badRequest().body("Partner name or Email is already");
         }catch (Exception ex){
             System.out.println(ex.getMessage());
+            return ResponseEntity.internalServerError().body(ex.getMessage());
         }
+
     }
 
     @Override
-    public List<PartnerDto> listPartner(GetPartnerDto getPartnerDto) {
+    public ResponseEntity<?> listPartner(GetPartnersDto getPartnerDto) {
         try {
-            PageRequest pageRequest = PageRequest.of(getPartnerDto.getPage(), getPartnerDto.getSize());
+            Sort sort = Sort.by(Sort.Order.desc("createdAt"));
+            PageRequest pageRequest = PageRequest.of(getPartnerDto.getPage(), getPartnerDto.getSize(),sort);
             Page<PartnerEntity> partners = partnerRepository.findByPartnerNameContaining(getPartnerDto.getPartnerName(),pageRequest);
             List<PartnerDto> partnerDtos = new ArrayList<>();
             for (PartnerEntity p : partners){
                 PartnerDto pd = EntityDtoConverter.convertToDto(p,PartnerDto.class);
                 partnerDtos.add(pd);
             }
-            return partnerDtos;
+            return ResponseEntity.ok().body(partnerDtos);
         }catch (Exception ex){
             System.out.println(ex.getMessage());
-            return null;
+            return ResponseEntity.internalServerError().body(ex.getMessage());
         }
     }
 
 
     @Override
-    public void updatePartner(Long id, UpdatePartnerDto updatePartnerDto) {
+    public ResponseEntity<?> updatePartner(Long id, UpdatePartnerDto updatePartnerDto) {
         try {
             Optional<PartnerEntity> partner = partnerRepository.findById(id);
             if (partner.isPresent()) {
                 PartnerEntity p = EntityDtoConverter.convertToEntity(updatePartnerDto,PartnerEntity.class);
                 PartnerEntity pn = TransferValuesIfNull.transferValuesIfNull(partner.get(),p);
                 partnerRepository.save(pn);
+                return ResponseEntity.ok().body("Update success");
             }
         }catch (Exception ex){
             System.out.println(ex.getMessage());
+            return ResponseEntity.internalServerError().body(ex.getMessage());
         }
+        return null;
     }
 
     @Override
-    public void blockPartner(Long id) {
+    public ResponseEntity<?> blockPartner(Long id) {
         try {
             Optional<PartnerEntity> partner = partnerRepository.findById(id);
             if (partner.isPresent()) {
                 PartnerEntity p = partner.get();
                 p.setStatus("Blocked");
                 partnerRepository.save(p);
+                return ResponseEntity.ok().body("Block success");
             }
+            return ResponseEntity.badRequest().body("Not found partner");
         }catch (Exception ex){
             System.out.println(ex.getMessage());
+            return ResponseEntity.internalServerError().body(ex.getMessage());
         }
+
     }
 
     @Override
@@ -123,23 +136,25 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
-    public List<PartnerEntity> searchAllField(String value) {
+    public ResponseEntity<?> searchAllField(String value) {
         try {
             Specification<PartnerEntity> spec = new DynamicSpecification<>(value);
-            return partnerRepository.findAll(spec);
+            List<PartnerEntity> partners = partnerRepository.findAll(spec);
+            return ResponseEntity.ok().body(partners);
         }catch (Exception ex){
             System.out.println(ex.getMessage());
-            return null;
+            return ResponseEntity.internalServerError().body(ex.getMessage());
         }
     }
 
     @Override
-    public PartnerEntity getPartner(Long id) {
+    public ResponseEntity<?> getPartner(Long id) {
         try {
-            return partnerRepository.findById(id).get();
+            PartnerEntity partner = partnerRepository.findById(id).get();
+            return ResponseEntity.ok().body(partner);
         }catch (Exception e){
             System.out.println(e.getMessage());
-            return null;
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 }

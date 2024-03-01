@@ -11,18 +11,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 @Service
 public class ImageUploadServiceImpl implements ImageUploadService {
     @Autowired
     private Cloudinary cloudinary;
 
     @Override
-    public String imageUpload(MultipartFile files) {
+    public List<String> imageUpload(List<MultipartFile> files) {
         try {
-
-                Map uploadResult = cloudinary.uploader().upload(files.getBytes(), ObjectUtils.emptyMap());
-                String imageUrl = uploadResult.get("url").toString();
-                return imageUrl;
+            List<String> urls = new ArrayList<>();
+            for (MultipartFile file : files) {
+                Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+                String url = uploadResult.get("url").toString();
+                urls.add(url);
+            }
+            return urls;
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -30,9 +30,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -202,12 +200,11 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    @Override
-    public String activeUser(String email) {
+    public boolean activeUser(String email) {
         try {
             UserEntity user = repository.findUserByEmail(email);
             if (user == null) {
-                return "Email not exists";
+                return false;
             } else {
                 RoleEntity userRole = roleRepository.findRoleByRoleName("USER");
                 if (userRole == null) {
@@ -218,13 +215,12 @@ public class UserServiceImpl implements UserService {
                 user.getRoles().add(userRole);
                 user.setStatus("Activate");
                 repository.save(user);
-                return "Active success";
+                return true;
             }
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-            return ex.getMessage();
+            return false;
         }
-
     }
 
     @Override

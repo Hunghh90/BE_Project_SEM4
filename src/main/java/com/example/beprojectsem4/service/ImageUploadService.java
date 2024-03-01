@@ -5,5 +5,5 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ImageUploadService {
-    String imageUpload(MultipartFile file);
+    List<String> imageUpload(List<MultipartFile> files);
 }

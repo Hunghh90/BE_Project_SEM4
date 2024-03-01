@@ -1,19 +1,13 @@
 package com.example.beprojectsem4.controller;
 
 import com.example.beprojectsem4.dtos.partnerDtos.CreatePartnerDto;
-import com.example.beprojectsem4.dtos.partnerDtos.GetPartnerDto;
-import com.example.beprojectsem4.dtos.partnerDtos.PartnerDto;
+import com.example.beprojectsem4.dtos.partnerDtos.GetPartnersDto;
 import com.example.beprojectsem4.dtos.partnerDtos.UpdatePartnerDto;
-import com.example.beprojectsem4.entities.PartnerEntity;
-import com.example.beprojectsem4.service.ImageUploadService;
 import com.example.beprojectsem4.service.PartnerService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/partner")
@@ -22,26 +16,31 @@ public class PartnerController {
     private PartnerService partnerService;
 
     @PostMapping("/create-partner")
-    public void createPartner(@RequestBody CreatePartnerDto createPartnerDto) {
-        partnerService.createPartner(createPartnerDto);
+    public ResponseEntity<?> createPartner(@RequestBody CreatePartnerDto createPartnerDto) {
+        return partnerService.createPartner(createPartnerDto);
     }
 
     @GetMapping("/get-all-partner")
-    public List<PartnerDto> listPartner(GetPartnerDto getPartnerDto){
+    public ResponseEntity<?> listPartner(@Nullable GetPartnersDto getPartnerDto){
         return partnerService.listPartner(getPartnerDto);
     }
 @GetMapping("/get-partner-by-search")
-    public List<PartnerEntity> searchAllField(@RequestParam("search") String search){
+    public ResponseEntity<?> searchAllField(@RequestParam("search") String search){
         return partnerService.searchAllField(search);
     }
 
     @PostMapping("/update-partner")
-    public void updatepartner(@RequestParam("id")Long id, UpdatePartnerDto updatePartnerDto){
-        partnerService.updatePartner(id,updatePartnerDto);
+    public ResponseEntity<?> updatepartner(@RequestParam("id")Long id, UpdatePartnerDto updatePartnerDto){
+        return partnerService.updatePartner(id,updatePartnerDto);
     }
 
     @GetMapping("/block-partner")
-    public void blockPartner(@RequestParam("id") Long id){
-        partnerService.blockPartner(id);
+    public ResponseEntity<?> blockPartner(@RequestParam("id") Long id){
+        return partnerService.blockPartner(id);
+    }
+
+    @GetMapping("/get-partner")
+    public ResponseEntity<?> getPartner(@RequestParam("id") Long id){
+        return partnerService.getPartner(id);
     }
 }

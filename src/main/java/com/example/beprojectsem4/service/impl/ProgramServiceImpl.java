@@ -1,11 +1,9 @@
 package com.example.beprojectsem4.service.impl;
 
-import com.example.beprojectsem4.dtos.partnerDtos.CreatePartnerDto;
-import com.example.beprojectsem4.dtos.partnerDtos.PartnerDto;
-import com.example.beprojectsem4.dtos.partnerDtos.UpdatePartnerDto;
 import com.example.beprojectsem4.dtos.programDtos.CreateProgramDto;
+import com.example.beprojectsem4.dtos.programDtos.GetProgramsDto;
+import com.example.beprojectsem4.dtos.programDtos.ProgramDto;
 import com.example.beprojectsem4.dtos.programDtos.UpdateProgramDto;
-import com.example.beprojectsem4.dtos.userDtos.GetMeDto;
 import com.example.beprojectsem4.entities.PartnerEntity;
 import com.example.beprojectsem4.entities.ProgramAttachmentEntity;
 import com.example.beprojectsem4.entities.ProgramEntity;
@@ -19,10 +17,13 @@ import com.example.beprojectsem4.service.ProgramService;
 import com.example.beprojectsem4.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.method.P;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -38,13 +39,13 @@ public class ProgramServiceImpl implements ProgramService {
     @Autowired
     private PartnerService partnerService;
     @Override
-    public void createProgram(HttpServletRequest request,CreateProgramDto createProgramDto) {
+    public ResponseEntity<?> createProgram(HttpServletRequest request, CreateProgramDto createProgramDto) {
 
         try{
             UserEntity user = userService.findUserByToken(request);
             UserEntity m = EntityDtoConverter.convertToEntity(user,UserEntity.class);
-            PartnerEntity pn = partnerService.getPartner(createProgramDto.getPartnerId());
-            if(!checkProgramByProgramName(createProgramDto.getProgramName())){
+            PartnerEntity pn = (PartnerEntity) partnerService.getPartner(createProgramDto.getPartnerId()).getBody();
+            if(!checkProgramByProgramName(createProgramDto.getProgramName()) && createProgramDto.getStartDonateDate().before(createProgramDto.getEndDonateDate()) && createProgramDto.getEndDonateDate().before(createProgramDto.getFinishDate())){
                 ProgramEntity program = EntityDtoConverter.convertToEntity(createProgramDto,ProgramEntity.class);
                 program.setStatus("Active");
                 program.setUser(m);
@@ -54,25 +55,35 @@ public class ProgramServiceImpl implements ProgramService {
                     ProgramAttachmentEntity pa = new ProgramAttachmentEntity(pr,"Certify",url);
                     programAttachmentRepository.save(pa);
                 }
+                return ResponseEntity.ok().body("Create program success");
             }
+            return ResponseEntity.badRequest().body("Program name is already or The date entered is incorrect");
         }catch (Exception e){
             System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 
     @Override
-    public List<ProgramEntity> listProgram() {
+    public ResponseEntity<?> listProgram(GetProgramsDto getProgramDto) {
         try{
-            List<ProgramEntity> programs = programRepository.findAll();
-            return programs;
+            Sort sort = Sort.by(Sort.Order.desc("createdAt"));
+            PageRequest pageable = PageRequest.of(getProgramDto.getPage(), getProgramDto.getSize(),sort);
+            Page<ProgramEntity> programs = programRepository.findByProgramNameContaining(getProgramDto.getProgramName(),pageable );
+            List<ProgramDto> programDtoList = new ArrayList<>();
+            for (ProgramEntity p : programs){
+                ProgramDto pd = EntityDtoConverter.convertToDto(p,ProgramDto.class);
+                programDtoList.add(pd);
+            }
+            return ResponseEntity.ok().body(programs);
         }catch (Exception e){
             System.out.println(e.getMessage());
-            return null;
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 
     @Override
-    public void updateProgram(HttpServletRequest request, Long id, UpdateProgramDto updateProgramDto) {
+    public ResponseEntity<?> updateProgram(HttpServletRequest request, Long id, UpdateProgramDto updateProgramDto) {
         Date now = new Date();
         try {
             UserEntity user = userService.findUserByToken(request);
@@ -91,9 +102,12 @@ public class ProgramServiceImpl implements ProgramService {
                         programAttachmentRepository.save(img);
                     }
                 }
+                return ResponseEntity.ok().body("Update program success");
             }
+            return ResponseEntity.badRequest().body("Program not exists or Update timed out");
         }catch (Exception e){
             System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 

@@ -5,9 +5,14 @@ import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
 import com.example.beprojectsem4.dtos.userDtos.ResetPasswordDto;
 import com.example.beprojectsem4.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/auth")
@@ -31,9 +36,9 @@ public class AuthController {
     }
 
     @GetMapping("/active")
-    public void active(@RequestParam("code") String code, @RequestParam("email") String email){
-        authService.activeAccount(code,email);
-    };
+    public RedirectView active(@RequestParam("code") String code, @RequestParam("email") String email){
+        return authService.activeAccount(code,email);
+    }
 
     @GetMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestParam String email){

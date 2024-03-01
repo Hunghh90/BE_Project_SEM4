@@ -9,6 +9,7 @@ import com.example.beprojectsem4.service.UserService;
 import com.example.beprojectsem4.service.jwt.JwtAuthenticationFilter;
 import com.example.beprojectsem4.service.jwt.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +19,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -89,22 +90,17 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.clearContext();
     }
 
-    @Override
-    public ResponseEntity<?> activeAccount(String code, String email) {
+    public RedirectView activeAccount(String code, String email) {
         try {
             boolean isMatch = bCryptPasswordEncoder.matches(email, code);
-            if (isMatch) {
-                if (Objects.equals(userService.activeUser(email), ResponseEntity.ok())) {
-                    return ResponseEntity.ok("Success");
-                }else {
-                    return ResponseEntity.badRequest().body("Not Success");
-                }
+            if (isMatch && userService.activeUser(email)) {
+                return new RedirectView("http://localhost:3000/login?isActivate=true");
             } else {
-                return ResponseEntity.badRequest().body("Not Success");
+                return new RedirectView("http://localhost:3000/login?isActivate=false");
             }
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-            return ResponseEntity.internalServerError().body(ex.getMessage());
+            return new RedirectView("http://localhost:3000/login?isActivate=false");
         }
     }
 

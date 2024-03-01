@@ -13,9 +13,9 @@ public class UserController {
     @Autowired
     private UserServiceImpl userService;
 
-    @GetMapping("/detail")
-    public String getDetailUser(){
-        return "User";
+    @GetMapping("/get-me")
+    public ResponseEntity<?> getDetailUser(HttpServletRequest request){
+        return userService.getMe(request);
     }
 
     @PostMapping("/change-password")

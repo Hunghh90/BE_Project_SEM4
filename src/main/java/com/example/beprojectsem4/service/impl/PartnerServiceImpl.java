@@ -1,6 +1,7 @@
 package com.example.beprojectsem4.service.impl;
 
 import com.example.beprojectsem4.dtos.partnerDtos.CreatePartnerDto;
+import com.example.beprojectsem4.dtos.partnerDtos.GetPartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.PartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.UpdatePartnerDto;
 import com.example.beprojectsem4.entities.PartnerAttachmentEntity;
@@ -13,6 +14,8 @@ import com.example.beprojectsem4.repository.PartnerRepository;
 import com.example.beprojectsem4.service.ImageUploadService;
 import com.example.beprojectsem4.service.PartnerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -46,9 +49,10 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
-    public List<PartnerDto> listPartner() {
+    public List<PartnerDto> listPartner(GetPartnerDto getPartnerDto) {
         try {
-            List<PartnerEntity> partners = partnerRepository.findAll();
+            PageRequest pageRequest = PageRequest.of(getPartnerDto.getPage(), getPartnerDto.getSize());
+            Page<PartnerEntity> partners = partnerRepository.findByPartnerNameContaining(getPartnerDto.getPartnerName(),pageRequest);
             List<PartnerDto> partnerDtos = new ArrayList<>();
             for (PartnerEntity p : partners){
                 PartnerDto pd = EntityDtoConverter.convertToDto(p,PartnerDto.class);
@@ -63,7 +67,7 @@ public class PartnerServiceImpl implements PartnerService {
 
 
     @Override
-    public void updatePartner(@Nullable List<MultipartFile> files,Long id, UpdatePartnerDto updatePartnerDto) {
+    public void updatePartner(Long id, UpdatePartnerDto updatePartnerDto) {
         try {
             Optional<PartnerEntity> partner = partnerRepository.findById(id);
             if (partner.isPresent()) {

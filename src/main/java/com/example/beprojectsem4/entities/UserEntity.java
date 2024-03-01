@@ -21,6 +21,7 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long userId;
+    @Column(unique = true)
     private String email;
     private String password;
     @Column(name = "birthday")
@@ -30,6 +31,8 @@ public class UserEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
     private String status;
+    @Column(name = "display_name")
+    private String displayName;
     @OneToMany(mappedBy = "user")
     private List<ProgramEntity> programs;
     @Column(name = "refresh_token")
@@ -39,6 +42,9 @@ public class UserEntity {
     @Column(name = "updated_at")
     private Date updatedAt;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private UserAttachmentEntity userAttachment;
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))

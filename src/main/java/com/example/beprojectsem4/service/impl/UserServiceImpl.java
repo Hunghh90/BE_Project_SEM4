@@ -8,9 +8,11 @@ import com.example.beprojectsem4.dtos.userDtos.GetMeDto;
 import com.example.beprojectsem4.dtos.userDtos.ResetPasswordDto;
 import com.example.beprojectsem4.dtos.userDtos.UpdateUserDto;
 import com.example.beprojectsem4.entities.RoleEntity;
+import com.example.beprojectsem4.entities.UserAttachmentEntity;
 import com.example.beprojectsem4.entities.UserEntity;
 import com.example.beprojectsem4.helper.EntityDtoConverter;
 import com.example.beprojectsem4.repository.RoleRepository;
+import com.example.beprojectsem4.repository.UserAttachmentRepository;
 import com.example.beprojectsem4.repository.UserRepository;
 import com.example.beprojectsem4.service.UserService;
 import com.example.beprojectsem4.service.jwt.JwtAuthenticationFilter;
@@ -28,7 +30,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -45,23 +49,26 @@ public class UserServiceImpl implements UserService {
     private RoleRepository roleRepository;
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private UserAttachmentRepository userAttachmentRepository;
 
     @Override
-    public boolean createAccountUser(RegisterDto registerDto) {
+    public ResponseEntity<?> createAccountUser(RegisterDto registerDto) {
         try {
             UserEntity u = checkUser(registerDto.getEmail());
             if (u != null) {
-                return false;
+                return ResponseEntity.badRequest().body("Email is exists");
             }
-            UserEntity user = EntityDtoConverter.convertToEntity(registerDto, UserEntity.class);
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-
-            user.setStatus("DeActivate");
-            repository.save(user);
-            return true;
+            UserEntity us = EntityDtoConverter.convertToEntity(registerDto, UserEntity.class);
+            us.setPassword(bCryptPasswordEncoder.encode(us.getPassword()));
+            us.setStatus("DeActivate");
+            UserEntity user = repository.save(us);
+            UserAttachmentEntity avatar = new UserAttachmentEntity(user,"Avatar", registerDto.getAvatarUrl() );
+            userAttachmentRepository.save(avatar);
+            return ResponseEntity.status(201).body("Create success");
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-            return false;
+            return ResponseEntity.internalServerError().body(ex.getMessage());
         }
     }
 
@@ -96,18 +103,18 @@ public class UserServiceImpl implements UserService {
             UserEntity user = jwtService.getMeFromToken(token);
             boolean checkPassword = bCryptPasswordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword());
             if (!checkPassword) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password not correct");
+                return ResponseEntity.badRequest().body("Old password not correct");
             }
             if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())) {
-                return ResponseEntity.status(HttpStatus.OK).body("Confirm password not correct");
+                return ResponseEntity.badRequest().body("Confirm password not correct");
 
             }
             user.setPassword(bCryptPasswordEncoder.encode(changePasswordDto.getNewPassword()));
             repository.save(user);
-            return ResponseEntity.status(HttpStatus.OK).body("Change password success");
+            return ResponseEntity.ok().body("Change password success");
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Change password not success " + ex.getMessage());
+            return ResponseEntity.internalServerError().body("Change password not success " + ex.getMessage());
         }
 
     }
@@ -148,27 +155,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GetMeDto getMe(HttpServletRequest request) {
+    public ResponseEntity<?> getMe(HttpServletRequest request) {
         try{
             UserEntity user = findUserByToken(request);
-            return EntityDtoConverter.convertToDto(user, GetMeDto.class);
+            GetMeDto gm = EntityDtoConverter.convertToDto(user, GetMeDto.class);
+            return ResponseEntity.ok().body(gm);
         }catch (Exception ex){
             System.out.println(ex.getMessage());
-            return null;
+            return ResponseEntity.internalServerError().body(ex.getMessage());
         }
     }
 
     @Override
-    public ResponseEntity<?> updateUser(HttpServletRequest request,UpdateUserDto updateUserDto) {
+    public String updateUser(HttpServletRequest request, UpdateUserDto updateUserDto) {
         try{
             UserEntity user = findUserByToken(request);
             if(user == null){
-                return ResponseEntity.badRequest().body("User not found");
+                return "User not found";
             }else{
                 user.setBod(updateUserDto.getBod());
                 user.setPhoneNumber(updateUserDto.getPhoneNumber());
                 repository.save(user);
-                return ResponseEntity.ok().body("Update user successfully");
+                return "Update user successfully";
             }
         }catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -177,29 +185,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<?> blockUser(String email) {
+    public String blockUser(String email) {
         try{
             UserEntity user = repository.findUserByEmail(email);
             if(user == null){
-                return ResponseEntity.badRequest().body("Email not exists");
+                return "Email not exists";
             }else{
                 user.setStatus("Block");
                 repository.save(user);
-                return ResponseEntity.ok().body("Block user success");
+                return "Block user success";
             }
         }catch (Exception ex){
             System.out.println(ex.getMessage());
-            return ResponseEntity.internalServerError().body("An error occurred");
+            return "An error occurred";
         }
 
     }
 
     @Override
-    public ResponseEntity<?> activeUser(String email) {
+    public String activeUser(String email) {
         try {
             UserEntity user = repository.findUserByEmail(email);
             if (user == null) {
-                return ResponseEntity.badRequest().body("Email not exists");
+                return "Email not exists";
             } else {
                 RoleEntity userRole = roleRepository.findRoleByRoleName("USER");
                 if (userRole == null) {
@@ -210,11 +218,11 @@ public class UserServiceImpl implements UserService {
                 user.getRoles().add(userRole);
                 user.setStatus("Activate");
                 repository.save(user);
-                return ResponseEntity.ok().body("Active success");
+                return "Active success";
             }
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-            return ResponseEntity.internalServerError().body("An error occurred");
+            return ex.getMessage();
         }
 
     }
@@ -238,6 +246,8 @@ public class UserServiceImpl implements UserService {
                 long diffInMillies = Math.abs(currentDate.getTime() - user.getCreateAt().getTime());
                 long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
                 if (diff > 7) {
+                    UserAttachmentEntity attachment = userAttachmentRepository.findUserAttachmentEntityByUser_UserId(user.getUserId());
+                    userAttachmentRepository.delete(attachment);
                     repository.delete(user);
                 }
             }

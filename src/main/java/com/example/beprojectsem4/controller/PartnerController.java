@@ -1,6 +1,7 @@
 package com.example.beprojectsem4.controller;
 
 import com.example.beprojectsem4.dtos.partnerDtos.CreatePartnerDto;
+import com.example.beprojectsem4.dtos.partnerDtos.GetPartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.PartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.UpdatePartnerDto;
 import com.example.beprojectsem4.entities.PartnerEntity;
@@ -26,8 +27,8 @@ public class PartnerController {
     }
 
     @GetMapping("/get-all-partner")
-    public List<PartnerDto> listPartner(){
-        return partnerService.listPartner();
+    public List<PartnerDto> listPartner(GetPartnerDto getPartnerDto){
+        return partnerService.listPartner(getPartnerDto);
     }
 @GetMapping("/get-partner-by-search")
     public List<PartnerEntity> searchAllField(@RequestParam("search") String search){
@@ -35,8 +36,8 @@ public class PartnerController {
     }
 
     @PostMapping("/update-partner")
-    public void updatepartner(@Nullable List<MultipartFile> files,@RequestParam("id")Long id, UpdatePartnerDto updatePartnerDto){
-        partnerService.updatePartner(files,id,updatePartnerDto);
+    public void updatepartner(@RequestParam("id")Long id, UpdatePartnerDto updatePartnerDto){
+        partnerService.updatePartner(id,updatePartnerDto);
     }
 
     @GetMapping("/block-partner")

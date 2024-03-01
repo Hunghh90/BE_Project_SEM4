@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -41,8 +43,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<?> register(RegisterDto registerDto) {
         try {
-            if (!userService.createAccountUser(registerDto)) {
-                return ResponseEntity.badRequest().body("Email is exists or an error occurred");
+            ResponseEntity<?> createAccountResponse = userService.createAccountUser(registerDto);
+            if (!createAccountResponse.getStatusCode().is2xxSuccessful()) {
+                return createAccountResponse;
             }
             String hashedEmail = bCryptPasswordEncoder.encode(registerDto.getEmail());
             sendEmailService.sendEmail(registerDto.getEmail(),
@@ -51,7 +54,7 @@ public class AuthServiceImpl implements AuthService {
             return ResponseEntity.ok().body("Check Email to activate account");
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("register not success");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 

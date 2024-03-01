@@ -41,9 +41,9 @@ public class ProgramServiceImpl implements ProgramService {
     public void createProgram(HttpServletRequest request,CreateProgramDto createProgramDto) {
 
         try{
-            GetMeDto me = userService.getMe(request);
-            UserEntity m = EntityDtoConverter.convertToEntity(me,UserEntity.class);
-            PartnerEntity pn = partnerService.getPartner(createProgramDto.partnerId);
+            UserEntity user = userService.findUserByToken(request);
+            UserEntity m = EntityDtoConverter.convertToEntity(user,UserEntity.class);
+            PartnerEntity pn = partnerService.getPartner(createProgramDto.getPartnerId());
             if(!checkProgramByProgramName(createProgramDto.getProgramName())){
                 ProgramEntity program = EntityDtoConverter.convertToEntity(createProgramDto,ProgramEntity.class);
                 program.setStatus("Active");
@@ -75,8 +75,8 @@ public class ProgramServiceImpl implements ProgramService {
     public void updateProgram(HttpServletRequest request, Long id, UpdateProgramDto updateProgramDto) {
         Date now = new Date();
         try {
-            GetMeDto me = userService.getMe(request);
-            UserEntity m = EntityDtoConverter.convertToEntity(me,UserEntity.class);
+            UserEntity user = userService.findUserByToken(request);
+            UserEntity m = EntityDtoConverter.convertToEntity(user,UserEntity.class);
             Optional<ProgramEntity> pr = programRepository.findById(id);
             if(pr.isPresent() && pr.get().getStartDonateDate().before(now)){
                 ProgramEntity updateProgram = EntityDtoConverter.convertToEntity(updateProgramDto,ProgramEntity.class);

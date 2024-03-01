@@ -18,7 +18,7 @@ public class ProgramEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long programId;
-    @Column(name = "program_name")
+    @Column(name = "program_name",unique = true)
     private String programName;
     private Long target;
     @Column(name = "start_donate_date")

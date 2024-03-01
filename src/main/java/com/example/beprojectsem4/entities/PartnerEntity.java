@@ -17,8 +17,9 @@ public class PartnerEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long partnerId;
-    @Column(name = "partner_name")
+    @Column(name = "partner_name",unique = true)
     private String partnerName;
+    @Column(unique = true)
     private String email;
     @Column(columnDefinition = "LONGTEXT")
     private String description;

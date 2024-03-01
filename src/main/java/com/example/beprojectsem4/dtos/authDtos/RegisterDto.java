@@ -20,4 +20,6 @@ public class RegisterDto {
     @Temporal(TemporalType.DATE)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd", timezone = "UTC")
     private Date bod;
+    private String displayName;
+    private String avatarUrl;
 }

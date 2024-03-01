@@ -16,4 +16,5 @@ public class PartnerDto {
     private String email;
     private String description;
     private List<PartnerAttachmentEntity> attachment;
+    private String status;
 }

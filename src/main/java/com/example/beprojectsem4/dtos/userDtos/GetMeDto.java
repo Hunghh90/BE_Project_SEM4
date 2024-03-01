@@ -1,5 +1,6 @@
 package com.example.beprojectsem4.dtos.userDtos;
 
+import com.example.beprojectsem4.entities.UserAttachmentEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -14,10 +15,11 @@ import java.util.Date;
 @AllArgsConstructor
 public class GetMeDto {
     private String email;
-    private String password;
+    private String displayName;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy/MM/dd")
     private Date bod;
     private String phoneNumber;
+    private UserAttachmentEntity avatarUrl;
     private String status;
 }

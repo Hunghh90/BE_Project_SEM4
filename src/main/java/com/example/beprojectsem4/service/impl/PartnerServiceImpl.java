@@ -56,8 +56,14 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     public ResponseEntity<?> listPartner(GetPartnersDto getPartnerDto) {
         try {
+            if(getPartnerDto.getPage() <=0){
+                getPartnerDto.setPage(1);
+            }
+            if(getPartnerDto.getSize()<=0){
+                getPartnerDto.setSize(20);
+            }
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
-            PageRequest pageRequest = PageRequest.of(getPartnerDto.getPage(), getPartnerDto.getSize(),sort);
+            PageRequest pageRequest = PageRequest.of(getPartnerDto.getPage()-1, getPartnerDto.getSize(),sort);
             Page<PartnerEntity> partners = partnerRepository.findByPartnerNameContaining(getPartnerDto.getPartnerName(),pageRequest);
             List<PartnerDto> partnerDtos = new ArrayList<>();
             for (PartnerEntity p : partners){

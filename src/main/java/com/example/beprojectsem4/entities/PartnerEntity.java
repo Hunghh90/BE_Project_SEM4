@@ -29,13 +29,13 @@ public class PartnerEntity {
     @OneToMany(mappedBy = "partnerId")
     private List<PartnerAttachmentEntity> attachment;
     @Column(name = "created_at")
-    private Date createAt;
+    private Date createdAt;
     @Column(name = "updated_at")
     private Date updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        createAt = new Date();
+        createdAt = new Date();
     }
 
     @PreUpdate

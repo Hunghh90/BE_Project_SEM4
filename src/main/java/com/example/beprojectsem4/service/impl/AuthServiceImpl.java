@@ -11,6 +11,8 @@ import com.example.beprojectsem4.service.jwt.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
@@ -49,9 +52,14 @@ public class AuthServiceImpl implements AuthService {
                 return createAccountResponse;
             }
             String hashedEmail = bCryptPasswordEncoder.encode(registerDto.getEmail());
+            Resource resource = new ClassPathResource("templates/ActiveAccount.html");
+            String htmlContent = new String(FileCopyUtils.copyToByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
+            String processedHtmlContent = htmlContent
+                    .replace("[[Recipient_Name]]", registerDto.getDisplayName())
+                    .replace("[[Link_Active]]", "http://www.localhost:8081/auth/active?code=" + hashedEmail + "&email=" + URLEncoder.encode(registerDto.getEmail(), StandardCharsets.UTF_8));
             sendEmailService.sendEmail(registerDto.getEmail(),
                     "Link Activate account",
-                    "http://www.localhost:8081/auth/active?code=" + hashedEmail + "&email=" + URLEncoder.encode(registerDto.getEmail(), StandardCharsets.UTF_8));
+                    processedHtmlContent);
             return ResponseEntity.ok().body("Check Email to activate account");
         } catch (Exception ex) {
             System.out.println(ex.getMessage());

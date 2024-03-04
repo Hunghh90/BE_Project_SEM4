@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.cloudinary.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,28 +35,33 @@ public class SubProgramServiceImpl implements SubProgramService {
 	
 	@Autowired
 	private SubProgramRepository subprogramRepository;
-	 @PersistenceContext
-	    private EntityManager entityManager;
+	
 	@Override
-	@Transactional
+	
 	public ResponseEntity<?> createSubprogram(CreateSubProgramDto createSubProgramDto) {
 		 try {
 		        SubProgramEntity subprogram = EntityDtoConverter.convertToEntity(createSubProgramDto, SubProgramEntity.class);
-		        UserEntity user = entityManager.find(UserEntity.class, createSubProgramDto.getUserid());
-		        ProgramEntity program = entityManager.find(ProgramEntity.class, createSubProgramDto.getProgramid());
-		           
-		           
-		        if(user != null && program != null)   { 
-		          
-		            subprogram.setUser(user);
-		            subprogram.setProgram(program);
-		            entityManager.persist(subprogram);
-		            subprogramRepository.save(subprogram);
-		            return ResponseEntity.status(HttpStatus.CREATED).body("Create subprogram success");
-		        } else {
-		           
-		            return ResponseEntity.badRequest().body("cannot Create");
-		        }} catch (Exception ex){
+		        if(subprogram != null) {
+		    	    UserEntity user=new UserEntity();
+		    	    ProgramEntity program=new ProgramEntity();
+		    	    program.setProgramId(createSubProgramDto.getProgramid());
+		    	    user.setUserId(createSubProgramDto.getUserid());
+		    	   
+		    	    if (subprogramRepository.existsByUserAndProgram(user, program)) {
+		    	      
+		    	        return ResponseEntity.badRequest().body("User has already registered for this program");
+		    	    } else {
+		    	       
+		    	        subprogram.setUser(user);
+		    	        subprogram.setProgram(program);
+		    	        subprogramRepository.save(subprogram);
+		    	        return ResponseEntity.status(HttpStatus.CREATED).body("Create subprogram success");
+		    	    }}
+		        else {
+		        	   return ResponseEntity.badRequest().body("Can't create subprogram");
+		        }       
+		 }
+		 catch (Exception ex){
     System.out.println(ex.getMessage());
     return ResponseEntity.internalServerError().body(ex.getMessage());
 }
@@ -64,12 +70,27 @@ public class SubProgramServiceImpl implements SubProgramService {
 
 	@Override
 	public ResponseEntity<?> getSubprogram(Long id) {
-		try{SubProgramEntity subprograms= subprogramRepository.findById(id).get();
-		return ResponseEntity.ok().body(subprograms);
-	}catch (Exception e){
-        System.out.println(e.getMessage());
-        return ResponseEntity.internalServerError().body(e.getMessage());
-    }
+		try {
+	        Optional<SubProgramEntity> subprogramOptional = subprogramRepository.findById(id);
+	        if (subprogramOptional.isPresent()) {
+	           SubProgramsDto responsedto=new SubProgramsDto();
+	           SubProgramEntity subprogram = subprogramOptional.get();
+	            UserEntity user = subprogram.getUser();
+	            ProgramEntity program = subprogram.getProgram();
+	            responsedto.setSubProgramId(id);
+	            responsedto.setUserid(user.getUserId());
+	            responsedto.setProgramid(program.getProgramId());
+	            responsedto.setType(subprogram.getType());
+	            responsedto.setCreateAt(subprogram.getCreateAt());
+	            responsedto.setUpdatedAt(subprogram.getUpdatedAt());
+	           return ResponseEntity.ok().body(responsedto);
+	        } else {
+	            return ResponseEntity.badRequest().body("Subprogram not found");
+	        }
+	    } catch (Exception e) {
+	        System.out.println(e.getMessage());
+	        return ResponseEntity.internalServerError().body(e.getMessage());
+	    }
 	}
 
 	@Override
@@ -96,21 +117,47 @@ public class SubProgramServiceImpl implements SubProgramService {
 	            Optional<SubProgramEntity> subprogram= subprogramRepository.findById(id);
 	           
 	            if (subprogram.isPresent()) {
-	            	SubProgramEntity sub = EntityDtoConverter.convertToEntity(updateSubProgramsDto,SubProgramEntity.class);
-	            	System.out.println(sub);
-	            	
+	            	SubProgramEntity sub = EntityDtoConverter.convertToEntity(updateSubProgramsDto,SubProgramEntity.class);            	
 	            	SubProgramEntity subn = TransferValuesIfNull.transferValuesIfNull(subprogram.get(),sub);
-	            	System.out.println(subn);
 	            	
+	            	 UserEntity user=new UserEntity();
+			    	    ProgramEntity program=new ProgramEntity();
+			    	    
+			    	    program.setProgramId(updateSubProgramsDto.getProgramid());
+			    	    user.setUserId(updateSubProgramsDto.getUserid());
+			    	    subn.setUser(user);
+			    	    subn.setProgram(program);
 	 		           
 	            	subprogramRepository.save(subn);
 	                return ResponseEntity.ok().body("Update success");
+	            }
+	            else {
+	            	return ResponseEntity.badRequest().body("Can not update");
 	            }
 	      
 	        }catch (Exception ex){
 	            System.out.println(ex.getMessage());
 	            return ResponseEntity.internalServerError().body(ex.getMessage());
 	        }
-	        return null;
+	       
+	}
+
+	@Override
+	public ResponseEntity<?> deleteSubprogram(Long id) {
+		  try{
+			  Optional<SubProgramEntity> subProgramOptional = subprogramRepository.findById(id);
+	        if (subProgramOptional.isPresent()) {
+	            SubProgramEntity subProgram = subProgramOptional.get();
+	            subprogramRepository.delete(subProgram);
+	            return ResponseEntity.ok().body("Delete success");
+	        } else {
+	        	return ResponseEntity.badRequest().body("Can't delete cause subprogram not found");
+	        }}
+		  
+	        catch (Exception ex){
+	            System.out.println(ex.getMessage());
+	            return ResponseEntity.internalServerError().body(ex.getMessage());
+	        }
+	       
 	}
 }

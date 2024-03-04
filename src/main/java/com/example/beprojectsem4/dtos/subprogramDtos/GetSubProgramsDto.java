@@ -16,24 +16,5 @@ public class GetSubProgramsDto {
 	    @Nullable
 	    private int page;
 	    @Nullable
-	    private int size;
-		public String getType() {
-			return type;
-		}
-		public void setType(String type) {
-			this.type = type;
-		}
-		public int getPage() {
-			return page;
-		}
-		public void setPage(int page) {
-			this.page = page;
-		}
-		public int getSize() {
-			return size;
-		}
-		public void setSize(int size) {
-			this.size = size;
-		}
-
+	    private int size;	
 }

@@ -3,7 +3,9 @@ package com.example.beprojectsem4.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,4 +43,8 @@ public class SubProgramController {
 	    public ResponseEntity<?> updateSubprogram(@RequestParam("id")Long id, @RequestBody UpdateSubProgramsDto updateSubProgramsDto){
 	        return subprogramService.updateSubprogram(id, updateSubProgramsDto);
 	    }
+	  @DeleteMapping("/delete-subprogram")
+	    public ResponseEntity<?> deleteSubProgram(@RequestParam("id")Long id) {
+		  return subprogramService.deleteSubprogram(id);
+	  }
 }

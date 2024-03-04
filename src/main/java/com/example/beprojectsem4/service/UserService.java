@@ -20,5 +20,6 @@ public interface UserService {
     boolean activeUser(String email);
     UserEntity checkUser(String email);
     UserEntity findUserByToken(HttpServletRequest request);
+   
     boolean resetPassword(String email, ResetPasswordDto resetPasswordDto);
 }

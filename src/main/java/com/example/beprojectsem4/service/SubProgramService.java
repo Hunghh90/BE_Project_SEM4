@@ -12,4 +12,5 @@ public interface SubProgramService {
     ResponseEntity<?> getSubprogram(Long id);
     ResponseEntity<?> listSubprogram(GetSubProgramsDto getSubProgramsDto);
     ResponseEntity<?> updateSubprogram(Long id, UpdateSubProgramsDto updateSubProgramsDto);
+    ResponseEntity<?> deleteSubprogram(Long id);
 }

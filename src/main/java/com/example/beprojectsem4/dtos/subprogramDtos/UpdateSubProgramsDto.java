@@ -4,6 +4,15 @@ import java.util.Date;
 
 import org.springframework.lang.Nullable;
 
+import com.example.beprojectsem4.entities.ProgramEntity;
+import com.example.beprojectsem4.entities.UserEntity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateSubProgramsDto {
 	 @Nullable
 	 private Long userid;
@@ -13,30 +22,7 @@ public class UpdateSubProgramsDto {
 	 private Long programid;  	 
 	 @Nullable
 	 private Date updatedAt;
-	public Long getUserid() {
-		return userid;
-	}
-	public void setUserid(Long userid) {
-		this.userid = userid;
-	}
-	public String getType() {
-		return type;
-	}
-	public void setType(String type) {
-		this.type = type;
-	}
-	public Long getProgramid() {
-		return programid;
-	}
-	public void setProgramid(Long programid) {
-		this.programid = programid;
-	}
-	public Date getUpdatedAt() {
-		return updatedAt;
-	}
-	public void setUpdatedAt(Date updatedAt) {
-		this.updatedAt = updatedAt;
-	}
+	
 	 
 	 
 }

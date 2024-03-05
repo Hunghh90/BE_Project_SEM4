@@ -11,5 +11,5 @@ import com.example.beprojectsem4.entities.UserEntity;
 
 public interface SubProgramRepository extends JpaRepository<SubProgramEntity, Long> {
 	  Page<SubProgramEntity> findBytypeContaining(String type,@Nullable Pageable pageable);
-	  boolean existsByUserAndProgram(UserEntity user, ProgramEntity program);
+	  boolean existsByUserAndProgramAndType(UserEntity user, ProgramEntity program,String type);
 }

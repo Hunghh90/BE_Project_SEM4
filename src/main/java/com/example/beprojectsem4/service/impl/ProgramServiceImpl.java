@@ -125,4 +125,19 @@ public class ProgramServiceImpl implements ProgramService {
     public List<ProgramEntity> searchAllField(String value) {
         return null;
     }
+
+	@Override
+	public ProgramEntity FindById(Long id) {
+		
+		Optional<ProgramEntity> program=programRepository.findById(id);
+		if(program.isPresent()) {
+			ProgramEntity programpn=program.get();
+			return programpn;
+		}
+		else {
+			return null;
+		}
+		
+		
+	}
 }

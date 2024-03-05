@@ -5,15 +5,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.beprojectsem4.dtos.partnerDtos.GetPartnersDto;
-import com.example.beprojectsem4.dtos.partnerDtos.UpdatePartnerDto;
 import com.example.beprojectsem4.dtos.subprogramDtos.CreateSubProgramDto;
 import com.example.beprojectsem4.dtos.subprogramDtos.GetSubProgramsDto;
 import com.example.beprojectsem4.dtos.subprogramDtos.UpdateSubProgramsDto;
@@ -28,8 +25,8 @@ public class SubProgramController {
 	private SubProgramService subprogramService;
 	
 	 @PostMapping("/create-subprogram")
-	public ResponseEntity<?> createSubProgram(@RequestBody CreateSubProgramDto createSubProgramDto) {
-        return subprogramService.createSubprogram(createSubProgramDto);
+	public ResponseEntity<?> createSubProgram(@RequestBody CreateSubProgramDto createSubProgramDto,HttpServletRequest request) {
+        return subprogramService.createSubprogram(createSubProgramDto,request);
     }
 	 @GetMapping("/get-subprogram")
 	    public ResponseEntity<?> getSubProgram(@RequestParam("id") Long id){
@@ -40,8 +37,8 @@ public class SubProgramController {
 	        return subprogramService.listSubprogram(getSubProgramsDto);
 	    }
 	  @PostMapping("/update-subprogram")
-	    public ResponseEntity<?> updateSubprogram(@RequestParam("id")Long id, @RequestBody UpdateSubProgramsDto updateSubProgramsDto){
-	        return subprogramService.updateSubprogram(id, updateSubProgramsDto);
+	    public ResponseEntity<?> updateSubprogram(@RequestParam("id")Long id, @RequestBody UpdateSubProgramsDto updateSubProgramsDto,HttpServletRequest request){
+	        return subprogramService.updateSubprogram(id, updateSubProgramsDto,request);
 	    }
 	  @DeleteMapping("/delete-subprogram")
 	    public ResponseEntity<?> deleteSubProgram(@RequestParam("id")Long id) {

@@ -18,4 +18,5 @@ public interface ProgramService {
     boolean checkProgramByProgramName(String programName);
 
     List<ProgramEntity> searchAllField(String value);
+    ProgramEntity FindById(Long id);
 }

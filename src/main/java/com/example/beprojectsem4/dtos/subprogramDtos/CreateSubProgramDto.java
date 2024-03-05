@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreateSubProgramDto {
 	   
-	    private Long userid;
+	    private Long userId;
 	    private String type;
-	    private Long programid;  
+	    private Long programId;  
 	    private Date createAt;	  
 }

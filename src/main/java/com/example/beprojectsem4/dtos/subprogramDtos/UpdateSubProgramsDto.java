@@ -15,11 +15,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UpdateSubProgramsDto {
 	 @Nullable
-	 private Long userid;
+	 private Long userId;
 	 @Nullable
 	 private String type;
 	 @Nullable
-	 private Long programid;  	 
+	 private Long programId;  	 
 	 @Nullable
 	 private Date updatedAt;
 	

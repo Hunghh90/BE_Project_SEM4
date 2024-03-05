@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.cloudinary.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,11 +22,11 @@ import com.example.beprojectsem4.entities.UserEntity;
 import com.example.beprojectsem4.helper.EntityDtoConverter;
 import com.example.beprojectsem4.helper.TransferValuesIfNull;
 import com.example.beprojectsem4.repository.SubProgramRepository;
+import com.example.beprojectsem4.service.ProgramService;
 import com.example.beprojectsem4.service.SubProgramService;
+import com.example.beprojectsem4.service.UserService;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class SubProgramServiceImpl implements SubProgramService {
@@ -35,28 +34,27 @@ public class SubProgramServiceImpl implements SubProgramService {
 	
 	@Autowired
 	private SubProgramRepository subprogramRepository;
-	
+	@Autowired
+	private UserService userService;
+	@Autowired 
+	private ProgramService programService;
 	@Override
-	
-	public ResponseEntity<?> createSubprogram(CreateSubProgramDto createSubProgramDto) {
+	public ResponseEntity<?> createSubprogram(CreateSubProgramDto createSubProgramDto,HttpServletRequest request) {
 		 try {
 		        SubProgramEntity subprogram = EntityDtoConverter.convertToEntity(createSubProgramDto, SubProgramEntity.class);
 		        if(subprogram != null) {
-		    	    UserEntity user=new UserEntity();
-		    	    ProgramEntity program=new ProgramEntity();
-		    	    program.setProgramId(createSubProgramDto.getProgramid());
-		    	    user.setUserId(createSubProgramDto.getUserid());
-		    	   
-		    	    if (subprogramRepository.existsByUserAndProgram(user, program)) {
-		    	      
+		    	    UserEntity user=userService.findUserByToken(request);
+		    	    ProgramEntity program=programService.FindById(createSubProgramDto.getProgramId());		    	      	    	   
+		    	    if (subprogramRepository.existsByUserAndProgramAndType(user, program,subprogram.getType())) {		    	      
 		    	        return ResponseEntity.badRequest().body("User has already registered for this program");
-		    	    } else {
-		    	       
+		    	    } 
+		    	    else {		    	       
 		    	        subprogram.setUser(user);
 		    	        subprogram.setProgram(program);
 		    	        subprogramRepository.save(subprogram);
 		    	        return ResponseEntity.status(HttpStatus.CREATED).body("Create subprogram success");
-		    	    }}
+		    	    }
+		    	    }
 		        else {
 		        	   return ResponseEntity.badRequest().body("Can't create subprogram");
 		        }       
@@ -67,23 +65,18 @@ public class SubProgramServiceImpl implements SubProgramService {
 }
 
 	}
-
 	@Override
 	public ResponseEntity<?> getSubprogram(Long id) {
 		try {
-	        Optional<SubProgramEntity> subprogramOptional = subprogramRepository.findById(id);
-	        if (subprogramOptional.isPresent()) {
-	           SubProgramsDto responsedto=new SubProgramsDto();
-	           SubProgramEntity subprogram = subprogramOptional.get();
-	            UserEntity user = subprogram.getUser();
-	            ProgramEntity program = subprogram.getProgram();
-	            responsedto.setSubProgramId(id);
-	            responsedto.setUserid(user.getUserId());
-	            responsedto.setProgramid(program.getProgramId());
-	            responsedto.setType(subprogram.getType());
-	            responsedto.setCreateAt(subprogram.getCreateAt());
-	            responsedto.setUpdatedAt(subprogram.getUpdatedAt());
-	           return ResponseEntity.ok().body(responsedto);
+	       Optional<SubProgramEntity> subprogram = subprogramRepository.findById(id);
+	        if (subprogram.isPresent()) {
+	        	SubProgramEntity subEntity=subprogram.get();
+	        	SubProgramsDto subdto=EntityDtoConverter.convertToDto(subEntity, SubProgramsDto.class);
+	        	UserEntity user=subEntity.getUser();
+	        	ProgramEntity program=subEntity.getProgram();
+	        	subdto.setUserId(user.getUserId());
+	        	subdto.setProgramId(program.getProgramId());
+	           return ResponseEntity.ok().body(subdto);
 	        } else {
 	            return ResponseEntity.badRequest().body("Subprogram not found");
 	        }
@@ -110,24 +103,19 @@ public class SubProgramServiceImpl implements SubProgramService {
 	            return ResponseEntity.internalServerError().body(ex.getMessage());
 	        }
 	}
-
 	@Override
-	public ResponseEntity<?> updateSubprogram(Long id, UpdateSubProgramsDto updateSubProgramsDto) {
+	public ResponseEntity<?> updateSubprogram(Long id, UpdateSubProgramsDto updateSubProgramsDto,HttpServletRequest request) {
 		  try {
 	            Optional<SubProgramEntity> subprogram= subprogramRepository.findById(id);
 	           
 	            if (subprogram.isPresent()) {
 	            	SubProgramEntity sub = EntityDtoConverter.convertToEntity(updateSubProgramsDto,SubProgramEntity.class);            	
-	            	SubProgramEntity subn = TransferValuesIfNull.transferValuesIfNull(subprogram.get(),sub);
-	            	
-	            	 UserEntity user=new UserEntity();
-			    	    ProgramEntity program=new ProgramEntity();
-			    	    
-			    	    program.setProgramId(updateSubProgramsDto.getProgramid());
-			    	    user.setUserId(updateSubProgramsDto.getUserid());
+	            	SubProgramEntity subn = TransferValuesIfNull.transferValuesIfNull(subprogram.get(),sub);            	
+	                    UserEntity user=userService.findUserByToken(request);
+	                    ProgramEntity program=programService.FindById(updateSubProgramsDto.getProgramId());		
+			    	    program.setProgramId(updateSubProgramsDto.getProgramId());			    	
 			    	    subn.setUser(user);
-			    	    subn.setProgram(program);
-	 		           
+			    	    subn.setProgram(program);	 		           
 	            	subprogramRepository.save(subn);
 	                return ResponseEntity.ok().body("Update success");
 	            }
@@ -138,10 +126,8 @@ public class SubProgramServiceImpl implements SubProgramService {
 	        }catch (Exception ex){
 	            System.out.println(ex.getMessage());
 	            return ResponseEntity.internalServerError().body(ex.getMessage());
-	        }
-	       
+	        }       
 	}
-
 	@Override
 	public ResponseEntity<?> deleteSubprogram(Long id) {
 		  try{

@@ -1,6 +1,8 @@
 package com.example.beprojectsem4.service.impl;
 
+import com.example.beprojectsem4.entities.DonationEntity;
 import com.example.beprojectsem4.entities.ProgramEntity;
+import com.example.beprojectsem4.entities.UserEntity;
 import com.example.beprojectsem4.exception.NotFoundException;
 import com.example.beprojectsem4.repository.DonationRepository;
 import com.example.beprojectsem4.repository.ProgramRepository;
@@ -35,4 +37,10 @@ public class DonationServiceImpl implements DonationService {
         programRepository.save(programEntity);
 
     }
+
+	@Override
+	public DonationEntity FindByUser(UserEntity entity) {
+		return donationRepository.FindByUser(entity);
+	}
+    
 }

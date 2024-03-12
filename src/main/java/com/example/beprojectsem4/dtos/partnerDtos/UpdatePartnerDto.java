@@ -16,4 +16,6 @@ public class UpdatePartnerDto  {
     private String email;
     @Nullable
     private String description;
+    @Nullable
+    private String urlLogo;
 }

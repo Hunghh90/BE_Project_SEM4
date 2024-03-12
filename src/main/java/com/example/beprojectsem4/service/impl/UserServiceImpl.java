@@ -113,6 +113,8 @@ public class UserServiceImpl implements UserService {
             user.getRoles().add(userRole);
             user.setStatus("Activate");
             repository.save(user);
+            UserAttachmentEntity avatar = new UserAttachmentEntity(user,"Avatar", registerDto.getAvatarUrl() );
+            userAttachmentRepository.save(avatar);
             return ResponseEntity.status(HttpStatus.CREATED).body("Create success");
         } catch (Exception ex) {
             System.out.println(ex.getMessage());

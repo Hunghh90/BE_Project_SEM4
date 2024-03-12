@@ -71,6 +71,7 @@ public class PartnerServiceImpl implements PartnerService {
                             "12345678",
                             null,
                             null,
+                            null,
                             createPartnerDto.getPartnerName(),
                             createPartnerDto.getUrlLogo()
                     );
@@ -133,6 +134,8 @@ public class PartnerServiceImpl implements PartnerService {
                 PartnerEntity p = EntityDtoConverter.convertToEntity(updatePartnerDto,PartnerEntity.class);
                 PartnerEntity pn = TransferValuesIfNull.transferValuesIfNull(partner.get(),p);
                 partnerRepository.save(pn);
+                PartnerAttachmentEntity attachment = new PartnerAttachmentEntity(pn,"Logo", updatePartnerDto.getUrlLogo());
+                attachmentRepository.save(attachment);
                 return ResponseEntity.ok().body("Update success");
             }else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found partner");

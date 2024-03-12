@@ -23,4 +23,5 @@ public class GetMeDto {
     private UserAttachmentEntity avatarUrl;
     private String status;
     private String role;
+    private Date updatedAt;
 }

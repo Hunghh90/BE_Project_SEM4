@@ -3,6 +3,7 @@ package com.example.beprojectsem4.controller;
 import com.example.beprojectsem4.config.VNPayConfig;
 import com.example.beprojectsem4.dto.request.RequestDonate;
 import com.example.beprojectsem4.dto.response.ResponseDonate;
+import com.example.beprojectsem4.dtos.Donation.DonateDto;
 import com.example.beprojectsem4.service.DonationService;
 import com.example.beprojectsem4.service.impl.PaypalService;
 import com.example.beprojectsem4.service.impl.VNPayService;
@@ -87,12 +88,20 @@ public class DonationController {
             if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
                 if("Paypal".equals(request.getParameter("payment_Method"))) {
                     int vnpAmount = Integer.parseInt(vnpAmountParam);
-                    donationService.DonationSuccess(Long.valueOf(request.getParameter("ProgramId")), vnpAmount,"Paypal");
+                    DonateDto donateDto = new DonateDto();
+                    donateDto.setId(Long.valueOf(request.getParameter("ProgramId")));
+                    donateDto.setAmount(vnpAmount/100.0);
+                    donateDto.setPaymentMethod("Paypal");
+                    donationService.DonationSuccess(request,donateDto);
                     return "OK";
                 }
                 int vnpAmount = Integer.parseInt(vnpAmountParam);
                 double result = vnpAmount / 100.0;
-                donationService.DonationSuccess(Long.valueOf(request.getParameter("ProgramId")), result,"VNPay");
+                DonateDto donateDto = new DonateDto();
+                donateDto.setId(Long.valueOf(request.getParameter("ProgramId")));
+                donateDto.setAmount(result);
+                donateDto.setPaymentMethod("VNPay");
+                donationService.DonationSuccess(request,donateDto);
                 return "OK";
             } else {
                 return "FAIL";

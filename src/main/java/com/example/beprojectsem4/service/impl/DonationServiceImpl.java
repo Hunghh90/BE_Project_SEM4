@@ -1,7 +1,11 @@
 package com.example.beprojectsem4.service.impl;
 
+import com.example.beprojectsem4.dtos.Donation.DonateDto;
+import com.example.beprojectsem4.entities.DonationEntity;
 import com.example.beprojectsem4.entities.ProgramEntity;
+import com.example.beprojectsem4.entities.UserEntity;
 import com.example.beprojectsem4.exception.NotFoundException;
+import com.example.beprojectsem4.helper.EntityDtoConverter;
 import com.example.beprojectsem4.repository.DonationRepository;
 import com.example.beprojectsem4.repository.ProgramRepository;
 import com.example.beprojectsem4.service.DonationService;
@@ -25,14 +29,24 @@ public class DonationServiceImpl implements DonationService {
     UserService userService;
 
     @Override
-    public void DonationSuccess(Long id, double amount,String paymentMethod) {
-        Optional<ProgramEntity> programEntityOptional =  programRepository.findById(id);
-        if(!programEntityOptional.isPresent()){
-            throw new NotFoundException("Not found Program");
+    public void DonationSuccess(HttpServletRequest request,DonateDto donateDto) {
+        try{
+            Optional<ProgramEntity> programEntityOptional =  programRepository.findById(donateDto.getId());
+            if(programEntityOptional.isEmpty()){
+                throw new NotFoundException("Not found Program");
+            }
+            ProgramEntity programEntity = programEntityOptional.get();
+            programEntity.setTotalMoney(programEntity.getTotalMoney() + donateDto.getAmount());
+            programRepository.save(programEntity);
+            DonationEntity donate = EntityDtoConverter.convertToEntity(donateDto,DonationEntity.class);
+            UserEntity user = userService.findUserByToken(request);
+            if(user != null){
+                donate.setUser(user);
+                donate.setProgram(programEntity);
+            }
+            donationRepository.save(donate);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
         }
-        ProgramEntity programEntity = programEntityOptional.get();
-        programEntity.setTotalMoney(programEntity.getTotalMoney() + amount);
-        programRepository.save(programEntity);
-
     }
 }

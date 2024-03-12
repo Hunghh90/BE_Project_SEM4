@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 public interface UserService {
     ResponseEntity<?> createAccountUser(RegisterDto registerDto);
     ResponseEntity<?> createAccountAdmin(RegisterDto registerDto);
+    ResponseEntity<?> createAccountPartner(RegisterDto registerDto);
     ResponseEntity<?> changePassword(HttpServletRequest request, ChangePasswordDto changePasswordDto);
     void saveRefreshToken(String email,String refreshToken);
     ResponseEntity<?> refreshToken(HttpServletRequest request);

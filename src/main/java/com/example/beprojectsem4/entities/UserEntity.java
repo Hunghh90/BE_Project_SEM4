@@ -58,11 +58,12 @@ public class UserEntity {
     protected void onUpdate() {
         updatedAt = new Date();
     }
-    public UserEntity(String email,String password,Date bod,String phoneNumber){
+    public UserEntity(String email,String password,Date bod,String phoneNumber,String displayName){
         this.email = email;
         this.password = password;
         this.bod = bod;
         this.phoneNumber = phoneNumber;
+        this.displayName = displayName;
         this.status = "Deactivate";
     }
 

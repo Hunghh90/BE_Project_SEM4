@@ -10,6 +10,7 @@ import com.example.beprojectsem4.entities.ProgramEntity;
 import com.example.beprojectsem4.entities.UserEntity;
 import com.example.beprojectsem4.helper.EntityDtoConverter;
 import com.example.beprojectsem4.helper.TransferValuesIfNull;
+import com.example.beprojectsem4.repository.DynamicSpecification;
 import com.example.beprojectsem4.repository.ProgramAttachmentRepository;
 import com.example.beprojectsem4.repository.ProgramRepository;
 import com.example.beprojectsem4.service.PartnerService;
@@ -20,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -44,10 +47,10 @@ public class ProgramServiceImpl implements ProgramService {
         try{
             UserEntity user = userService.findUserByToken(request);
             UserEntity m = EntityDtoConverter.convertToEntity(user,UserEntity.class);
-            PartnerEntity pn = (PartnerEntity) partnerService.getPartner(createProgramDto.getPartnerId()).getBody();
+            PartnerEntity pn = (PartnerEntity) partnerService.getPartnerByEmail(user.getEmail()).getBody();
             if(!checkProgramByProgramName(createProgramDto.getProgramName()) && createProgramDto.getStartDonateDate().before(createProgramDto.getEndDonateDate()) && createProgramDto.getEndDonateDate().before(createProgramDto.getFinishDate())){
                 ProgramEntity program = EntityDtoConverter.convertToEntity(createProgramDto,ProgramEntity.class);
-                program.setStatus("Active");
+                program.setStatus("DeActive");
                 program.setUser(m);
                 program.setPartner(pn);
                 ProgramEntity pr = programRepository.save(program);
@@ -75,7 +78,7 @@ public class ProgramServiceImpl implements ProgramService {
                 ProgramDto pd = EntityDtoConverter.convertToDto(p,ProgramDto.class);
                 programDtoList.add(pd);
             }
-            return ResponseEntity.ok().body(programs);
+            return ResponseEntity.ok().body(programDtoList);
         }catch (Exception e){
             System.out.println(e.getMessage());
             return ResponseEntity.internalServerError().body(e.getMessage());
@@ -112,17 +115,69 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     @Override
-    public void blockProgram(Long id) {
+    public ResponseEntity<?> activekProgram(Long id) {
+        try {
+            Optional<ProgramEntity> programOptional = programRepository.findById(id);
+            if (programOptional.isPresent()) {
+                programOptional.get().setStatus("Active");
+                programRepository.save(programOptional.get());
+                return ResponseEntity.ok().body("Active program success");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found program");
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
 
+    @Override
+    public ResponseEntity<?> blockProgram(Long id) {
+        try {
+            Optional<ProgramEntity> programOptional = programRepository.findById(id);
+            if(programOptional.isPresent()){
+                programOptional.get().setStatus("Block");
+                programRepository.save(programOptional.get());
+                return ResponseEntity.ok().body("Block program success");
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found program");
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
 
     @Override
     public boolean checkProgramByProgramName(String programName) {
-        return false;
+        try{
+            ProgramEntity program = programRepository.findByProgramName(programName);
+            if(program == null){
+                return false;
+            }
+            return true;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
     }
 
     @Override
-    public List<ProgramEntity> searchAllField(String value) {
-        return null;
+    public ResponseEntity<?> searchAllField(String value) {
+        try {
+            Specification<ProgramEntity> spec = new DynamicSpecification<>(value);
+            List<ProgramEntity> programs = programRepository.findAll(spec);
+            if (programs.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No program found for the given search criteria");
+            }
+            List<ProgramDto> programDtoList = new ArrayList<>();
+            for(ProgramEntity p : programs){
+                ProgramDto programDto = EntityDtoConverter.convertToDto(p,ProgramDto.class);
+                programDtoList.add(programDto);
+            }
+            return ResponseEntity.ok().body(programDtoList);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
 }

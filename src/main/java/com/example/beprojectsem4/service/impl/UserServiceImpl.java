@@ -14,6 +14,7 @@ import com.example.beprojectsem4.helper.EntityDtoConverter;
 import com.example.beprojectsem4.repository.RoleRepository;
 import com.example.beprojectsem4.repository.UserAttachmentRepository;
 import com.example.beprojectsem4.repository.UserRepository;
+import com.example.beprojectsem4.service.RoleService;
 import com.example.beprojectsem4.service.UserService;
 import com.example.beprojectsem4.service.jwt.JwtAuthenticationFilter;
 import com.example.beprojectsem4.service.jwt.JwtService;
@@ -46,7 +47,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository repository;
     @Autowired
-    private RoleRepository roleRepository;
+    private RoleService roleService;
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
@@ -80,11 +81,34 @@ public class UserServiceImpl implements UserService {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is exists, please choose an other email");
             }
             UserEntity user = EntityDtoConverter.convertToEntity(registerDto, UserEntity.class);
-            RoleEntity userRole = roleRepository.findRoleByRoleName("ADMIN");
+            user.setPassword(bCryptPasswordEncoder.encode(registerDto.getPassword()));
+            RoleEntity userRole = roleService.findRoleByRoleName("ADMIN");
+            if (roleService.findRoleByRoleName("ADMIN") == null) {
+                roleService.createRole("ADMIN");
+                userRole = roleService.findRoleByRoleName("ADMIN");
+            }
+            user.getRoles().add(userRole);
+            user.setStatus("Activate");
+            repository.save(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Create success");
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An error occurred");
+        }
+    }
+    @Override
+    public ResponseEntity<?> createAccountPartner(RegisterDto registerDto) {
+        try {
+            UserEntity u = checkUser(registerDto.getEmail());
+            if (u != null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is exists, please choose an other email");
+            }
+            UserEntity user = EntityDtoConverter.convertToEntity(registerDto, UserEntity.class);
+            user.setPassword(bCryptPasswordEncoder.encode(registerDto.getPassword()));
+            RoleEntity userRole = roleService.findRoleByRoleName("PARTNER");
             if (userRole == null) {
-                userRole = new RoleEntity();
-                userRole.setRoleName("ADMIN");
-                roleRepository.save(userRole);
+               roleService.createRole("PARTNER");
+                userRole = roleService.findRoleByRoleName("PARTNER");
             }
             user.getRoles().add(userRole);
             user.setStatus("Activate");
@@ -210,11 +234,10 @@ public class UserServiceImpl implements UserService {
             if (user == null) {
                 return false;
             } else {
-                RoleEntity userRole = roleRepository.findRoleByRoleName("USER");
+                RoleEntity userRole = roleService.findRoleByRoleName("USER");
                 if (userRole == null) {
-                    userRole = new RoleEntity();
-                    userRole.setRoleName("USER");
-                    roleRepository.save(userRole);
+                    roleService.createRole("USER");
+                    userRole = roleService.findRoleByRoleName("USER");
                 }
                 user.getRoles().add(userRole);
                 user.setStatus("Activate");

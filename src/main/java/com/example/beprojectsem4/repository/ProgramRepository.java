@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface ProgramRepository extends JpaRepository<ProgramEntity, Long>, JpaSpecificationExecutor<ProgramEntity> {
     Page<ProgramEntity> findByProgramNameContaining(String programrName, Pageable pageable);
+    ProgramEntity findByProgramName(String programName);
 }

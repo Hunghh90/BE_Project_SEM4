@@ -9,6 +9,7 @@ public interface PartnerService {
 
     ResponseEntity<?> createPartner(CreatePartnerDto createPartnerDto);
     ResponseEntity<?> getPartner(Long id);
+    ResponseEntity<?> getPartnerByEmail(String email);
     ResponseEntity<?> listPartner(GetPartnersDto getPartnerDto);
     ResponseEntity<?> updatePartner(Long id, UpdatePartnerDto updatePartnerDto);
     ResponseEntity<?> blockPartner(Long id);

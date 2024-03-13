@@ -40,7 +40,7 @@ public class DonationServiceImpl implements DonationService {
 
 	@Override
 	public DonationEntity FindByUser(UserEntity entity) {
-		return donationRepository.FindByUser(entity);
+		return donationRepository.findByUser(entity);
 	}
     
 }

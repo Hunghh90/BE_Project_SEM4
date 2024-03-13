@@ -3,6 +3,8 @@ package com.example.beprojectsem4.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -45,19 +47,25 @@ public class FeedBackServiceImpl implements FeedBackService {
 	public ResponseEntity<?> createFeedBack(CreateFeedBackDto createFeedBackDto,HttpServletRequest request) {
 		 try {
 		        FeedBackEntity feedback = EntityDtoConverter.convertToEntity(createFeedBackDto, FeedBackEntity.class);
+		        String regex = "\\b(vl|vcl|đụ|mẹ|mày|cặc|đỉ|lồn|buồi|đéo|địt|cặc)\\b";
 		        if(feedback != null) {
-		    	    UserEntity user=userService.findUserByToken(request);
+		        	UserEntity user=userService.findUserByToken(request);
 		    	    ProgramEntity program=programService.FindById(createFeedBackDto.getProgramId());
-		    	    DonationEntity donate=donationService.FindByUser(user);
-		    	   		    	      	    	   
+		    	    DonationEntity donate=donationService.FindByUser(user);	    	   		    	      	    	   
 		    	    if (donate == null) {		    	      
 		    	        return ResponseEntity.badRequest().body("User haven't donate");
 		    	    } 
-		    	    else {		    	       
-		    	    	feedback.setUser(user);
-		    	    	feedback.setProgram(program);
-		    	    	feedBackRepository.save(feedback);
-		    	        return ResponseEntity.status(HttpStatus.CREATED).body("Create feedbaack success");
+		    	    else {				    	    	
+			        	 Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+			             Matcher matcher = pattern.matcher(createFeedBackDto.getContent());
+			             if (matcher.find()) {
+			            	 return ResponseEntity.badRequest().body("Users use vulgar words");
+			             } else {
+			            	    feedback.setUser(user);
+				    	    	feedback.setProgram(program);
+				    	    	feedBackRepository.save(feedback);
+				    	        return ResponseEntity.status(HttpStatus.CREATED).body("Create feedbaack success");
+			             }    	    	
 		    	    }
 		    	    }
 		        else {
@@ -76,7 +84,7 @@ public class FeedBackServiceImpl implements FeedBackService {
 	       Optional<FeedBackEntity> feedback = feedBackRepository.findById(id);
 	        if (feedback.isPresent()) {
 	        	FeedBackEntity fbEntity=feedback.get();
-	        	SubProgramsDto subdto=EntityDtoConverter.convertToDto(fbEntity, SubProgramsDto.class);
+	        	FeedBackDto subdto=EntityDtoConverter.convertToDto(fbEntity, FeedBackDto.class);
 	        	UserEntity user=fbEntity.getUser();
 	        	ProgramEntity program=fbEntity.getProgram();
 	        	subdto.setUserId(user.getUserId());
@@ -112,17 +120,24 @@ public class FeedBackServiceImpl implements FeedBackService {
 	public ResponseEntity<?> updateFeedBack(Long id, UpdateFeedBackDto updateFeedBackDto, HttpServletRequest request) {
 		  try {
 	            Optional<FeedBackEntity> feedback= feedBackRepository.findById(id);
-	           
+	            String regex = "\\b(vl|vcl|đụ|mẹ|mày|cặc|đỉ|lồn|buồi|đéo|địt|cặc)\\b";
 	            if (feedback.isPresent()) {
-	            	FeedBackEntity feedbk = EntityDtoConverter.convertToEntity(updateFeedBackDto,FeedBackEntity.class);            	
-	            	FeedBackEntity feedbkn = TransferValuesIfNull.transferValuesIfNull(feedback.get(),feedbk);            	
-	                    UserEntity user=userService.findUserByToken(request);
-	                    ProgramEntity program=programService.FindById(updateFeedBackDto.getProgramId());		
-			    	    program.setProgramId(updateFeedBackDto.getProgramId());			    	
-			    	    feedbkn.setUser(user);
-			    	    feedbkn.setProgram(program);	 		           
-			    	    feedBackRepository.save(feedbkn);
-	                return ResponseEntity.ok().body("Update success");
+	            	 Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+		             Matcher matcher = pattern.matcher(updateFeedBackDto.getContent());
+		             if (matcher.find()) {
+		            	 return ResponseEntity.badRequest().body("Users use vulgar words");
+		             } else {
+		            	 FeedBackEntity feedbk = EntityDtoConverter.convertToEntity(updateFeedBackDto,FeedBackEntity.class);            	
+			            	FeedBackEntity feedbkn = TransferValuesIfNull.transferValuesIfNull(feedback.get(),feedbk);            	
+			                    UserEntity user=userService.findUserByToken(request);
+			                    ProgramEntity program=programService.FindById(updateFeedBackDto.getProgramId());		
+					    	    program.setProgramId(updateFeedBackDto.getProgramId());			    	
+					    	    feedbkn.setUser(user);
+					    	    feedbkn.setProgram(program);	 		           
+					    	    feedBackRepository.save(feedbkn);
+			                return ResponseEntity.ok().body("Update success");
+		             }    	    	
+	            	
 	            }
 	            else {
 	            	return ResponseEntity.badRequest().body("Can not update");

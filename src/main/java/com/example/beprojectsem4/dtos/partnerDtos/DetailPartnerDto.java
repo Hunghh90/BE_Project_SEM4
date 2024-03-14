@@ -1,6 +1,6 @@
 package com.example.beprojectsem4.dtos.partnerDtos;
 
-import com.example.beprojectsem4.dtos.programDtos.TotalMoneyDto;
+import com.example.beprojectsem4.dtos.programDtos.DetailProgramDto;
 import com.example.beprojectsem4.entities.PartnerAttachmentEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,5 +20,5 @@ public class DetailPartnerDto {
     private List<PartnerAttachmentEntity> attachment;
     private String status;
     private Date createdAt;
-    private List<TotalMoneyDto> programs;
+    private List<DetailProgramDto> programs;
 }

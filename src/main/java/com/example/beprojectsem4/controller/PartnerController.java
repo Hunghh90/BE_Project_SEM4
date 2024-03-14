@@ -39,7 +39,7 @@ public class PartnerController {
         return partnerService.blockPartner(id);
     }
 
-    @GetMapping("/get-partner")
+    @GetMapping("/detail-partner")
     public ResponseEntity<?> getPartner(@RequestParam("id") Long id){
         return partnerService.getPartner(id);
     }

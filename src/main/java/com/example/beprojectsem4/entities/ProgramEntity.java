@@ -48,6 +48,8 @@ public class ProgramEntity {
     private Date updatedAt;
     @Column(name = "total")
     private Double totalMoney;
+    @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
+    private List<DonationEntity> donations;
 
     @PrePersist
     protected void onCreate() {

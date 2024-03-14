@@ -5,7 +5,7 @@ import com.example.beprojectsem4.dtos.partnerDtos.CreatePartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.GetListPartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.PartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.UpdatePartnerDto;
-import com.example.beprojectsem4.dtos.programDtos.TotalMoneyDto;
+import com.example.beprojectsem4.dtos.programDtos.DetailProgramDto;
 import com.example.beprojectsem4.entities.*;
 import com.example.beprojectsem4.helper.EntityDtoConverter;
 import com.example.beprojectsem4.helper.TransferValuesIfNull;
@@ -24,9 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PartnerServiceImpl implements PartnerService {
@@ -146,6 +144,7 @@ public class PartnerServiceImpl implements PartnerService {
         try {
             Optional<PartnerEntity> partner = partnerRepository.findById(id);
             if (partner.isPresent()) {
+                userService.blockUser(partner.get().getEmail());
                 PartnerEntity p = partner.get();
                 p.setStatus("Blocked");
                 partnerRepository.save(p);
@@ -212,11 +211,22 @@ public class PartnerServiceImpl implements PartnerService {
         try {
             Optional<PartnerEntity> partner = partnerRepository.findById(id);
             if(partner.isPresent()){
-//                List<TotalMoneyDto> total = new ArrayList<>();
-//                for (ProgramEntity program : partner.get().getPrograms()){
-//                    DonationEntity donation =
-//                }
+                List<DetailProgramDto> total = new ArrayList<>();
+
+                for (ProgramEntity program : partner.get().getPrograms()){
+                    Map<String, Double> totalAmountByPaymentMethod = new HashMap<>();
+                    for (DonationEntity donation : program.getDonations()) {
+                        String paymentMethod = donation.getPaymentMethod();
+                        Double amount = donation.getAmount();
+                        totalAmountByPaymentMethod.put(paymentMethod, totalAmountByPaymentMethod.getOrDefault(paymentMethod, 0.0) + amount);
+                    }
+                    DetailProgramDto moneyDto = EntityDtoConverter.convertToDto(program, DetailProgramDto.class);
+                    moneyDto.setDonateByPaypal(totalAmountByPaymentMethod.getOrDefault("Paypal",0.0));
+                    moneyDto.setDonateByVNPay(totalAmountByPaymentMethod.getOrDefault("VNPay",0.0));
+                    total.add(moneyDto);
+                }
                 PartnerDto partnerDto = EntityDtoConverter.convertToDto(partner.get(),PartnerDto.class);
+                partnerDto.setPrograms(total);
                 return ResponseEntity.ok().body(partnerDto);
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found partner");

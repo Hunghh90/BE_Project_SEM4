@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TotalMoneyDto {
+public class DetailProgramDto {
     private Long programId;
     private String programName;
     private Long target;

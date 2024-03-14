@@ -2,20 +2,16 @@ package com.example.beprojectsem4.service.impl;
 
 import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
 import com.example.beprojectsem4.dtos.partnerDtos.CreatePartnerDto;
-import com.example.beprojectsem4.dtos.partnerDtos.GetPartnersDto;
+import com.example.beprojectsem4.dtos.partnerDtos.GetListPartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.PartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.UpdatePartnerDto;
-import com.example.beprojectsem4.entities.PartnerAttachmentEntity;
-import com.example.beprojectsem4.entities.PartnerEntity;
-import com.example.beprojectsem4.entities.RoleEntity;
-import com.example.beprojectsem4.entities.UserEntity;
+import com.example.beprojectsem4.dtos.programDtos.TotalMoneyDto;
+import com.example.beprojectsem4.entities.*;
 import com.example.beprojectsem4.helper.EntityDtoConverter;
 import com.example.beprojectsem4.helper.TransferValuesIfNull;
 import com.example.beprojectsem4.repository.DynamicSpecification;
 import com.example.beprojectsem4.repository.PartnerAttachmentRepository;
 import com.example.beprojectsem4.repository.PartnerRepository;
-import com.example.beprojectsem4.repository.RoleRepository;
-import com.example.beprojectsem4.service.ImageUploadService;
 import com.example.beprojectsem4.service.PartnerService;
 import com.example.beprojectsem4.service.RoleService;
 import com.example.beprojectsem4.service.UserService;
@@ -71,7 +67,6 @@ public class PartnerServiceImpl implements PartnerService {
                             "12345678",
                             null,
                             null,
-                            null,
                             createPartnerDto.getPartnerName(),
                             createPartnerDto.getUrlLogo()
                     );
@@ -99,7 +94,7 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
-    public ResponseEntity<?> listPartner(GetPartnersDto getPartnerDto) {
+    public ResponseEntity<?> listPartner(GetListPartnerDto getPartnerDto) {
         try {
             if(getPartnerDto.getPage() <=0){
                 getPartnerDto.setPage(1);
@@ -217,6 +212,10 @@ public class PartnerServiceImpl implements PartnerService {
         try {
             Optional<PartnerEntity> partner = partnerRepository.findById(id);
             if(partner.isPresent()){
+//                List<TotalMoneyDto> total = new ArrayList<>();
+//                for (ProgramEntity program : partner.get().getPrograms()){
+//                    DonationEntity donation =
+//                }
                 PartnerDto partnerDto = EntityDtoConverter.convertToDto(partner.get(),PartnerDto.class);
                 return ResponseEntity.ok().body(partnerDto);
             }

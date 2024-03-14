@@ -44,7 +44,7 @@ public class UserEntity {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
-    private UserAttachmentEntity userAttachment;
+    private UserAttachmentEntity avatarUrl;
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))

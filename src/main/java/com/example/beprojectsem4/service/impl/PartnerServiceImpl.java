@@ -1,6 +1,7 @@
 package com.example.beprojectsem4.service.impl;
 
 import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
+import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
 import com.example.beprojectsem4.dtos.partnerDtos.CreatePartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.GetListPartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.PartnerDto;
@@ -92,17 +93,17 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
-    public ResponseEntity<?> listPartner(GetListPartnerDto getPartnerDto) {
+    public ResponseEntity<?> listPartner(PaginateAndSearchByNameDto paginateAndSearchByNameDto) {
         try {
-            if(getPartnerDto.getPage() <=0){
-                getPartnerDto.setPage(1);
+            if(paginateAndSearchByNameDto.getPage() <=0){
+                paginateAndSearchByNameDto.setPage(1);
             }
-            if(getPartnerDto.getSize()<=0){
-                getPartnerDto.setSize(20);
+            if(paginateAndSearchByNameDto.getSize()<=0){
+                paginateAndSearchByNameDto.setSize(20);
             }
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
-            PageRequest pageRequest = PageRequest.of(getPartnerDto.getPage()-1, getPartnerDto.getSize(),sort);
-            Page<PartnerEntity> partners = partnerRepository.findByPartnerNameContaining(getPartnerDto.getPartnerName(),pageRequest);
+            PageRequest pageRequest = PageRequest.of(paginateAndSearchByNameDto.getPage()-1, paginateAndSearchByNameDto.getSize(),sort);
+            Page<PartnerEntity> partners = partnerRepository.findByPartnerNameContaining(paginateAndSearchByNameDto.getSearch(),pageRequest);
             if (partners.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No found partner");
             }

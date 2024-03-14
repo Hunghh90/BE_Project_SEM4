@@ -1,5 +1,6 @@
 package com.example.beprojectsem4.service.impl;
 
+import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
 import com.example.beprojectsem4.dtos.programDtos.CreateProgramDto;
 import com.example.beprojectsem4.dtos.programDtos.GetProgramsDto;
 import com.example.beprojectsem4.dtos.programDtos.ProgramDto;
@@ -68,11 +69,11 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     @Override
-    public ResponseEntity<?> listProgram(GetProgramsDto getProgramDto) {
+    public ResponseEntity<?> listProgram(PaginateAndSearchByNameDto paginateAndSearchByNameDto) {
         try{
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
-            PageRequest pageable = PageRequest.of(getProgramDto.getPage(), getProgramDto.getSize(),sort);
-            Page<ProgramEntity> programs = programRepository.findByProgramNameContaining(getProgramDto.getProgramName(),pageable );
+            PageRequest pageable = PageRequest.of(paginateAndSearchByNameDto.getPage(), paginateAndSearchByNameDto.getSize(),sort);
+            Page<ProgramEntity> programs = programRepository.findByProgramNameContaining(paginateAndSearchByNameDto.getSearch(),pageable );
             List<ProgramDto> programDtoList = new ArrayList<>();
             for (ProgramEntity p : programs){
                 ProgramDto pd = EntityDtoConverter.convertToDto(p,ProgramDto.class);
@@ -118,7 +119,7 @@ public class ProgramServiceImpl implements ProgramService {
     public ResponseEntity<?> activekProgram(Long id) {
         try {
             Optional<ProgramEntity> programOptional = programRepository.findById(id);
-            if (programOptional.isPresent()) {
+            if (programOptional.isPresent() && programOptional.get().getStatus().equals("DeActive")) {
                 programOptional.get().setStatus("Active");
                 programRepository.save(programOptional.get());
                 return ResponseEntity.ok().body("Active program success");
@@ -136,9 +137,14 @@ public class ProgramServiceImpl implements ProgramService {
         try {
             Optional<ProgramEntity> programOptional = programRepository.findById(id);
             if(programOptional.isPresent()){
-                programOptional.get().setStatus("Block");
-                programRepository.save(programOptional.get());
-                return ResponseEntity.ok().body("Block program success");
+                if(programOptional.get().getStartDonateDate().before(new Date())){
+                    programOptional.get().setStatus("Block");
+                    programRepository.save(programOptional.get());
+                    return ResponseEntity.ok().body("Block program success");
+                }else {
+                    return ResponseEntity.badRequest().body("The program is already active and cannot be changed");
+                }
+
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found program");
         }catch (Exception e){
@@ -177,6 +183,44 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.ok().body(programDtoList);
         }catch (Exception e){
             System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> listProgramDeActive(PaginateAndSearchByNameDto paginateAndSearchByNameDto) {
+        try{
+                if(paginateAndSearchByNameDto.getPage() <=0){
+                    paginateAndSearchByNameDto.setPage(1);
+                }
+                if(paginateAndSearchByNameDto.getSize()<=0){
+                    paginateAndSearchByNameDto.setSize(20);
+                }
+            Sort sort = Sort.by(Sort.Order.desc("createdAt"));
+            PageRequest pageable = PageRequest.of(paginateAndSearchByNameDto.getPage()-1, paginateAndSearchByNameDto.getSize(),sort);
+            Page<ProgramEntity> programs = programRepository.findByStatus("DeActive",pageable );
+            List<ProgramDto> programDtoList = new ArrayList<>();
+            for (ProgramEntity p : programs){
+                ProgramDto pd = EntityDtoConverter.convertToDto(p,ProgramDto.class);
+                programDtoList.add(pd);
+            }
+            return ResponseEntity.ok().body(programDtoList);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> detailProgram(Long id) {
+        try{
+            Optional<ProgramEntity> program = programRepository.findById(id);
+            if(program.isPresent()){
+                ProgramDto programDto = EntityDtoConverter.convertToDto(program.get(),ProgramDto.class);
+                return ResponseEntity.ok().body(programDto);
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found program");
+        }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }

@@ -1,5 +1,6 @@
 package com.example.beprojectsem4.service;
 
+import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
 import com.example.beprojectsem4.dtos.partnerDtos.CreatePartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.GetListPartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.UpdatePartnerDto;
@@ -10,7 +11,7 @@ public interface PartnerService {
     ResponseEntity<?> createPartner(CreatePartnerDto createPartnerDto);
     ResponseEntity<?> getPartner(Long id);
     ResponseEntity<?> getPartnerByEmail(String email);
-    ResponseEntity<?> listPartner(GetListPartnerDto getPartnerDto);
+    ResponseEntity<?> listPartner(PaginateAndSearchByNameDto paginateAndSearchByNameDto);
     ResponseEntity<?> updatePartner(Long id, UpdatePartnerDto updatePartnerDto);
     ResponseEntity<?> blockPartner(Long id);
     boolean checkPartnertByEmail(String email);

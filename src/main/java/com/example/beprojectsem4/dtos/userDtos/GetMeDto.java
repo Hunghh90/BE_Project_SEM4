@@ -14,6 +14,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetMeDto {
+    private Long userId;
     private String email;
     private String displayName;
     @Temporal(TemporalType.DATE)

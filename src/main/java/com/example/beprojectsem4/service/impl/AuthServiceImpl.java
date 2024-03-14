@@ -51,9 +51,6 @@ public class AuthServiceImpl implements AuthService {
             if (!createAccountResponse.getStatusCode().is2xxSuccessful()) {
                 return createAccountResponse;
             }
-            if(!registerDto.getPassword().equals(registerDto.getConfirmPassword())){
-                return ResponseEntity.badRequest().body("Confirm password not correct");
-            }
             String hashedEmail = bCryptPasswordEncoder.encode(registerDto.getEmail());
             Resource resource = new ClassPathResource("templates/ActiveAccount.html");
             String htmlContent = new String(FileCopyUtils.copyToByteArray(resource.getInputStream()), StandardCharsets.UTF_8);

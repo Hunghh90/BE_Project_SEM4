@@ -60,6 +60,9 @@ public class UserServiceImpl implements UserService {
             if (u != null) {
                 return ResponseEntity.badRequest().body("Email is exists");
             }
+            if(!registerDto.getPassword().equals(registerDto.getConfirmPassword())){
+                return ResponseEntity.badRequest().body("Confirm password not correct");
+            }
             UserEntity us = EntityDtoConverter.convertToEntity(registerDto, UserEntity.class);
             us.setPassword(bCryptPasswordEncoder.encode(us.getPassword()));
             us.setStatus("DeActivate");
@@ -201,7 +204,6 @@ public class UserServiceImpl implements UserService {
             if(user == null){
                 return "User not found";
             }else{
-                user.setBod(updateUserDto.getBod());
                 user.setPhoneNumber(updateUserDto.getPhoneNumber());
                 repository.save(user);
                 return "Update user successfully";

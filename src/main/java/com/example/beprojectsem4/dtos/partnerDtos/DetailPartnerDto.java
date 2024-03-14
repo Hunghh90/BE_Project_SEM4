@@ -1,5 +1,6 @@
 package com.example.beprojectsem4.dtos.partnerDtos;
 
+import com.example.beprojectsem4.dtos.programDtos.TotalMoneyDto;
 import com.example.beprojectsem4.entities.PartnerAttachmentEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,9 +10,9 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class PartnerDto {
+@AllArgsConstructor
+public class DetailPartnerDto {
     private Long partnerId;
     private String partnerName;
     private String email;
@@ -19,4 +20,5 @@ public class PartnerDto {
     private List<PartnerAttachmentEntity> attachment;
     private String status;
     private Date createdAt;
+    private List<TotalMoneyDto> programs;
 }

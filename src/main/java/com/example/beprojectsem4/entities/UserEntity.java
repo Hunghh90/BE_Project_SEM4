@@ -24,10 +24,10 @@ public class UserEntity {
     @Column(unique = true)
     private String email;
     private String password;
-    @Column(name = "birthday")
-    @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "yyyy/MM/dd")
-    private Date bod;
+//    @Column(name = "birthday")
+//    @Temporal(TemporalType.DATE)
+//    @DateTimeFormat(pattern = "yyyy/MM/dd")
+//    private Date bod;
     @Column(name = "phone_number")
     private String phoneNumber;
     private String status;
@@ -58,10 +58,10 @@ public class UserEntity {
     protected void onUpdate() {
         updatedAt = new Date();
     }
-    public UserEntity(String email,String password,Date bod,String phoneNumber,String displayName){
+    public UserEntity(String email,String password,String phoneNumber,String displayName){
         this.email = email;
         this.password = password;
-        this.bod = bod;
+//        this.bod = bod;
         this.phoneNumber = phoneNumber;
         this.displayName = displayName;
         this.status = "Deactivate";

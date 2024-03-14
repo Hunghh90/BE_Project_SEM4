@@ -1,7 +1,7 @@
 package com.example.beprojectsem4.controller;
 
 import com.example.beprojectsem4.dtos.partnerDtos.CreatePartnerDto;
-import com.example.beprojectsem4.dtos.partnerDtos.GetPartnersDto;
+import com.example.beprojectsem4.dtos.partnerDtos.GetListPartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.UpdatePartnerDto;
 import com.example.beprojectsem4.service.PartnerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class PartnerController {
     }
 
     @GetMapping("/get-all-partner")
-    public ResponseEntity<?> listPartner(@Nullable GetPartnersDto getPartnerDto){
+    public ResponseEntity<?> listPartner(@Nullable GetListPartnerDto getPartnerDto){
         return partnerService.listPartner(getPartnerDto);
     }
 @GetMapping("/get-partner-by-search")

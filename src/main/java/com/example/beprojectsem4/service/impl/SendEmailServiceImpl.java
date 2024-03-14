@@ -17,12 +17,17 @@ public class SendEmailServiceImpl implements SendEmailService {
     private JavaMailSender mailSender;
     @Override
     public void sendEmail(String email, String subject, String body) throws  MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-        helper.setFrom("Hunghh");
-        helper.setTo(email);
-        helper.setSubject(subject);
-        helper.setText(body,true);
-        mailSender.send(message);
+       try {
+           MimeMessage message = mailSender.createMimeMessage();
+           MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+           helper.setFrom("Hunghh");
+           helper.setTo(email);
+           helper.setSubject(subject);
+           helper.setText(body,true);
+           mailSender.send(message);
+           System.out.println("Success");
+       }catch (Exception e){
+           System.out.println(e.getMessage());
+       }
     }
 }

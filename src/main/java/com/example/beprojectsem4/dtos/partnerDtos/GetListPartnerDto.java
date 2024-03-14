@@ -8,7 +8,7 @@ import org.springframework.lang.Nullable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetPartnersDto {
+public class GetListPartnerDto {
     @Nullable
     private String partnerName;
     @Nullable

@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CreateProgramDto {
     private String programName;
-    private Double target;
+    private Long target;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date startDonateDate;
@@ -31,6 +31,5 @@ public class CreateProgramDto {
     private String description;
     private boolean finishSoon;
     private boolean recruitCollaborators;
-    private Long partnerId;
     private List<String> imageUrl;
 }

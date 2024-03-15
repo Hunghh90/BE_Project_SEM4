@@ -23,7 +23,7 @@ public class ProgramEntity {
     private Long programId;
     @Column(name = "program_name",unique = true)
     private String programName;
-    private Double target;
+    private Long target;
     @Column(name = "start_donate_date")
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -57,7 +57,6 @@ public class ProgramEntity {
     private Date updatedAt;
     @Column(name = "total")
     private Double totalMoney;
-//    @JsonIgnore
     @OneToMany(mappedBy = "program")
     private List<DonationEntity> donations;
 
@@ -71,7 +70,7 @@ public class ProgramEntity {
         updatedAt = new Date();
     }
 
-    public ProgramEntity(String programName,String description,Double target,Date startDonateDate,Date endDonateDate,Date finishDate,String status,boolean finishSoon,boolean recruitCollaborators){
+    public ProgramEntity(String programName,String description,Long target,Date startDonateDate,Date endDonateDate,Date finishDate,String status,boolean finishSoon,boolean recruitCollaborators){
         this.programName = programName;
         this.description = description;
         this.startDonateDate = startDonateDate;

@@ -259,7 +259,7 @@ public class ProgramServiceImpl implements ProgramService {
             ProgramEntity programEntity = programEntityOptional.get();
             programEntity.setTotalMoney(programEntity.getTotalMoney() + donateDto.getAmount());
             if(programEntity.isFinishSoon()){
-                int compareResult = programEntity.getTarget().compareTo(programEntity.getTotalMoney());
+                int compareResult = Double.compare(programEntity.getTarget().doubleValue(), programEntity.getTotalMoney());
                 if(compareResult >= 0){
                     programEntity.setStatus("End");
                 }

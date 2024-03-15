@@ -22,7 +22,7 @@ public class PartnerController {
     }
 
     @GetMapping("/get-all-partner")
-    public ResponseEntity<?> listPartner(@Nullable @RequestBody PaginateAndSearchByNameDto paginateAndSearchByNameDto){
+    public ResponseEntity<?> listPartner(@Nullable PaginateAndSearchByNameDto paginateAndSearchByNameDto){
         return partnerService.listPartner(paginateAndSearchByNameDto);
     }
 @GetMapping("/get-partner-by-search")

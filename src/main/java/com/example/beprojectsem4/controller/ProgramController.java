@@ -16,7 +16,7 @@ public class ProgramController {
     @Autowired
     private ProgramService programService;
     @GetMapping("/get-all-programs")
-    public ResponseEntity<?> getAllProgram(@RequestBody PaginateAndSearchByNameDto paginateAndSearchByNameDto){
+    public ResponseEntity<?> getAllProgram( PaginateAndSearchByNameDto paginateAndSearchByNameDto){
         return programService.listProgram(paginateAndSearchByNameDto);
     }
 
@@ -31,17 +31,17 @@ public class ProgramController {
     }
 
     @PostMapping("/active-program")
-    public ResponseEntity<?> activekProgram(@RequestParam Long id){
+    public ResponseEntity<?> activekProgram(@RequestBody Long id){
         return programService.activekProgram(id);
     }
 
     @PostMapping("/block-program")
-    public ResponseEntity<?> blockProgram(@RequestParam Long id){
+    public ResponseEntity<?> blockProgram(@RequestBody Long id){
         return programService.blockProgram(id);
     }
 
     @PostMapping("/search")
-    public ResponseEntity<?> searchAllField(@RequestParam("search") String search){
+    public ResponseEntity<?> searchAllField(@RequestBody() String search){
         return programService.searchAllField(search);
     }
 

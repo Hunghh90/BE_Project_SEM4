@@ -31,8 +31,6 @@ public class UserEntity {
     private String status;
     @Column(name = "display_name")
     private String displayName;
-    @OneToMany
-    private List<ProgramEntity> programs;
     @Column(name = "refresh_token")
     private String refreshToken;
     @Column(name = "created_at")

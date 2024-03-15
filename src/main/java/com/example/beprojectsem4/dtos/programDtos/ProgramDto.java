@@ -1,5 +1,7 @@
 package com.example.beprojectsem4.dtos.programDtos;
 
+import com.example.beprojectsem4.dtos.Donation.DonateDto;
+import com.example.beprojectsem4.entities.DonationEntity;
 import com.example.beprojectsem4.entities.PartnerEntity;
 import com.example.beprojectsem4.entities.ProgramAttachmentEntity;
 import jakarta.persistence.Column;
@@ -26,4 +28,5 @@ public class ProgramDto {
     private List<ProgramAttachmentEntity> attachment;
     private Double totalMoney;
     private PartnerEntity partner;
+    private List<DonateDto> donations;
 }

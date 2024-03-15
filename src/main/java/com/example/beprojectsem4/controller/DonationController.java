@@ -3,11 +3,10 @@ package com.example.beprojectsem4.controller;
 import com.example.beprojectsem4.config.VNPayConfig;
 import com.example.beprojectsem4.dto.request.RequestDonate;
 import com.example.beprojectsem4.dto.response.ResponseDonate;
-import com.example.beprojectsem4.dtos.Donation.DonateDto;
+import com.example.beprojectsem4.dtos.Donation.CreateDonateDto;
 import com.example.beprojectsem4.service.DonationService;
 import com.example.beprojectsem4.service.impl.PaypalService;
 import com.example.beprojectsem4.service.impl.VNPayService;
-import com.google.gson.JsonObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -88,7 +87,7 @@ public class DonationController {
             if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
                 if("Paypal".equals(request.getParameter("payment_Method"))) {
                     int vnpAmount = Integer.parseInt(vnpAmountParam);
-                    DonateDto donateDto = new DonateDto();
+                    CreateDonateDto donateDto = new CreateDonateDto();
                     donateDto.setId(Long.valueOf(request.getParameter("ProgramId")));
                     donateDto.setAmount(vnpAmount/100.0);
                     donateDto.setPaymentMethod("Paypal");
@@ -97,7 +96,7 @@ public class DonationController {
                 }
                 int vnpAmount = Integer.parseInt(vnpAmountParam);
                 double result = vnpAmount / 100.0;
-                DonateDto donateDto = new DonateDto();
+                CreateDonateDto donateDto = new CreateDonateDto();
                 donateDto.setId(Long.valueOf(request.getParameter("ProgramId")));
                 donateDto.setAmount(result);
                 donateDto.setPaymentMethod("VNPay");

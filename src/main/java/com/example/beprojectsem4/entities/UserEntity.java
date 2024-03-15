@@ -1,9 +1,9 @@
 package com.example.beprojectsem4.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -13,9 +13,11 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"programs","avatarUrl","roles"})
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,21 +26,17 @@ public class UserEntity {
     @Column(unique = true)
     private String email;
     private String password;
-//    @Column(name = "birthday")
-//    @Temporal(TemporalType.DATE)
-//    @DateTimeFormat(pattern = "yyyy/MM/dd")
-//    private Date bod;
     @Column(name = "phone_number")
     private String phoneNumber;
     private String status;
     @Column(name = "display_name")
     private String displayName;
-    @OneToMany(mappedBy = "user")
+    @OneToMany
     private List<ProgramEntity> programs;
     @Column(name = "refresh_token")
     private String refreshToken;
     @Column(name = "created_at")
-    private Date createAt;
+    private Date createdAt;
     @Column(name = "updated_at")
     private Date updatedAt;
 
@@ -51,7 +49,7 @@ public class UserEntity {
     Set<RoleEntity> roles = new HashSet<>();
     @PrePersist
     protected void onCreate() {
-        createAt = new Date();
+        createdAt = new Date();
     }
 
     @PreUpdate

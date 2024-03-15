@@ -1,5 +1,7 @@
 package com.example.beprojectsem4.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"programs","attachment"})
 public class PartnerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

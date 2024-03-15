@@ -1,17 +1,18 @@
 package com.example.beprojectsem4.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 
 @Entity
 @Table(name = "partner_payment")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"partner"})
 public class PartnerPaymentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +26,7 @@ public class PartnerPaymentEntity {
     private String bankName;
     private String status;
     @Column(name = "created_at")
-    private Date createAt;
+    private Date createdAt;
     @Column(name = "updated_at")
     private Date updatedAt;
     @OneToOne
@@ -34,7 +35,7 @@ public class PartnerPaymentEntity {
 
     @PrePersist
     protected void onCreate() {
-        createAt = new Date();
+        createdAt = new Date();
     }
 
     @PreUpdate

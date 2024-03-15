@@ -6,18 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
-import java.util.Date;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DonateDto {
-    private Long donationId;
+public class CreateDonateDto {
+    private Long id;
     private Double amount;
     @Nullable
     private String paymentMethod;
     @Nullable
     private String description;
-    private GetMeDto user;
-    private Date createdAt;
 }

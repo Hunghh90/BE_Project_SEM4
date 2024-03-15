@@ -17,9 +17,9 @@ public class GetMeDto {
     private Long userId;
     private String email;
     private String displayName;
-    @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "yyyy/MM/dd")
-    private Date bod;
+//    @Temporal(TemporalType.DATE)
+//    @DateTimeFormat(pattern = "yyyy/MM/dd")
+//    private Date bod;
     private String phoneNumber;
     private UserAttachmentEntity avatarUrl;
     private String status;

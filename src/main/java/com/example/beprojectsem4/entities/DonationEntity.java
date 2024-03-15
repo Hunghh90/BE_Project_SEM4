@@ -1,39 +1,40 @@
 package com.example.beprojectsem4.entities;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 @Entity
 @Table(name = "donations")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
+@JsonIgnoreProperties({"user","program"})
 public class DonationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long donationId;
-    private double amount;
+    private Double amount;
     private String description;
     @Column(name = "created_at")
-    private Date createAt;
+    private Date createdAt;
     @Column(name = "updated_at")
     private Date updatedAt;
     private String paymentMethod;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "program_id")
     private ProgramEntity program;
 
     @PrePersist
     protected void onCreate() {
-        createAt = new Date();
+        createdAt = new Date();
     }
 
     @PreUpdate

@@ -270,7 +270,7 @@ public class UserServiceImpl implements UserService {
             List<UserEntity> users = repository.findAllByStatus("DeActivate");
             Date currentDate = new Date();
             for (UserEntity user : users) {
-                long diffInMillies = Math.abs(currentDate.getTime() - user.getCreateAt().getTime());
+                long diffInMillies = Math.abs(currentDate.getTime() - user.getCreatedAt().getTime());
                 long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
                 if (diff > 7) {
                     UserAttachmentEntity attachment = userAttachmentRepository.findUserAttachmentEntityByUser_UserId(user.getUserId());

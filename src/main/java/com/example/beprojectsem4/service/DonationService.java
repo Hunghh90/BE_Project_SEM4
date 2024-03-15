@@ -1,9 +1,9 @@
 package com.example.beprojectsem4.service;
 
-import com.example.beprojectsem4.dto.request.RequestDonate;
-import com.example.beprojectsem4.dtos.Donation.DonateDto;
+import com.example.beprojectsem4.dtos.Donation.CreateDonateDto;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
 
 public interface DonationService {
-     void DonationSuccess(HttpServletRequest request,DonateDto donateDto);
+     ResponseEntity<?> DonationSuccess(HttpServletRequest request, CreateDonateDto donateDto);
 }

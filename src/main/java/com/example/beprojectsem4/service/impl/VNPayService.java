@@ -18,8 +18,6 @@ import java.util.*;
 @Service
 public class VNPayService {
     @Autowired
-    DonationServiceImpl donationService;
-    @Autowired
     ProgramRepository programRepository;
     public  String createOrder(RequestDonate requestDonate){
         Optional<ProgramEntity> findProgramId =  programRepository.findById(requestDonate.getProgramId());
@@ -51,7 +49,7 @@ public class VNPayService {
         vnp_Params.put("vnp_Locale", locate);
 
 //        String urlReturn += VNPayConfig.vnp_ReturnUrl;
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl+ "?ProgramId=" + requestDonate.getProgramId());
+        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl+ "?ProgramId=" + requestDonate.getProgramId()+"&UserId="+requestDonate.getUserId());
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));

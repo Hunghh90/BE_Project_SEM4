@@ -23,8 +23,6 @@ public class PaypalService {
     @Autowired
     private APIContext apiContext;
 
-    @Autowired
-    DonationServiceImpl donationService;
 
     @Autowired
     ProgramRepository programRepository;

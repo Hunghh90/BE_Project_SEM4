@@ -1,15 +1,10 @@
 package com.example.beprojectsem4.service.impl;
 
-import com.example.beprojectsem4.dtos.userDtos.ChangePasswordDto;
+import com.example.beprojectsem4.dtos.userDtos.*;
 import com.example.beprojectsem4.dtos.authDtos.JwtResponseDto;
 import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
 import com.example.beprojectsem4.dtos.authDtos.TokenResponseDto;
-import com.example.beprojectsem4.dtos.userDtos.GetMeDto;
-import com.example.beprojectsem4.dtos.userDtos.ResetPasswordDto;
-import com.example.beprojectsem4.dtos.userDtos.UpdateUserDto;
-import com.example.beprojectsem4.entities.RoleEntity;
-import com.example.beprojectsem4.entities.UserAttachmentEntity;
-import com.example.beprojectsem4.entities.UserEntity;
+import com.example.beprojectsem4.entities.*;
 import com.example.beprojectsem4.helper.EntityDtoConverter;
 import com.example.beprojectsem4.repository.RoleRepository;
 import com.example.beprojectsem4.repository.UserAttachmentRepository;
@@ -30,10 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -188,9 +180,19 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<?> getMe(HttpServletRequest request) {
         try{
             UserEntity user = findUserByToken(request);
+            if(user == null){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found user");
+            }
             String userRole = user.getRoles().iterator().next().getRoleName();
+            List<DonateByUserDto> donations = new ArrayList<>();
+            for(DonationEntity donation : user.getDonations()){
+                DonateByUserDto donate = EntityDtoConverter.convertToDto(donation, DonateByUserDto.class);
+                donate.setProgramName(donation.getProgram().getProgramName());
+                donations.add(donate);
+            }
             GetMeDto gm = EntityDtoConverter.convertToDto(user, GetMeDto.class);
             gm.setRole(userRole);
+            gm.setDonations(donations);
             return ResponseEntity.ok().body(gm);
         }catch (Exception ex){
             System.out.println(ex.getMessage());

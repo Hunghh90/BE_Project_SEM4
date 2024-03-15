@@ -17,7 +17,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"programs","avatarUrl","roles"})
+@JsonIgnoreProperties({"avatarUrl","roles","programs","donations"})
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,6 +39,8 @@ public class UserEntity {
     private Date createdAt;
     @Column(name = "updated_at")
     private Date updatedAt;
+    @OneToMany(mappedBy = "user")
+    private List<DonationEntity> donations;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn

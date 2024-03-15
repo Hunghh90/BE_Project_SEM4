@@ -103,7 +103,7 @@ public class PartnerServiceImpl implements PartnerService {
             }
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
             PageRequest pageRequest = PageRequest.of(paginateAndSearchByNameDto.getPage()-1, paginateAndSearchByNameDto.getSize(),sort);
-            Page<PartnerEntity> partners = partnerRepository.findByPartnerNameContaining(paginateAndSearchByNameDto.getSearch(),pageRequest);
+            Page<PartnerEntity> partners = partnerRepository.findByPartnerNameContaining(paginateAndSearchByNameDto.getName(),pageRequest);
             if (partners.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No found partner");
             }

@@ -5,6 +5,7 @@ import com.example.beprojectsem4.entities.PartnerAttachmentEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import java.util.Date;
 import java.util.List;
@@ -17,6 +18,8 @@ public class DetailPartnerDto {
     private String partnerName;
     private String email;
     private String description;
+    private String paypalAccount;
+    private String vnpayAccount;
     private List<PartnerAttachmentEntity> attachment;
     private String status;
     private Date createdAt;

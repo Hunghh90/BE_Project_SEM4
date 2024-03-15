@@ -13,4 +13,5 @@ public class RequestDonate {
     @Pattern(regexp = "^(VNPay|Paypal)$", message = "Invalid payment method. Allowed values are 'VNPay' or 'Paypal'")
     private String paymentMethod;
     private Long programId;
+    private Long userId;
 }

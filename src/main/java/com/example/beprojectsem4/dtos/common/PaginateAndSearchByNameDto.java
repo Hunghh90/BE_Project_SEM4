@@ -10,7 +10,7 @@ import org.springframework.lang.Nullable;
 @AllArgsConstructor
 public class PaginateAndSearchByNameDto {
     @Nullable
-    private String search;
+    private String name;
     @Nullable
     private int page;
     @Nullable

@@ -78,7 +78,7 @@ public class ProgramServiceImpl implements ProgramService {
             }
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
             PageRequest pageable = PageRequest.of(paginateAndSearchByNameDto.getPage()-1, paginateAndSearchByNameDto.getSize(),sort);
-            Page<ProgramEntity> programs = programRepository.findByProgramNameContaining(paginateAndSearchByNameDto.getSearch(),pageable );
+            Page<ProgramEntity> programs = programRepository.findByProgramNameContaining(paginateAndSearchByNameDto.getName(),pageable );
             List<ProgramDto> programDtoList = new ArrayList<>();
             for (ProgramEntity p : programs){
                 List<DonateDto> donateDtoList = new ArrayList<>();
@@ -213,7 +213,7 @@ public class ProgramServiceImpl implements ProgramService {
                 }
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
             PageRequest pageable = PageRequest.of(paginateAndSearchByNameDto.getPage()-1, paginateAndSearchByNameDto.getSize(),sort);
-            Page<ProgramEntity> programs = programRepository.findByStatus(paginateAndSearchByNameDto.getSearch(),pageable );
+            Page<ProgramEntity> programs = programRepository.findByStatus(paginateAndSearchByNameDto.getName(),pageable );
             List<ProgramDto> programDtoList = new ArrayList<>();
             for (ProgramEntity p : programs){
                 ProgramDto pd = EntityDtoConverter.convertToDto(p,ProgramDto.class);

@@ -5,6 +5,7 @@ import com.example.beprojectsem4.entities.PartnerAttachmentEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import java.util.Date;
 import java.util.List;
@@ -21,4 +22,6 @@ public class PartnerDto {
     private String status;
     private Date createdAt;
     private List<DetailProgramDto> programs;
+    private String paypalAccount;
+    private String vnpayAccount;
 }

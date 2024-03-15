@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.lang.Nullable;
 
 import java.util.Date;
 import java.util.List;
@@ -35,7 +36,10 @@ public class PartnerEntity {
     private Date createdAt;
     @Column(name = "updated_at")
     private Date updatedAt;
-
+    @Column(name = "paypal_account")
+    private String paypalAccount;
+    @Column(name = "vnpay_account")
+    private String vnpayAccount;
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();
@@ -45,10 +49,12 @@ public class PartnerEntity {
     protected void onUpdate() {
         updatedAt = new Date();
     }
-    public PartnerEntity(String partnerName,String email,String description,String status) {
+    public PartnerEntity(String partnerName,String email,String description,String status,String vnpayAccount,String paypalAccount) {
         this.partnerName = partnerName;
         this.email = email;
         this.description = description;
         this.status = status;
+        this.vnpayAccount = vnpayAccount;
+        this.paypalAccount = paypalAccount;
     }
 }

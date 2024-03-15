@@ -11,6 +11,7 @@ import org.springframework.lang.Nullable;
 @AllArgsConstructor
 public class CreateDonateDto {
     private Long id;
+    private Long userId;
     private Double amount;
     @Nullable
     private String paymentMethod;

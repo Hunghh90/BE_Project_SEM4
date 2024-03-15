@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -302,6 +303,17 @@ public class UserServiceImpl implements UserService {
         }catch (Exception ex){
             System.out.println(ex.getMessage());
             return false;
+        }
+    }
+
+    @Override
+    public UserEntity findUserById(Long id) {
+        try{
+            Optional<UserEntity> user = repository.findById(id);
+            return user.orElse(null);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
         }
     }
 }

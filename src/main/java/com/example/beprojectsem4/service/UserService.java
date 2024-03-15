@@ -20,6 +20,7 @@ public interface UserService {
     String blockUser(String email);
     boolean activeUser(String email);
     UserEntity checkUser(String email);
+    UserEntity findUserById(Long id);
     UserEntity findUserByToken(HttpServletRequest request);
     boolean resetPassword(String email, ResetPasswordDto resetPasswordDto);
 }

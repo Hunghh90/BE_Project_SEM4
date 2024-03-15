@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CreateProgramDto {
     private String programName;
-    private Long target;
+    private Double target;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date startDonateDate;

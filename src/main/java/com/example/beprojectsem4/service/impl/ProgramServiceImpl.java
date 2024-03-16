@@ -58,6 +58,8 @@ public class ProgramServiceImpl implements ProgramService {
                     ProgramAttachmentEntity pa = new ProgramAttachmentEntity(pr,"Certify",url);
                     programAttachmentRepository.save(pa);
                 }
+                ProgramAttachmentEntity lg = new ProgramAttachmentEntity(pr,"Logo",createProgramDto.getImageLogo());
+                programAttachmentRepository.save(lg);
                 return ResponseEntity.ok().body("Create program success");
             }
             return ResponseEntity.badRequest().body("Program name is already or The date entered is incorrect");

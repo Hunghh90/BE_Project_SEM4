@@ -32,4 +32,5 @@ public class CreateProgramDto {
     private boolean finishSoon;
     private boolean recruitCollaborators;
     private List<String> imageUrl;
+    private String imageLogo;
 }

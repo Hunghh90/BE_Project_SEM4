@@ -3,7 +3,6 @@ package com.example.beprojectsem4.service.impl;
 import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
 import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
 import com.example.beprojectsem4.dtos.partnerDtos.CreatePartnerDto;
-import com.example.beprojectsem4.dtos.partnerDtos.GetListPartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.PartnerDto;
 import com.example.beprojectsem4.dtos.partnerDtos.UpdatePartnerDto;
 import com.example.beprojectsem4.dtos.programDtos.DetailProgramDto;
@@ -103,7 +102,7 @@ public class PartnerServiceImpl implements PartnerService {
             }
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
             PageRequest pageRequest = PageRequest.of(paginateAndSearchByNameDto.getPage()-1, paginateAndSearchByNameDto.getSize(),sort);
-            Page<PartnerEntity> partners = partnerRepository.findByPartnerNameContaining(paginateAndSearchByNameDto                                                                                                                         .getName(),pageRequest);
+            Page<PartnerEntity> partners = partnerRepository.findByPartnerNameContaining(paginateAndSearchByNameDto.getName(),pageRequest);
             if (partners.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No found partner");
             }

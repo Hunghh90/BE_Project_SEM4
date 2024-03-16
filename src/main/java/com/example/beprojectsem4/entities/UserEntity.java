@@ -39,7 +39,6 @@ public class UserEntity {
     private Date updatedAt;
     @OneToMany(mappedBy = "user")
     private List<DonationEntity> donations;
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private UserAttachmentEntity avatarUrl;

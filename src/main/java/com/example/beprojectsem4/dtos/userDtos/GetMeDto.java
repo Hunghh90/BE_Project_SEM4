@@ -4,10 +4,12 @@ import com.example.beprojectsem4.entities.UserAttachmentEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 
 import java.util.Date;
 import java.util.List;
@@ -28,4 +30,6 @@ public class GetMeDto {
     private String role;
     private Date updatedAt;
     private List<DonateByUserDto> donations;
+    @Nullable
+    private Long partnerId;
 }

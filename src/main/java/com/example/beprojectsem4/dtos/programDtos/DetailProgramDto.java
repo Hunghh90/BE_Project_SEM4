@@ -26,4 +26,5 @@ public class DetailProgramDto {
     private Double totalMoney;
     private Double donateByPaypal;
     private Double donateByVNPay;
+    private Date createdAt;
 }

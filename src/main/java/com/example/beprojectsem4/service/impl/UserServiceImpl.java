@@ -6,9 +6,11 @@ import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
 import com.example.beprojectsem4.dtos.authDtos.TokenResponseDto;
 import com.example.beprojectsem4.entities.*;
 import com.example.beprojectsem4.helper.EntityDtoConverter;
+import com.example.beprojectsem4.repository.PartnerRepository;
 import com.example.beprojectsem4.repository.RoleRepository;
 import com.example.beprojectsem4.repository.UserAttachmentRepository;
 import com.example.beprojectsem4.repository.UserRepository;
+import com.example.beprojectsem4.service.PartnerService;
 import com.example.beprojectsem4.service.RoleService;
 import com.example.beprojectsem4.service.UserService;
 import com.example.beprojectsem4.service.jwt.JwtAuthenticationFilter;
@@ -45,6 +47,8 @@ public class UserServiceImpl implements UserService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private UserAttachmentRepository userAttachmentRepository;
+    @Autowired
+    private PartnerRepository partnerRepository;
 
     @Override
     public ResponseEntity<?> createAccountUser(RegisterDto registerDto) {
@@ -191,6 +195,11 @@ public class UserServiceImpl implements UserService {
                 donations.add(donate);
             }
             GetMeDto gm = EntityDtoConverter.convertToDto(user, GetMeDto.class);
+            if(userRole.equals("PARTNER")){
+                PartnerEntity partner = partnerRepository.findByEmail(user.getEmail());
+                assert partner != null;
+                gm.setPartnerId(partner.getPartnerId());
+            }
             gm.setRole(userRole);
             gm.setDonations(donations);
             return ResponseEntity.ok().body(gm);

@@ -30,8 +30,8 @@ public class ProgramController {
         return programService.updateProgram(request, id, updateProgramDto);
     }
 
-    @PostMapping("/active-program")
-    public ResponseEntity<?> activekProgram(@RequestBody Long id){
+    @GetMapping("/active-program/{id}")
+        public ResponseEntity<?> activekProgram(@PathVariable("id") Long id){
         return programService.activekProgram(id);
     }
 

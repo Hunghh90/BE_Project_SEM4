@@ -257,16 +257,19 @@ public class ProgramServiceImpl implements ProgramService {
             if(programEntityOptional.isEmpty()){
                 throw new NotFoundException("Not found Program");
             }
-            ProgramEntity programEntity = programEntityOptional.get();
-            programEntity.setTotalMoney(programEntity.getTotalMoney() + donateDto.getAmount());
-            if(programEntity.isFinishSoon()){
-                int compareResult = Double.compare(programEntity.getTarget().doubleValue(), programEntity.getTotalMoney());
-                if(compareResult >= 0){
-                    programEntity.setStatus("End");
-                    programEntity.setEndDonateDate(new Date());
+            if(programEntityOptional.isPresent() && programEntityOptional.get().getStatus().equals("Coming soon")){
+                ProgramEntity programEntity = programEntityOptional.get();
+                programEntity.setTotalMoney(programEntity.getTotalMoney() + donateDto.getAmount());
+                if(programEntity.isFinishSoon()){
+                    int compareResult = Double.compare(programEntity.getTarget().doubleValue(), programEntity.getTotalMoney());
+                    if(compareResult <= 0){
+                        programEntity.setStatus("End");
+                        programEntity.setEndDonateDate(new Date());
+                    }
                 }
+                return programRepository.save(programEntity);
             }
-            return programRepository.save(programEntity);
+            return null;
         }catch (Exception e){
             System.out.println(e.getMessage());
             return null;

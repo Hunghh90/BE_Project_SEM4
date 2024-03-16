@@ -94,28 +94,28 @@ public class DonationServiceImpl implements DonationService {
                         CreateDonateDto donateDto = new CreateDonateDto();
                         donateDto.setId(Long.valueOf(request.getParameter("ProgramId")));
                         donateDto.setUserId(Long.valueOf(request.getParameter("UserId")));
-                        donateDto.setAmount(vnpAmount);
+                        donateDto.setAmount(vnpAmount/100);
                         donateDto.setPaymentMethod("Paypal");
                         DonationSuccess(donateDto);
-                        return new RedirectView("");
+                        return new RedirectView("localhost:3000/payment-success");
                     }
                     Double vnpAmount = Double.parseDouble(vnpAmountParam);
                     CreateDonateDto donateDto = new CreateDonateDto();
                     donateDto.setId(Long.valueOf(request.getParameter("ProgramId")));
                     donateDto.setUserId(Long.valueOf(request.getParameter("UserId")));
-                    donateDto.setAmount(vnpAmount);
+                    donateDto.setAmount(vnpAmount/100);
                     donateDto.setPaymentMethod("VNPay");
                     DonationSuccess(donateDto);
-                    return new RedirectView("");
+                    return new RedirectView("localhost:3000/payment-success");
                 } else {
-                    return new RedirectView("");
+                    return new RedirectView("localhost:3000/payment-success");
                 }
             } else {
-                return new RedirectView("");
+                return new RedirectView("localhost:3000/payment-success");
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
-            return new RedirectView("");
+            return new RedirectView("localhost:3000/payment-success");
         }
     }
 

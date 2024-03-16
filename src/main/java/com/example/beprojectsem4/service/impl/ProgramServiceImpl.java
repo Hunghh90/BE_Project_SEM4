@@ -136,6 +136,7 @@ public class ProgramServiceImpl implements ProgramService {
             if (programOptional.isPresent() &&
                     (programOptional.get().getStatus().equals("DeActive") || programOptional.get().getStatus().equals("Block"))) {
                 programOptional.get().setStatus("Active");
+                programOptional.get().setTotalMoney(0.0);
                 programRepository.save(programOptional.get());
                 return ResponseEntity.ok().body("Active program success");
             } else {
@@ -262,6 +263,7 @@ public class ProgramServiceImpl implements ProgramService {
                 int compareResult = Double.compare(programEntity.getTarget().doubleValue(), programEntity.getTotalMoney());
                 if(compareResult >= 0){
                     programEntity.setStatus("End");
+                    programEntity.setEndDonateDate(new Date());
                 }
             }
             return programRepository.save(programEntity);

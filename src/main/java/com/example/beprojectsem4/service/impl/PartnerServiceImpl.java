@@ -92,14 +92,9 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
-    public ResponseEntity<?> listPartner(PaginateAndSearchByNameDto paginateAndSearchByNameDto) {
+    public ResponseEntity<?> listPartner(PaginateAndSearchByNameDto paginateDto) {
         try {
-            if(paginateAndSearchByNameDto.getPage() <=0){
-                paginateAndSearchByNameDto.setPage(1);
-            }
-            if(paginateAndSearchByNameDto.getSize()<=0){
-                paginateAndSearchByNameDto.setSize(20);
-            }
+            PaginateAndSearchByNameDto paginateAndSearchByNameDto = new PaginateAndSearchByNameDto(paginateDto.getName(),paginateDto.getPage(), paginateDto.getSize());
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
             PageRequest pageRequest = PageRequest.of(paginateAndSearchByNameDto.getPage()-1, paginateAndSearchByNameDto.getSize(),sort);
             Page<PartnerEntity> partners = partnerRepository.findByPartnerNameContaining(paginateAndSearchByNameDto.getName(),pageRequest);

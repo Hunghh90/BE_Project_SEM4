@@ -8,6 +8,7 @@ import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
 import com.example.beprojectsem4.service.DonationService;
 import com.example.beprojectsem4.service.impl.PaypalService;
 import com.example.beprojectsem4.service.impl.VNPayService;
+import com.itextpdf.text.DocumentException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -18,6 +19,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
@@ -39,9 +42,9 @@ public class DonationController {
         return donationService.makePayment(paymentRequest);
     }
 
-    @GetMapping("/pay-return")
-    public RedirectView orderReturn(HttpServletRequest request) {
-        return donationService.payReturn(request);
+    @PostMapping("/pay-return")
+    public ResponseEntity<?> orderReturn(HttpServletRequest request,@RequestBody CreateDonateDto donateDto) {
+        return donationService.donationSuccess(request,donateDto);
     }
 
 //    @PostMapping("/all-donate-by-program")
@@ -49,4 +52,8 @@ public class DonationController {
 //        return donationService.listDonateByProgramName(paginateAndSearchByNameDto);
 //    }
 
+    @GetMapping("/download-donations")
+    public ResponseEntity<byte[]> generateDonationPDF(Long programId) throws DocumentException, IOException {
+        return donationService.generateDonationPDF(programId);
+    }
 }

@@ -29,4 +29,5 @@ public class ProgramDto {
     private Double totalMoney;
     private PartnerEntity partner;
     private List<DonateDto> donations;
+    private String reasonRejection;
 }

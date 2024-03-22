@@ -43,6 +43,8 @@ public class ProgramEntity {
     private boolean finishSoon;
     @Column(name = "recruit_collaborators")
     private boolean recruitCollaborators;
+    @Column(name = "reason_rejection")
+    private String reasonRejection;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;

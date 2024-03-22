@@ -1,14 +1,14 @@
 package com.example.beprojectsem4.controller;
 
 import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
-import com.example.beprojectsem4.dtos.programDtos.CreateProgramDto;
-import com.example.beprojectsem4.dtos.programDtos.GetProgramsDto;
-import com.example.beprojectsem4.dtos.programDtos.UpdateProgramDto;
+import com.example.beprojectsem4.dtos.programDtos.*;
 import com.example.beprojectsem4.service.ProgramService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/program")
@@ -31,8 +31,8 @@ public class ProgramController {
     }
 
     @GetMapping("/active-program/{id}")
-        public ResponseEntity<?> activekProgram(@PathVariable("id") Long id){
-        return programService.activekProgram(id);
+        public ResponseEntity<?> activeProgram(@PathVariable("id") Long id, RejectProgramDto rejectProgramDto){
+        return programService.approveProgram(id,rejectProgramDto);
     }
 
     @PostMapping("/block-program")
@@ -53,5 +53,15 @@ public class ProgramController {
     @GetMapping("/detail-program/{id}")
     public ResponseEntity<?> detailProgram(@PathVariable("id") Long id){
         return programService.detailProgram(id);
+    }
+
+    @PostMapping("/finish-program/{id}")
+    public ResponseEntity<?> finishProgram(@RequestBody ListUrlDto listUrlDto,@PathVariable Long id){
+        return programService.finishProgram(listUrlDto,id);
+    }
+
+    @PostMapping("/delete-certify/{id}")
+    public ResponseEntity<?> deleteCertify(@RequestBody ListUrlDto listUrlDto, @PathVariable Long id){
+        return programService.deleteCertify(listUrlDto,id);
     }
 }

@@ -51,10 +51,10 @@ public class UserEntity {
         createdAt = new Date();
     }
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = new Date();
-    }
+//    @PreUpdate
+//    protected void onUpdate() {
+//        updatedAt = new Date();
+//    }
     public UserEntity(String email,String password,String phoneNumber,String displayName){
         this.email = email;
         this.password = password;

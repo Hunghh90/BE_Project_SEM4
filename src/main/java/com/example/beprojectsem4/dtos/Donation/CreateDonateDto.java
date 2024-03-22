@@ -10,11 +10,9 @@ import org.springframework.lang.Nullable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateDonateDto {
-    private Long id;
-    private Long userId;
+    private Long programId;
     private Double amount;
     @Nullable
     private String paymentMethod;
-    @Nullable
-    private String description;
+
 }

@@ -74,7 +74,7 @@ public class PaypalService {
         }
 
         try {
-            String successUrl = String.format("http://localhost:8080/api/v1/pay-return?vnp_Amount=%s&ProgramId=%s&vnp_TransactionStatus=%s&payment_Method=%s",
+            String successUrl = String.format("http://localhost:3000/payment-success?vnp_Amount=%s&ProgramId=%s&vnp_TransactionStatus=%s&payment_Method=%s",
                     requestDonate.getAmount(), requestDonate.getProgramId(), "00","Paypal");
 
             Payment payment = createPayment(Double.valueOf(requestDonate.getAmount()), "USD", PaypalPaymentMethod.paypal,

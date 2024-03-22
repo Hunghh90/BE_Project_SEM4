@@ -27,4 +27,5 @@ public class DetailProgramDto {
     private Double donateByPaypal;
     private Double donateByVNPay;
     private Date createdAt;
+    private String reasonRejection;
 }

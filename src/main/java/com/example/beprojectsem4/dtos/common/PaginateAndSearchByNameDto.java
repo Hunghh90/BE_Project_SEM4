@@ -15,4 +15,10 @@ public class PaginateAndSearchByNameDto {
     private int page;
     @Nullable
     private int size;
+
+    public PaginateAndSearchByNameDto(String name, Integer page, Integer size) {
+        this.name = name;
+        this.page = (page != null && page > 0) ? page : 1;
+        this.size = (size != null && size > 0) ? size : 10;
+    }
 }

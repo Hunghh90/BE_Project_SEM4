@@ -3,10 +3,7 @@ package com.example.beprojectsem4.service.impl;
 import com.example.beprojectsem4.dtos.Donation.CreateDonateDto;
 import com.example.beprojectsem4.dtos.Donation.DonateDto;
 import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
-import com.example.beprojectsem4.dtos.programDtos.CreateProgramDto;
-import com.example.beprojectsem4.dtos.programDtos.GetProgramsDto;
-import com.example.beprojectsem4.dtos.programDtos.ProgramDto;
-import com.example.beprojectsem4.dtos.programDtos.UpdateProgramDto;
+import com.example.beprojectsem4.dtos.programDtos.*;
 import com.example.beprojectsem4.dtos.userDtos.GetMeDto;
 import com.example.beprojectsem4.entities.*;
 import com.example.beprojectsem4.exception.NotFoundException;
@@ -19,6 +16,7 @@ import com.example.beprojectsem4.service.PartnerService;
 import com.example.beprojectsem4.service.ProgramService;
 import com.example.beprojectsem4.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +24,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -46,13 +43,14 @@ public class ProgramServiceImpl implements ProgramService {
 
         try{
             UserEntity user = userService.findUserByToken(request);
-            UserEntity m = EntityDtoConverter.convertToEntity(user,UserEntity.class);
             PartnerEntity pn = (PartnerEntity) partnerService.getPartnerByEmail(user.getEmail()).getBody();
             if(!checkProgramByProgramName(createProgramDto.getProgramName()) && createProgramDto.getStartDonateDate().before(createProgramDto.getEndDonateDate()) && createProgramDto.getEndDonateDate().before(createProgramDto.getFinishDate())){
+                String escapedData = StringEscapeUtils.escapeHtml4(createProgramDto.getDescription());
                 ProgramEntity program = EntityDtoConverter.convertToEntity(createProgramDto,ProgramEntity.class);
                 program.setStatus("DeActive");
-                program.setUser(m);
+                program.setUser(user);
                 program.setPartner(pn);
+                program.setDescription(escapedData);
                 ProgramEntity pr = programRepository.save(program);
                 for (String url : createProgramDto.getImageUrl()){
                     ProgramAttachmentEntity pa = new ProgramAttachmentEntity(pr,"Certify",url);
@@ -70,31 +68,13 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     @Override
-    public ResponseEntity<?> listProgram(PaginateAndSearchByNameDto paginateAndSearchByNameDto) {
+    public ResponseEntity<?> listProgram(PaginateAndSearchByNameDto paginateDto) {
         try{
-            if(paginateAndSearchByNameDto.getPage() <=0 ){
-                paginateAndSearchByNameDto.setPage(1);
-            }
-            if(paginateAndSearchByNameDto.getSize()<=0){
-                paginateAndSearchByNameDto.setSize(20);
-            }
+            PaginateAndSearchByNameDto paginateAndSearchByNameDto = new PaginateAndSearchByNameDto(paginateDto.getName(),paginateDto.getPage(), paginateDto.getSize());
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
             PageRequest pageable = PageRequest.of(paginateAndSearchByNameDto.getPage()-1, paginateAndSearchByNameDto.getSize(),sort);
             Page<ProgramEntity> programs = programRepository.findByProgramNameContaining(paginateAndSearchByNameDto.getName(),pageable );
-            List<ProgramDto> programDtoList = new ArrayList<>();
-            for (ProgramEntity p : programs){
-                List<DonateDto> donateDtoList = new ArrayList<>();
-                for(DonationEntity getDonate : p.getDonations()){
-                    DonateDto donateDto = EntityDtoConverter.convertToDto(getDonate, DonateDto.class);
-                    GetMeDto gm = EntityDtoConverter.convertToDto(getDonate.getUser(), GetMeDto.class);
-                    donateDto.setUser(gm);
-                    donateDtoList.add(donateDto);
-                }
-                Collections.sort(donateDtoList, Comparator.comparing(DonateDto::getCreatedAt).reversed());
-                ProgramDto programDto = EntityDtoConverter.convertToDto(p,ProgramDto.class);
-                programDto.setDonations(donateDtoList);
-                programDtoList.add(programDto);
-            }
+            List<ProgramDto> programDtoList = convertToProgramDto(programs.getContent());
             return ResponseEntity.ok().body(programDtoList);
         }catch (Exception e){
             System.out.println(e.getMessage());
@@ -108,21 +88,38 @@ public class ProgramServiceImpl implements ProgramService {
         try {
             UserEntity user = userService.findUserByToken(request);
             UserEntity m = EntityDtoConverter.convertToEntity(user,UserEntity.class);
-            Optional<ProgramEntity> pr = programRepository.findById(id);
-            if(pr.isPresent() && pr.get().getStartDonateDate().before(now)){
+            ProgramEntity program = findById(id);
+            assert program != null;
+            if(program.getStartDonateDate().before(now)){
                 ProgramEntity updateProgram = EntityDtoConverter.convertToEntity(updateProgramDto,ProgramEntity.class);
-                ProgramEntity up = TransferValuesIfNull.transferValuesIfNull(pr.get(),updateProgram);
+                if(!updateProgram.getDescription().isEmpty()){
+                    String escapedData = StringEscapeUtils.escapeHtml4(updateProgramDto.getDescription());
+                    program.setDescription(escapedData);
+                }
+                ProgramEntity up = TransferValuesIfNull.transferValuesIfNull(program,updateProgram);
                 up.setUser(m);
                 programRepository.save(up);
                 if(updateProgramDto.getImageUrl() != null && !updateProgramDto.getImageUrl().isEmpty()){
-                    List<ProgramAttachmentEntity> pa = programAttachmentRepository.findByProgramId_programId(pr.get().getProgramId());
-                    programAttachmentRepository.deleteAll(pa);
                     for (String url : updateProgramDto.getImageUrl()){
-                        ProgramAttachmentEntity img = new ProgramAttachmentEntity(pr.get(),"Certify",url);
+                        ProgramAttachmentEntity existingImage = programAttachmentRepository.findByUrlAndTypeAndProgramId_programId("Certify",url,program.getProgramId());
+                        if(existingImage == null){
+                            ProgramAttachmentEntity img = new ProgramAttachmentEntity(program,"Certify",url);
+                            programAttachmentRepository.save(img);
+                        }
+                    }
+                }
+                if(updateProgramDto.getImageLogo() != null && !updateProgramDto.getImageLogo().isEmpty()){
+                    ProgramAttachmentEntity existingImage = programAttachmentRepository.findByUrlAndTypeAndProgramId_programId("Logo",updateProgramDto.getImageLogo(),program.getProgramId());
+                    if(existingImage == null){
+                        ProgramAttachmentEntity img = new ProgramAttachmentEntity(program,"Logo",updateProgramDto.getImageLogo());
                         programAttachmentRepository.save(img);
                     }
                 }
                 return ResponseEntity.ok().body("Update program success");
+            }
+            if(updateProgramDto.getFinishDate() != null && updateProgramDto.getFinishDate().after(program.getFinishDate())){
+                program.setFinishDate(updateProgramDto.getFinishDate());
+                return ResponseEntity.ok().body("Extend finish date success");
             }
             return ResponseEntity.badRequest().body("Program not exists or Update timed out");
         }catch (Exception e){
@@ -132,15 +129,19 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     @Override
-    public ResponseEntity<?> activekProgram(Long id) {
+    public ResponseEntity<?> approveProgram(Long id, RejectProgramDto rejectProgramDto) {
         try {
-            Optional<ProgramEntity> programOptional = programRepository.findById(id);
-            if (programOptional.isPresent() &&
-                    (programOptional.get().getStatus().equals("DeActive") || programOptional.get().getStatus().equals("Block"))) {
-                programOptional.get().setStatus("Active");
-                programOptional.get().setTotalMoney(0.0);
-                programRepository.save(programOptional.get());
-                return ResponseEntity.ok().body("Active program success");
+            ProgramEntity program = findById(id);
+            if (program != null&&
+                    (program.getStatus().equals("DeActive") || program.getStatus().equals("Block"))) {
+                program.setStatus(rejectProgramDto.getValue());
+                if(rejectProgramDto.getValue().equals("Active")){
+                    program.setTotalMoney(0.0);
+                }else{
+                    program.setReasonRejection(rejectProgramDto.getReasonRejection());
+                }
+                programRepository.save(program);
+                return ResponseEntity.ok().body(rejectProgramDto.getValue()+" program success");
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found program");
             }
@@ -153,11 +154,11 @@ public class ProgramServiceImpl implements ProgramService {
     @Override
     public ResponseEntity<?> blockProgram(Long id) {
         try {
-            Optional<ProgramEntity> programOptional = programRepository.findById(id);
-            if(programOptional.isPresent()){
-                if(programOptional.get().getStartDonateDate().after(new Date())){
-                    programOptional.get().setStatus("Block");
-                    programRepository.save(programOptional.get());
+            ProgramEntity program = findById(id);
+            if(program != null){
+                if(program.getStartDonateDate().after(new Date())){
+                    program.setStatus("Block");
+                    programRepository.save(program);
                     return ResponseEntity.ok().body("Block program success");
                 }else {
                     return ResponseEntity.badRequest().body("The program is already active and cannot be changed");
@@ -175,10 +176,7 @@ public class ProgramServiceImpl implements ProgramService {
     public boolean checkProgramByProgramName(String programName) {
         try{
             ProgramEntity program = programRepository.findByProgramName(programName);
-            if(program == null){
-                return false;
-            }
-            return true;
+            return program != null;
         }catch (Exception e){
             System.out.println(e.getMessage());
             return false;
@@ -195,7 +193,11 @@ public class ProgramServiceImpl implements ProgramService {
             }
             List<ProgramDto> programDtoList = new ArrayList<>();
             for(ProgramEntity p : programs){
+                List<DonateDto> donateDtoList = listDonate(p);
+                String normalData = StringEscapeUtils.unescapeHtml4(p.getDescription());
+                p.setDescription(normalData);
                 ProgramDto programDto = EntityDtoConverter.convertToDto(p,ProgramDto.class);
+                programDto.setDonations(donateDtoList);
                 programDtoList.add(programDto);
             }
             return ResponseEntity.ok().body(programDtoList);
@@ -206,22 +208,13 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     @Override
-    public ResponseEntity<?> listProgramByStatus(PaginateAndSearchByNameDto paginateAndSearchByNameDto) {
+    public ResponseEntity<?> listProgramByStatus(PaginateAndSearchByNameDto paginateDto) {
         try{
-                if(paginateAndSearchByNameDto.getPage() <=0){
-                    paginateAndSearchByNameDto.setPage(1);
-                }
-                if(paginateAndSearchByNameDto.getSize()<=0){
-                    paginateAndSearchByNameDto.setSize(20);
-                }
+            PaginateAndSearchByNameDto paginateAndSearchByNameDto = new PaginateAndSearchByNameDto(paginateDto.getName(),paginateDto.getPage(), paginateDto.getSize());
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
             PageRequest pageable = PageRequest.of(paginateAndSearchByNameDto.getPage()-1, paginateAndSearchByNameDto.getSize(),sort);
             Page<ProgramEntity> programs = programRepository.findByStatus(paginateAndSearchByNameDto.getName(),pageable );
-            List<ProgramDto> programDtoList = new ArrayList<>();
-            for (ProgramEntity p : programs){
-                ProgramDto pd = EntityDtoConverter.convertToDto(p,ProgramDto.class);
-                programDtoList.add(pd);
-            }
+            List<ProgramDto> programDtoList = convertToProgramDto(programs.getContent());
             return ResponseEntity.ok().body(programDtoList);
         }catch (Exception e){
             System.out.println(e.getMessage());
@@ -232,17 +225,13 @@ public class ProgramServiceImpl implements ProgramService {
     @Override
     public ResponseEntity<?> detailProgram(Long id) {
         try{
-            Optional<ProgramEntity> program = programRepository.findById(id);
-            if(program.isPresent()){
-                List<DonateDto> donateDtoList = new ArrayList<>();
-                for(DonationEntity getDonate : program.get().getDonations()){
-                    DonateDto donateDto = EntityDtoConverter.convertToDto(getDonate, DonateDto.class);
-                    GetMeDto gm = EntityDtoConverter.convertToDto(getDonate.getUser(), GetMeDto.class);
-                    donateDto.setUser(gm);
-                    donateDtoList.add(donateDto);
-                }
-                Collections.sort(donateDtoList, Comparator.comparing(DonateDto::getCreatedAt).reversed());
-                ProgramDto programDto = EntityDtoConverter.convertToDto(program.get(),ProgramDto.class);
+            ProgramEntity program = findById(id);
+            if(program != null){
+                List<DonateDto> donateDtoList = listDonate(program);
+                donateDtoList.sort(Comparator.comparing(DonateDto::getCreatedAt).reversed());
+                String normalData = StringEscapeUtils.unescapeHtml4(program.getDescription());
+                program.setDescription(normalData);
+                ProgramDto programDto = EntityDtoConverter.convertToDto(program,ProgramDto.class);
                 programDto.setDonations(donateDtoList);
                 return ResponseEntity.ok().body(programDto);
             }
@@ -255,21 +244,13 @@ public class ProgramServiceImpl implements ProgramService {
     @Override
     public ProgramEntity addMoneyDonate(CreateDonateDto donateDto) {
         try{
-            Optional<ProgramEntity> programEntityOptional =  programRepository.findById(donateDto.getId());
-            if(programEntityOptional.isEmpty()){
+            ProgramEntity program = findById(donateDto.getProgramId());
+            if(program == null){
                 throw new NotFoundException("Not found Program");
             }
-            if(programEntityOptional.isPresent() && programEntityOptional.get().getStatus().equals("Coming soon")){
-                ProgramEntity programEntity = programEntityOptional.get();
-                programEntity.setTotalMoney(programEntity.getTotalMoney() + donateDto.getAmount());
-                if(programEntity.isFinishSoon()){
-                    int compareResult = Double.compare(programEntity.getTarget().doubleValue(), programEntity.getTotalMoney());
-                    if(compareResult <= 0){
-                        programEntity.setStatus("End");
-                        programEntity.setEndDonateDate(new Date());
-                    }
-                }
-                return programRepository.save(programEntity);
+            if(program.getStatus().equals("Active")){
+                program.setTotalMoney(program.getTotalMoney() + donateDto.getAmount());
+                return programRepository.save(program);
             }
             return null;
         }catch (Exception e){
@@ -278,23 +259,98 @@ public class ProgramServiceImpl implements ProgramService {
         }
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void changeStatusProgram(){
+//    @Scheduled(cron = "0 0 0 * * ?")
+//    public void changeStatusProgram(){
+//        try{
+//            List<ProgramEntity> programEntityList = programRepository.findAll();
+//            for(ProgramEntity program : programEntityList){
+//                if(program.getStartDonateDate().before(new Date()) && program.getStatus().equals("Active")){
+//                    program.setStatus("Coming soon");
+//                } else if (program.getEndDonateDate().before(new Date()) && program.getStatus().equals("Coming soon")) {
+//                    program.setStatus("Progress");
+//                } else if (program.getStatus().equals("Progress") && program.getEndDonateDate().after(new Date()) ) {
+//                    program.setStatus("End");
+//                }
+//            }
+//        }catch (Exception e){
+//            System.out.println(e.getMessage());
+//        }
+//    }
+
+    @Override
+    public ResponseEntity<?> deleteCertify(ListUrlDto listUrlDto, Long id) {
         try{
-            List<ProgramEntity> programEntityList = programRepository.findAll();
-            for(ProgramEntity program : programEntityList){
-                if(program.getStartDonateDate().before(new Date()) && program.getStatus().equals("Active")){
-                    program.setStatus("Coming soon");
-                } else if (program.getEndDonateDate().before(new Date()) && program.getStatus().equals("Coming soon")) {
-                    program.setStatus("Progress");
-                } else if (program.getStatus().equals("Progress") && program.getEndDonateDate().after(new Date()) ) {
-                    program.setStatus("End");
+            for(String url : listUrlDto.getUrl()){
+                ProgramAttachmentEntity image = programAttachmentRepository.findByUrlAndTypeAndProgramId_programId("Certify",url,id);
+                if(image != null){
+                    programAttachmentRepository.delete(image);
                 }
             }
+            return ResponseEntity.status(202).body("delete success");
         }catch (Exception e){
             System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
+    }
 
+    @Override
+    public ResponseEntity<?> finishProgram(ListUrlDto listUrlDto, Long id) {
+        try{
+            ProgramEntity program = findById(id);
+            if(program == null){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Program not found");
+            }
+            for(String url : listUrlDto.getUrl()){
+                ProgramAttachmentEntity pa = new ProgramAttachmentEntity(program,"finished",url);
+                programAttachmentRepository.save(pa);
+            }
+            program.setStatus("End");
+            return ResponseEntity.ok().body("Success");
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
 
+    public ProgramEntity findById(Long id){
+        try {
+            Optional<ProgramEntity> optionalProgramEntity = programRepository.findById(id);
+            return optionalProgramEntity.orElse(null);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    public List<DonateDto> listDonate(ProgramEntity program){
+        try {
+            List<DonateDto> donateDtoList = new ArrayList<>();
+            for(DonationEntity getDonate : program.getDonations()){
+                DonateDto donateDto = EntityDtoConverter.convertToDto(getDonate, DonateDto.class);
+                GetMeDto gm = EntityDtoConverter.convertToDto(getDonate.getUser(), GetMeDto.class);
+                donateDto.setUser(gm);
+                donateDtoList.add(donateDto);
+            }
+            return donateDtoList;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    public List<ProgramDto> convertToProgramDto(List<ProgramEntity> programs){
+        try {
+            List<ProgramDto> programDtoList = new ArrayList<>();
+            for (ProgramEntity p : programs){
+                List<DonateDto> donateDtoList = listDonate(p);
+                String normalData = StringEscapeUtils.unescapeHtml4(p.getDescription());
+                p.setDescription(normalData);
+                ProgramDto pd = EntityDtoConverter.convertToDto(p,ProgramDto.class);
+                pd.setDonations(donateDtoList);
+                programDtoList.add(pd);
+            }
+            return programDtoList;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 }

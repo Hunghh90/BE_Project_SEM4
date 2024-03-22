@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ProgramAttachmentRepository extends JpaRepository<ProgramAttachmentEntity, Long> {
     List<ProgramAttachmentEntity> findByProgramId_programId(Long programId);
+    ProgramAttachmentEntity findByUrlAndTypeAndProgramId_programId(String type,String url, Long programId);
 }

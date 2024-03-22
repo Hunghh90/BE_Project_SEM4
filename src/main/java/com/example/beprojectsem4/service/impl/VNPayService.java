@@ -22,7 +22,7 @@ public class VNPayService {
     public  String createOrder(RequestDonate requestDonate){
         Optional<ProgramEntity> findProgramId =  programRepository.findById(requestDonate.getProgramId());
 
-        if(!findProgramId.isPresent()){
+        if(findProgramId.isEmpty()){
             throw new NotFoundException("Not found Program");
         }
 

@@ -1,5 +1,6 @@
 package com.example.beprojectsem4.controller;
 
+import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
 import com.example.beprojectsem4.dtos.userDtos.ChangePasswordDto;
 import com.example.beprojectsem4.service.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,5 +27,10 @@ public class UserController {
     @GetMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(HttpServletRequest request) {
         return userService.refreshToken(request);
+    }
+
+    @PostMapping("/create-account-admin")
+    public void createAdminAccount(RegisterDto registerDto){
+        userService.createAccountAdmin(registerDto);
     }
 }

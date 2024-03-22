@@ -33,6 +33,8 @@ public class UpdateProgramDto {
         private boolean recruitCollaborators;
         @Nullable
         private List<String> imageUrl;
+        @Nullable
+        private String imageLogo;
 
 
 

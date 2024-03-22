@@ -18,9 +18,9 @@ public class JwtService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private UserRepository userRepository;
-    private static final String secret_key = "1234567890";
-    private static final String refresh_secret_key = "1234567890";
-    private static final int expired_time = 1800;
+    private static final String secret_key = "XdyUlzjBO1siyuJh";
+    private static final String refresh_secret_key = "Q6UcqbeyinGDPdNZ";
+    private static final int expired_time = 1800000;
 
     public TokenResponseDto generateToken(Authentication authentication) {
         UserDetail userDetail = (UserDetail) authentication.getPrincipal();

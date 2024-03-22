@@ -136,6 +136,7 @@ public class UserServiceImpl implements UserService {
 
             }
             user.setPassword(bCryptPasswordEncoder.encode(changePasswordDto.getNewPassword()));
+            user.setUpdatedAt(new Date());
             repository.save(user);
             return ResponseEntity.ok().body("Change password success");
         } catch (Exception ex) {
@@ -147,9 +148,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveRefreshToken(String email, String refreshToken) {
-        UserEntity user = repository.findUserByEmail(email);
-        user.setRefreshToken(refreshToken);
-        repository.save(user);
+        try{
+            UserEntity user = repository.findUserByEmail(email);
+            user.setRefreshToken(refreshToken);
+            repository.save(user);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override

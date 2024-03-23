@@ -15,7 +15,7 @@ public interface ProgramService {
     ResponseEntity<?> createProgram(HttpServletRequest request, CreateProgramDto createProgramDto);
 
     ResponseEntity<?> listProgram(PaginateAndSearchByNameDto paginateAndSearchByNameDto);
-    ResponseEntity<?> updateProgram(HttpServletRequest request, Long id, UpdateProgramDto updateProgramDto);
+    ResponseEntity<?> updateProgram(Long id, UpdateProgramDto updateProgramDto);
 
     ResponseEntity<?> blockProgram(Long id);
     ResponseEntity<?> approveProgram(Long id, RejectProgramDto rejectProgramDto);
@@ -30,4 +30,6 @@ public interface ProgramService {
 
 
     ResponseEntity<?> finishProgram(ListUrlDto files, Long id);
+    ResponseEntity<?> extendFinishProgram(Long id, UpdateProgramDto updateProgramDto);
+
 }

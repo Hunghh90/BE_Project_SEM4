@@ -83,11 +83,9 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     @Override
-    public ResponseEntity<?> updateProgram(HttpServletRequest request, Long id, UpdateProgramDto updateProgramDto) {
+    public ResponseEntity<?> updateProgram( Long id, UpdateProgramDto updateProgramDto) {
         Date now = new Date();
         try {
-            UserEntity user = userService.findUserByToken(request);
-            UserEntity m = EntityDtoConverter.convertToEntity(user,UserEntity.class);
             ProgramEntity program = findById(id);
             assert program != null;
             if(program.getStartDonateDate().before(now)){
@@ -97,7 +95,6 @@ public class ProgramServiceImpl implements ProgramService {
                     program.setDescription(escapedData);
                 }
                 ProgramEntity up = TransferValuesIfNull.transferValuesIfNull(program,updateProgram);
-                up.setUser(m);
                 programRepository.save(up);
                 if(updateProgramDto.getImageUrl() != null && !updateProgramDto.getImageUrl().isEmpty()){
                     for (String url : updateProgramDto.getImageUrl()){
@@ -105,6 +102,9 @@ public class ProgramServiceImpl implements ProgramService {
                         if(existingImage == null){
                             ProgramAttachmentEntity img = new ProgramAttachmentEntity(program,"Certify",url);
                             programAttachmentRepository.save(img);
+                        }else{
+                            existingImage.setUrl(url);
+                            programAttachmentRepository.save(existingImage);
                         }
                     }
                 }
@@ -113,14 +113,14 @@ public class ProgramServiceImpl implements ProgramService {
                     if(existingImage == null){
                         ProgramAttachmentEntity img = new ProgramAttachmentEntity(program,"Logo",updateProgramDto.getImageLogo());
                         programAttachmentRepository.save(img);
+                    }else{
+                        existingImage.setUrl(updateProgramDto.getImageLogo());
+                        programAttachmentRepository.save(existingImage);
                     }
                 }
                 return ResponseEntity.ok().body("Update program success");
             }
-            if(updateProgramDto.getFinishDate() != null && updateProgramDto.getFinishDate().after(program.getFinishDate())){
-                program.setFinishDate(updateProgramDto.getFinishDate());
-                return ResponseEntity.ok().body("Extend finish date success");
-            }
+
             return ResponseEntity.badRequest().body("Program not exists or Update timed out");
         }catch (Exception e){
             System.out.println(e.getMessage());
@@ -351,6 +351,22 @@ public class ProgramServiceImpl implements ProgramService {
         }catch (Exception e){
             System.out.println(e.getMessage());
             return null;
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> extendFinishProgram(Long id, UpdateProgramDto updateProgramDto) {
+        try {
+            ProgramEntity program = findById(id);
+            assert program !=null;
+            if(updateProgramDto.getFinishDate() != null && updateProgramDto.getFinishDate().after(program.getFinishDate())){
+                program.setFinishDate(updateProgramDto.getFinishDate());
+                return ResponseEntity.ok().body("Extend finish date success");
+            }
+            return ResponseEntity.badRequest().body("Extend finish date not success");
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 }

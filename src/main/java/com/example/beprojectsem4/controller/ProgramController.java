@@ -26,8 +26,8 @@ public class ProgramController {
     }
 
     @PostMapping("/update-program/{id}")
-    public ResponseEntity<?> updateProgram(HttpServletRequest request, @PathVariable Long id, @RequestBody UpdateProgramDto updateProgramDto){
-        return programService.updateProgram(request, id, updateProgramDto);
+    public ResponseEntity<?> updateProgram( @PathVariable Long id, @RequestBody UpdateProgramDto updateProgramDto){
+        return programService.updateProgram(id, updateProgramDto);
     }
 
     @GetMapping("/active-program/{id}")
@@ -63,5 +63,10 @@ public class ProgramController {
     @PostMapping("/delete-certify/{id}")
     public ResponseEntity<?> deleteCertify(@RequestBody ListUrlDto listUrlDto, @PathVariable Long id){
         return programService.deleteCertify(listUrlDto,id);
+    }
+
+    @PostMapping("/extend-program/{id}")
+    public ResponseEntity<?> extendFinishProgram(@PathVariable Long id, @RequestBody UpdateProgramDto updateProgramDto){
+        return programService.extendFinishProgram(id,updateProgramDto);
     }
 }

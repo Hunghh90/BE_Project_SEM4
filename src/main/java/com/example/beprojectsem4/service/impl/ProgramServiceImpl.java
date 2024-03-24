@@ -140,4 +140,9 @@ public class ProgramServiceImpl implements ProgramService {
 		
 		
 	}
+
+	@Override
+	public ProgramEntity FindByUser(UserEntity userEntity) {
+		return programRepository.findByUser(userEntity);
+	}
 }

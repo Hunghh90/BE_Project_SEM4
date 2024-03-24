@@ -1,5 +1,10 @@
 package com.example.beprojectsem4.service.impl;
 
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.example.beprojectsem4.entities.DonationEntity;
 import com.example.beprojectsem4.entities.ProgramEntity;
 import com.example.beprojectsem4.entities.UserEntity;
@@ -8,12 +13,6 @@ import com.example.beprojectsem4.repository.DonationRepository;
 import com.example.beprojectsem4.repository.ProgramRepository;
 import com.example.beprojectsem4.service.DonationService;
 import com.example.beprojectsem4.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import java.util.Optional;
 
 @Service
 public class DonationServiceImpl implements DonationService {
@@ -39,8 +38,10 @@ public class DonationServiceImpl implements DonationService {
     }
 
 	@Override
-	public DonationEntity FindByUser(UserEntity entity) {
-		return donationRepository.findByUser(entity);
+	public DonationEntity FindByUserAndProgram(UserEntity userEntity, ProgramEntity programEntity) {
+		
+		return donationRepository.findByUserAndProgram(userEntity, programEntity);
 	}
+
     
 }

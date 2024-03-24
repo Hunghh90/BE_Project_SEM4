@@ -51,8 +51,9 @@ public class FeedBackServiceImpl implements FeedBackService {
 		        if(feedback != null) {
 		        	UserEntity user=userService.findUserByToken(request);
 		    	    ProgramEntity program=programService.FindById(createFeedBackDto.getProgramId());
-		    	    DonationEntity donate=donationService.FindByUser(user);	    	   		    	      	    	   
-		    	    if (donate == null) {		    	      
+		    	    DonationEntity donate=donationService.FindByUserAndProgram(user,program);
+		    	 
+		    	    if (donate== null ) {		    	      
 		    	        return ResponseEntity.badRequest().body("User haven't donate");
 		    	    } 
 		    	    else {				    	    	
@@ -103,11 +104,15 @@ public class FeedBackServiceImpl implements FeedBackService {
 	public ResponseEntity<?> listFeedBack(GetFeedBackDto getfeedBackDto) {
 		  try {
 	            Sort sort = Sort.by(Sort.Order.desc("createAt"));
+	            ProgramEntity program=programService.FindById(getfeedBackDto.getProgramId());
 	            PageRequest pageRequest = PageRequest.of(getfeedBackDto.getPage(), getfeedBackDto.getSize(),sort);
-	            Page<FeedBackEntity> feedbacks = feedBackRepository.findBytypeContaining(getfeedBackDto.getType(),pageRequest);
+	            Page<FeedBackEntity> feedbacks = feedBackRepository.findByProgram(program,pageRequest);
 	            List<FeedBackDto> feedbacksDtos = new ArrayList<>();
 	            for (FeedBackEntity fback : feedbacks){
 	                FeedBackDto subproDto = EntityDtoConverter.convertToDto(fback,FeedBackDto.class);
+	                UserEntity user=fback.getUser();
+	                subproDto.setUserId(user.getUserId());
+	                subproDto.setProgramId(program.getProgramId());
 	                feedbacksDtos.add(subproDto);
 	            }
 	            return ResponseEntity.ok().body(feedbacksDtos);

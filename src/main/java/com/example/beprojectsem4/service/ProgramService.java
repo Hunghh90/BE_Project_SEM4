@@ -4,6 +4,8 @@ import com.example.beprojectsem4.dtos.programDtos.CreateProgramDto;
 import com.example.beprojectsem4.dtos.programDtos.GetProgramsDto;
 import com.example.beprojectsem4.dtos.programDtos.UpdateProgramDto;
 import com.example.beprojectsem4.entities.ProgramEntity;
+import com.example.beprojectsem4.entities.UserEntity;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
@@ -19,4 +21,5 @@ public interface ProgramService {
 
     List<ProgramEntity> searchAllField(String value);
     ProgramEntity FindById(Long id);
+    ProgramEntity FindByUser(UserEntity userEntity);
 }

@@ -13,6 +13,8 @@ public class GetFeedBackDto {
 	    private String content;
 		@Nullable
 	    private String type;
+		@Nullable
+	    private Long programId;
 	    @Nullable
 	    private int page;
 	    @Nullable

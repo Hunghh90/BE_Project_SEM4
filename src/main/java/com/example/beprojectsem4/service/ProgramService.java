@@ -17,7 +17,7 @@ public interface ProgramService {
     ResponseEntity<?> listProgram(PaginateAndSearchByNameDto paginateAndSearchByNameDto);
     ResponseEntity<?> updateProgram(Long id, UpdateProgramDto updateProgramDto);
 
-    ResponseEntity<?> blockProgram(Long id);
+    ResponseEntity<?> toggleLockProgram(Long id,String value);
     ResponseEntity<?> approveProgram(Long id, RejectProgramDto rejectProgramDto);
     ResponseEntity<?> listProgramByStatus(PaginateAndSearchByNameDto paginateAndSearchByNameDto);
     boolean checkProgramByProgramName(String programName);
@@ -27,9 +27,8 @@ public interface ProgramService {
     ProgramEntity addMoneyDonate(CreateDonateDto donateDto);
 
     ResponseEntity<?> deleteCertify(ListUrlDto files, Long id);
-
-
+    ResponseEntity<?> shareProgram(HttpServletRequest request,ShareProgramDto shareProgramDto);
     ResponseEntity<?> finishProgram(ListUrlDto files, Long id);
     ResponseEntity<?> extendFinishProgram(Long id, UpdateProgramDto updateProgramDto);
-
+    ProgramEntity findById(Long id);
 }

@@ -14,8 +14,12 @@ import com.example.beprojectsem4.repository.PartnerAttachmentRepository;
 import com.example.beprojectsem4.repository.PartnerRepository;
 import com.example.beprojectsem4.service.PartnerService;
 import com.example.beprojectsem4.service.RoleService;
+import com.example.beprojectsem4.service.SendEmailService;
 import com.example.beprojectsem4.service.UserService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,7 +27,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
@@ -36,6 +42,8 @@ public class PartnerServiceImpl implements PartnerService {
     private UserService userService;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private SendEmailService sendEmailService;
 
     @Override
     public ResponseEntity<?> getPartnerByEmail(String email) {
@@ -59,10 +67,11 @@ public class PartnerServiceImpl implements PartnerService {
                 PartnerEntity partner = EntityDtoConverter.convertToEntity(createPartnerDto, PartnerEntity.class);
                 partner.setStatus("Active");
                 UserEntity user = userService.checkUser(createPartnerDto.getEmail());
+                String password = RandomStringUtils.random(8, true, true);
                 if(user == null){
                     RegisterDto createUser = new RegisterDto(
                             createPartnerDto.getEmail(),
-                            "12345678",
+                            password,
                             null,
                             null,
                             createPartnerDto.getPartnerName(),
@@ -81,6 +90,15 @@ public class PartnerServiceImpl implements PartnerService {
                 PartnerEntity pn = partnerRepository.save(partner);
                     PartnerAttachmentEntity attachment = new PartnerAttachmentEntity(pn,"Logo", createPartnerDto.getUrlLogo());
                     attachmentRepository.save(attachment);
+                Resource resource = new ClassPathResource("templates/CreateAccountPartner.html");
+                String htmlContent = new String(FileCopyUtils.copyToByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
+                String processedHtmlContent = htmlContent
+                        .replace("[[Recipient_Name]]", pn.getPartnerName())
+                        .replace("[[Partner_Account]]", pn.getEmail())
+                        .replace("[[Password]]", password);
+                sendEmailService.sendEmail(pn.getEmail(),
+                        "Confirmation of Approval and Account Creation for Your Charity ",
+                        processedHtmlContent);
                     return ResponseEntity.status(HttpStatus.CREATED).body("Create partner success");
             }
             return ResponseEntity.badRequest().body("Partner name or Email is already");
@@ -135,15 +153,15 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
-    public ResponseEntity<?> blockPartner(Long id) {
+    public ResponseEntity<?> toggleLockPartner(Long id,String value) {
         try {
             Optional<PartnerEntity> partner = partnerRepository.findById(id);
             if (partner.isPresent()) {
                 userService.blockUser(partner.get().getEmail());
                 PartnerEntity p = partner.get();
-                p.setStatus("Blocked");
+                p.setStatus(value);
                 partnerRepository.save(p);
-                return ResponseEntity.ok().body("Block success");
+                return ResponseEntity.ok().body(value+" success");
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found partner");
         }catch (Exception ex){
@@ -230,4 +248,5 @@ public class PartnerServiceImpl implements PartnerService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
 }

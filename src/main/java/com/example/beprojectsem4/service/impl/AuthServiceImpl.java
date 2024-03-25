@@ -71,7 +71,10 @@ public class AuthServiceImpl implements AuthService {
     public ResponseEntity<?> login(LoginDto login) {
         try {
             UserEntity user = userService.checkUser(login.getEmail());
-            if (user != null && user.getStatus().equals("Activate")) {
+            if(user == null ){
+                return ResponseEntity.badRequest().body("Account not is exists");
+            }
+            if (user.getStatus().equals("Activate")) {
                 Authentication authentication = authenticationManager.authenticate(new
                         UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword()));
                 SecurityContextHolder.getContext().setAuthentication(authentication);

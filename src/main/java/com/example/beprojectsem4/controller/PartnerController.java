@@ -35,9 +35,9 @@ public class PartnerController {
         return partnerService.updatePartner(id,updatePartnerDto);
     }
 
-    @GetMapping("/block-partner")
-    public ResponseEntity<?> blockPartner(@RequestParam("id") Long id){
-        return partnerService.blockPartner(id);
+    @GetMapping("/toggle-lock-partner")
+    public ResponseEntity<?> blockPartner(@RequestParam("id") Long id,String value){
+        return partnerService.toggleLockPartner(id,value);
     }
 
     @GetMapping("/detail-partner")

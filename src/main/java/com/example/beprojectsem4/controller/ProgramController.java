@@ -35,9 +35,9 @@ public class ProgramController {
         return programService.approveProgram(id,rejectProgramDto);
     }
 
-    @PostMapping("/block-program")
-    public ResponseEntity<?> blockProgram(@RequestBody Long id){
-        return programService.blockProgram(id);
+    @PostMapping("/toggle-lock-program")
+    public ResponseEntity<?> toggleLockProgram(@RequestBody Long id,String value){
+        return programService.toggleLockProgram(id,value);
     }
 
     @PostMapping("/search")
@@ -68,5 +68,9 @@ public class ProgramController {
     @PostMapping("/extend-program/{id}")
     public ResponseEntity<?> extendFinishProgram(@PathVariable Long id, @RequestBody UpdateProgramDto updateProgramDto){
         return programService.extendFinishProgram(id,updateProgramDto);
+    }
+    @PostMapping("/share-program")
+    public ResponseEntity<?> shareProgram(HttpServletRequest request,@RequestBody ShareProgramDto shareProgramDto){
+        return programService.shareProgram(request,shareProgramDto);
     }
 }

@@ -7,14 +7,13 @@ import org.springframework.lang.Nullable;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class PaginateAndSearchByNameDto {
     @Nullable
     private String name;
     @Nullable
-    private int page;
+    private Integer page;
     @Nullable
-    private int size;
+    private Integer size;
 
     public PaginateAndSearchByNameDto(String name, Integer page, Integer size) {
         this.name = name;

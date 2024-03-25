@@ -13,7 +13,7 @@ public interface PartnerService {
     ResponseEntity<?> getPartnerByEmail(String email);
     ResponseEntity<?> listPartner(PaginateAndSearchByNameDto paginateAndSearchByNameDto);
     ResponseEntity<?> updatePartner(Long id, UpdatePartnerDto updatePartnerDto);
-    ResponseEntity<?> blockPartner(Long id);
+    ResponseEntity<?> toggleLockPartner(Long id,String value);
     boolean checkPartnertByEmail(String email);
     boolean checkPartnertByPartnerName(String partnerName);
 

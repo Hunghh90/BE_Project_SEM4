@@ -22,7 +22,6 @@ public class FeedBackEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
-    private String type;
     @ManyToOne
     @JoinColumn(name = "program_id")
     private ProgramEntity program;

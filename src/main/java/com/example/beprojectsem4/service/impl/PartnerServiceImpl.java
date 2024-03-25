@@ -12,12 +12,10 @@ import com.example.beprojectsem4.helper.TransferValuesIfNull;
 import com.example.beprojectsem4.repository.DynamicSpecification;
 import com.example.beprojectsem4.repository.PartnerAttachmentRepository;
 import com.example.beprojectsem4.repository.PartnerRepository;
-import com.example.beprojectsem4.service.PartnerService;
-import com.example.beprojectsem4.service.RoleService;
-import com.example.beprojectsem4.service.SendEmailService;
-import com.example.beprojectsem4.service.UserService;
+import com.example.beprojectsem4.service.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -44,6 +42,11 @@ public class PartnerServiceImpl implements PartnerService {
     private RoleService roleService;
     @Autowired
     private SendEmailService sendEmailService;
+    private final ProgramService programService;
+    @Autowired
+    public PartnerServiceImpl(@Lazy ProgramService programService){
+        this.programService = programService;
+    };
 
     @Override
     public ResponseEntity<?> getPartnerByEmail(String email) {
@@ -157,8 +160,19 @@ public class PartnerServiceImpl implements PartnerService {
         try {
             Optional<PartnerEntity> partner = partnerRepository.findById(id);
             if (partner.isPresent()) {
-                userService.blockUser(partner.get().getEmail());
                 PartnerEntity p = partner.get();
+                if(value.equals("Block")){
+                    userService.toggleLockUser(partner.get().getEmail(),value);
+                    for(ProgramEntity program : p.getPrograms()){
+                        programService.toggleLockProgram(program.getProgramId(),value);
+                    }
+                }
+                if(value.equals("Active")){
+                    userService.toggleLockUser(partner.get().getEmail(),value);
+                }
+                    for(ProgramEntity program : p.getPrograms()){
+                        programService.toggleLockProgram(program.getProgramId(),value);
+                }
                 p.setStatus(value);
                 partnerRepository.save(p);
                 return ResponseEntity.ok().body(value+" success");

@@ -17,7 +17,7 @@ public interface UserService {
     ResponseEntity<?> refreshToken(HttpServletRequest request);
     ResponseEntity<?> getMe(HttpServletRequest request);
     String updateUser(HttpServletRequest request, UpdateUserDto updateUserDto);
-    String blockUser(String email);
+    ResponseEntity<?> toggleLockUser(String email,String value);
     boolean activeUser(String email);
     UserEntity checkUser(String email);
     UserEntity findUserById(Long id);

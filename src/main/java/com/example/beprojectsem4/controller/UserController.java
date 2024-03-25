@@ -33,4 +33,9 @@ public class UserController {
     public void createAdminAccount(RegisterDto registerDto){
         userService.createAccountAdmin(registerDto);
     }
+
+    @GetMapping("/toggle-lock-user")
+    public ResponseEntity<?> toggleLockUser(String email,String value){
+        return userService.toggleLockUser(email,value);
+    }
 }

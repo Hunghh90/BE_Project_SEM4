@@ -232,19 +232,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String blockUser(String email) {
+    public ResponseEntity<?> toggleLockUser(String email,String value) {
         try{
             UserEntity user = repository.findUserByEmail(email);
             if(user == null){
-                return "Email not exists";
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not exists");
             }else{
-                user.setStatus("Block");
+                user.setStatus(value);
                 repository.save(user);
-                return "Block user success";
+                return ResponseEntity.ok().body(value+" user success");
             }
         }catch (Exception ex){
             System.out.println(ex.getMessage());
-            return "An error occurred";
+            return ResponseEntity.internalServerError().body(ex.getMessage());
         }
 
     }

@@ -35,8 +35,8 @@ public class ProgramController {
         return programService.approveProgram(id,rejectProgramDto);
     }
 
-    @PostMapping("/toggle-lock-program")
-    public ResponseEntity<?> toggleLockProgram(@RequestBody Long id,String value){
+    @GetMapping("/toggle-lock-program")
+    public ResponseEntity<?> toggleLockProgram( Long id,String value){
         return programService.toggleLockProgram(id,value);
     }
 

@@ -81,6 +81,8 @@ public class FeedBackServiceImpl implements FeedBackService {
             List<FeedBackDto> feedBackDtoList = new ArrayList<>();
             for(FeedBackEntity feedBack : feedBackEntityPage){
                 FeedBackDto feedBackDto = EntityDtoConverter.convertToDto(feedBack,FeedBackDto.class);
+                feedBackDto.setUserName(feedBack.getUser().getDisplayName());
+                feedBackDto.setUserId(feedBack.getUser().getUserId());
                 feedBackDtoList.add(feedBackDto);
             }
             return ResponseEntity.ok().body(feedBackDtoList);

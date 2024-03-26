@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 public class FeedBackDto {
     private Long feedBackId;
     private String content;
-    private String userName;
+    private UserEntity user;
 }

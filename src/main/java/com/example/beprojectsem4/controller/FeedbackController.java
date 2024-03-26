@@ -16,7 +16,7 @@ public class FeedbackController {
     private FeedBackService feedBackService;
 
     @PostMapping("create-feedback")
-    public ResponseEntity<?> createFeedback(HttpServletRequest request, CreateCommentDto createCommentDto){
+    public ResponseEntity<?> createFeedback(HttpServletRequest request,@RequestBody CreateCommentDto createCommentDto){
         return feedBackService.createComment(request,createCommentDto);
     }
 

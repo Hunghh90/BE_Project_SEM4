@@ -49,7 +49,7 @@ public class VNPayService {
         vnp_Params.put("vnp_Locale", locate);
 
 //        String urlReturn += VNPayConfig.vnp_ReturnUrl;
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl+ "?ProgramId=" + requestDonate.getProgramId());
+        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl+ "?ProgramId=" + requestDonate.getProgramId()+"&paymentMethod="+requestDonate.getPaymentMethod());
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));

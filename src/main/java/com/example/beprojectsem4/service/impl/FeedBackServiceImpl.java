@@ -70,7 +70,7 @@ public class FeedBackServiceImpl implements FeedBackService {
     @Override
     public ResponseEntity<?> getCommentByProgramId(Long programId, PaginateAndSearchByNameDto paginateDto) {
         try {
-            PaginateAndSearchByNameDto paginate = new PaginateAndSearchByNameDto(paginateDto.getName(), paginateDto.getPage(), paginateDto.getSize());
+            PaginateAndSearchByNameDto paginate = new PaginateAndSearchByNameDto( paginateDto.getPage(), paginateDto.getSize());
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
             PageRequest pageRequest = PageRequest.of(paginate.getPage()-1, paginate.getSize(),sort);
             ProgramEntity program = programService.findById(programId);
@@ -81,8 +81,8 @@ public class FeedBackServiceImpl implements FeedBackService {
             List<FeedBackDto> feedBackDtoList = new ArrayList<>();
             for(FeedBackEntity feedBack : feedBackEntityPage){
                 FeedBackDto feedBackDto = EntityDtoConverter.convertToDto(feedBack,FeedBackDto.class);
-                feedBackDto.setUserName(feedBack.getUser().getDisplayName());
-                feedBackDto.setUserId(feedBack.getUser().getUserId());
+//                feedBackDto.setUserName(feedBack.getUser().getDisplayName());
+//                feedBackDto.setUserId(feedBack.getUser().getUserId());
                 feedBackDtoList.add(feedBackDto);
             }
             return ResponseEntity.ok().body(feedBackDtoList);

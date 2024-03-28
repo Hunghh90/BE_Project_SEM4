@@ -21,9 +21,11 @@ public class SubProgramEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
     private String type;
+    private String note;
     @ManyToOne
     @JoinColumn(name = "program_id")
     private ProgramEntity program;
+    private String status;
     @Column(name = "created_at")
     private Date createdAt;
     @Column(name = "updated_at")
@@ -39,9 +41,10 @@ public class SubProgramEntity {
         updatedAt = new Date();
     }
 
-    public SubProgramEntity(UserEntity user, ProgramEntity program,String type){
+    public SubProgramEntity(UserEntity user, ProgramEntity program,String type,String status){
         this.user = user;
         this.program = program;
         this.type = type;
+        this.status = status;
     }
 }

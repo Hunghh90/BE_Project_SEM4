@@ -1,5 +1,6 @@
 package com.example.beprojectsem4.service;
 
+import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
 import com.example.beprojectsem4.dtos.userDtos.ChangePasswordDto;
 import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
 import com.example.beprojectsem4.dtos.userDtos.ResetPasswordDto;
@@ -22,5 +23,7 @@ public interface UserService {
     UserEntity checkUser(String email);
     UserEntity findUserById(Long id);
     UserEntity findUserByToken(HttpServletRequest request);
-    boolean resetPassword(String email, ResetPasswordDto resetPasswordDto);
+    String resetPassword(String email);
+    ResponseEntity<?> getAllUser(PaginateAndSearchByNameDto paginateAndSearchByNameDto);
+    ResponseEntity<?> getUserById(Long id);
 }

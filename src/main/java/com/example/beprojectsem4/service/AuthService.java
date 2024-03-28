@@ -14,5 +14,4 @@ public interface AuthService {
     public void logout(HttpServletRequest request);
     RedirectView activeAccount(String code, String email);
     ResponseEntity<?> forgotPassword(String email);
-    ResponseEntity<?> resetPassword(String email, ResetPasswordDto resetPasswordDto);
 }

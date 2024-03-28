@@ -1,10 +1,8 @@
 package com.example.beprojectsem4.dtos.programDtos;
 
-import com.example.beprojectsem4.dtos.Donation.DonateDto;
-import com.example.beprojectsem4.entities.DonationEntity;
+import com.example.beprojectsem4.dtos.DonationDtos.DonateDto;
 import com.example.beprojectsem4.entities.PartnerEntity;
 import com.example.beprojectsem4.entities.ProgramAttachmentEntity;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,4 +28,5 @@ public class ProgramDto {
     private PartnerEntity partner;
     private List<DonateDto> donations;
     private String reasonRejection;
+    private int share;
 }

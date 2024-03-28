@@ -67,9 +67,9 @@ public class SecurityConfig  {
                         "/swagger-ui.html"
                 ).permitAll()
 //                .requestMatchers("/api/v1/**").authenticated()
-                .anyRequest().permitAll());
+                .anyRequest().authenticated());
         httpSecurity.addFilterBefore(jwtAuthenticationFilter(), BasicAuthenticationFilter.class);
-//                .exceptionHandling().accessDeniedHandler(new AcessDenied());
+//        httpSecurity.exceptionHandling().accessDeniedHandler(new AcessDenied());
 //        httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         return httpSecurity.build();
     }

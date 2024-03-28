@@ -22,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
@@ -122,27 +123,20 @@ public class AuthServiceImpl implements AuthService {
             if (user == null) {
                 return ResponseEntity.badRequest().body("Email not exists");
             } else {
-                sendEmailService.sendEmail(email, "Reset password", "http://www.localhost:8081/auth/reset-password?email="+email);
-                return ResponseEntity.ok().body("Check email to reset password");
+                String password = userService.resetPassword(email);
+                Resource resource = new ClassPathResource("templates/ResetPassword.html");
+                String htmlContent = new String(FileCopyUtils.copyToByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
+                String processesHtmlContent = htmlContent
+                        .replace("[[Recipient_Name]]",user.getDisplayName())
+                        .replace("[[New_Password]]",password);
+                sendEmailService.sendEmail(email, "Password Reset Confirmation", processesHtmlContent);
+                return ResponseEntity.ok().body("Check email to view new password");
             }
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-            return ResponseEntity.internalServerError().body("An error");
+            return ResponseEntity.internalServerError().body(ex.getMessage());
         }
     }
 
-    @Override
-    public ResponseEntity<?> resetPassword(String email, ResetPasswordDto resetPasswordDto) {
-        try {
-           if(userService.resetPassword(email, resetPasswordDto)){
-               return ResponseEntity.ok("Change password success");
-           }else {
-               return ResponseEntity.badRequest().body("Check password and confirm password");
-           }
-        }catch (Exception ex){
-            System.out.println(ex.getMessage());
-            return ResponseEntity.internalServerError().body("Error");
-        }
-    }
 
 }

@@ -31,11 +31,11 @@ public class PartnerController {
     }
 
     @PostMapping("/update-partner")
-    public ResponseEntity<?> updatepartner(@RequestParam("id")Long id, UpdatePartnerDto updatePartnerDto){
+    public ResponseEntity<?> updatepartner(@RequestParam("id")Long id,@RequestBody UpdatePartnerDto updatePartnerDto){
         return partnerService.updatePartner(id,updatePartnerDto);
     }
 
-    @GetMapping("/toggle-lock-partner")
+    @GetMapping("/toggle-lock-partner/{id}")
     public ResponseEntity<?> blockPartner( Long id,String value){
         return partnerService.toggleLockPartner(id,value);
     }

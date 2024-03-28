@@ -39,12 +39,11 @@ public class ProgramEntity {
     @Column(columnDefinition = "LONGTEXT")
     private String description;
     private String status;
-    @Column(name = "finish_soon")
-    private boolean finishSoon;
     @Column(name = "recruit_collaborators")
     private boolean recruitCollaborators;
     @Column(name = "reason_rejection")
     private String reasonRejection;
+    private int share;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
@@ -72,7 +71,7 @@ public class ProgramEntity {
         updatedAt = new Date();
     }
 
-    public ProgramEntity(String programName,String description,Long target,Date startDonateDate,Date endDonateDate,Date finishDate,String status,boolean finishSoon,boolean recruitCollaborators){
+    public ProgramEntity(String programName,String description,Long target,Date startDonateDate,Date endDonateDate,Date finishDate,String status,boolean recruitCollaborators){
         this.programName = programName;
         this.description = description;
         this.startDonateDate = startDonateDate;
@@ -80,7 +79,6 @@ public class ProgramEntity {
         this.endDonateDate = endDonateDate;
         this.finishDate = finishDate;
         this.status = status;
-        this.finishSoon = finishSoon;
         this.recruitCollaborators = recruitCollaborators;
     }
 }

@@ -13,6 +13,7 @@ Cứt
 Lồn
 Con đĩ
 đm
+đmm
 đcm
 vcl
 vl
@@ -21,3 +22,4 @@ Cặc
 Lồn
 Con đĩ mẹ
 Lồn
+cc

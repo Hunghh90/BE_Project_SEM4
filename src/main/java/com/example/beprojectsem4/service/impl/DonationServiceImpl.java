@@ -1,11 +1,9 @@
 package com.example.beprojectsem4.service.impl;
 
-import com.example.beprojectsem4.config.VNPayConfig;
 import com.example.beprojectsem4.dto.request.RequestDonate;
 import com.example.beprojectsem4.dto.response.ResponseDonate;
-import com.example.beprojectsem4.dtos.Donation.CreateDonateDto;
-import com.example.beprojectsem4.dtos.Donation.DonateDto;
-import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
+import com.example.beprojectsem4.dtos.DonationDtos.CreateDonateDto;
+import com.example.beprojectsem4.dtos.DonationDtos.DonateDto;
 import com.example.beprojectsem4.dtos.programDtos.ProgramDto;
 import com.example.beprojectsem4.entities.DonationEntity;
 import com.example.beprojectsem4.entities.ProgramEntity;
@@ -15,25 +13,18 @@ import com.example.beprojectsem4.repository.DonationRepository;
 import com.example.beprojectsem4.service.DonationService;
 import com.example.beprojectsem4.service.ProgramService;
 import com.example.beprojectsem4.service.UserService;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.poi.xwpf.converter.pdf.PdfConverter;
+import org.apache.poi.xwpf.converter.pdf.PdfOptions;
+import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.*;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -158,34 +149,38 @@ public class DonationServiceImpl implements DonationService {
 //    }
 
     @Override
-    public ResponseEntity<byte[]> generateDonationPDF(Long programId) throws DocumentException, IOException {
-        Document document = new Document();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PdfWriter.getInstance(document, baos);
+    public ResponseEntity<byte[]> generateDonationPDF(Long programId) throws  IOException {
+        XWPFDocument doc = new XWPFDocument(new FileInputStream("src/main/resources/templates/ListDonates.docx"));
         ResponseEntity<?> programDetail = programService.detailProgram(programId);
         if(programDetail.getStatusCode().is2xxSuccessful()){
             ProgramDto program = (ProgramDto) programDetail.getBody();
             assert program != null;
-//            File pdfFile = new File(program.getProgramName() + ".pdf");
-//            PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
-            document.open();
             List<DonateDto> donations = program.getDonations();
-            document.add(new Paragraph("List donations " + program.getProgramName()));
+            XWPFTable table = doc.getTables().get(0);
             for (DonateDto donation : donations) {
-                String amountVND = NumberFormat.getCurrencyInstance(new Locale("vi", "VN")).format(donation.getAmount());
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-                String createdAtFormatted = dateFormat.format(donation.getCreatedAt());
-                document.add(new Paragraph(donation.getUser().getDisplayName() + " - " + amountVND + " - " + donation.getPaymentMethod() + " - " + createdAtFormatted));
+                XWPFTableRow row = table.createRow();
+                row.getCell(0).setText(donation.getUser().getDisplayName());
+                row.getCell(1).setText(NumberFormat.getCurrencyInstance(new Locale("vi", "VN")).format(donation.getAmount()));
+                row.getCell(2).setText(donation.getPaymentMethod());
+                row.getCell(3).setText(dateFormat.format(donation.getCreatedAt()));
             }
-            document.close();
-            String fileName = program.getProgramName().replace(" ", "_");
+
+            FileOutputStream out = new FileOutputStream("ListDonate_modified.docx");
+            doc.write(out);
+            out.close();
+            File pdfFile = new File("ListDonate_modified.pdf");
+            FileInputStream docxInputStream = new FileInputStream("ListDonate_modified.docx");
+            XWPFDocument documents = new XWPFDocument(docxInputStream);
+            PdfOptions options = PdfOptions.create();
+            PdfConverter.getInstance().convert(documents, new FileOutputStream(pdfFile), options);
+            byte[] pdfBytes = Files.readAllBytes(pdfFile.toPath());
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("attachment", fileName+".pdf");
-
+            headers.setContentDispositionFormData("attachment", program.getProgramName()+".pdf");
             return ResponseEntity.ok()
                     .headers(headers)
-                    .body(baos.toByteArray());
+                    .body(pdfBytes);
         }
         return ResponseEntity.notFound().build();
     }

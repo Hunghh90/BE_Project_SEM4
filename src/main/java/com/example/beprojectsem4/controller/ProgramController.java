@@ -40,13 +40,13 @@ public class ProgramController {
         return programService.toggleLockProgram(id,value);
     }
 
-    @PostMapping("/search")
-    public ResponseEntity<?> searchAllField(@RequestBody() String search){
+    @GetMapping("/search")
+    public ResponseEntity<?> searchAllField( String search){
         return programService.searchAllField(search);
     }
 
-    @PostMapping("/list-program-by-status")
-    public ResponseEntity<?> listProgramByStatus(@RequestBody PaginateAndSearchByNameDto paginateAndSearchByNameDto){
+    @GetMapping("/list-program-by-status")
+    public ResponseEntity<?> listProgramByStatus( PaginateAndSearchByNameDto paginateAndSearchByNameDto){
         return programService.listProgramByStatus(paginateAndSearchByNameDto);
     }
 

@@ -1,6 +1,5 @@
-package com.example.beprojectsem4.dtos.Donation;
+package com.example.beprojectsem4.dtos.DonationDtos;
 
-import com.example.beprojectsem4.dtos.userDtos.GetMeDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

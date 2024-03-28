@@ -8,10 +8,11 @@ import com.example.beprojectsem4.repository.UserRepository;
 import com.example.beprojectsem4.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@PreAuthorize("hasRole('ADMIN')")
 @Service
 public class RoleServiceImpl implements RoleService {
     @Autowired

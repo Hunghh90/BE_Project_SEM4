@@ -24,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 
@@ -48,6 +49,7 @@ public class PartnerServiceImpl implements PartnerService {
         this.programService = programService;
     };
 
+ @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> getPartnerByEmail(String email) {
         try{
@@ -62,7 +64,7 @@ public class PartnerServiceImpl implements PartnerService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> createPartner(CreatePartnerDto createPartnerDto) {
         try {
@@ -111,16 +113,16 @@ public class PartnerServiceImpl implements PartnerService {
         }
 
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> listPartner(PaginateAndSearchByNameDto paginateDto) {
         try {
-            PaginateAndSearchByNameDto paginateAndSearchByNameDto = new PaginateAndSearchByNameDto(paginateDto.getName(),paginateDto.getPage(), paginateDto.getSize());
+            PaginateAndSearchByNameDto paginateAndSearchByNameDto = new PaginateAndSearchByNameDto(paginateDto.getPage(), paginateDto.getSize());
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
             PageRequest pageRequest = PageRequest.of(paginateAndSearchByNameDto.getPage()-1, paginateAndSearchByNameDto.getSize(),sort);
-            Page<PartnerEntity> partners = partnerRepository.findByPartnerNameContaining(paginateAndSearchByNameDto.getName(),pageRequest);
+            Page<PartnerEntity> partners = partnerRepository.findByPartnerNameContaining(paginateDto.getName(),pageRequest);
             if (partners.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No found partner");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found partner");
             }
             List<PartnerDto> partnerDto = new ArrayList<>();
             for (PartnerEntity p : partners){
@@ -134,7 +136,7 @@ public class PartnerServiceImpl implements PartnerService {
         }
     }
 
-
+    @PreAuthorize("hasRole('PARTNER')")
     @Override
     public ResponseEntity<?> updatePartner(Long id, UpdatePartnerDto updatePartnerDto) {
         try {
@@ -154,7 +156,7 @@ public class PartnerServiceImpl implements PartnerService {
             return ResponseEntity.internalServerError().body(ex.getMessage());
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> toggleLockPartner(Long id,String value) {
         try {
@@ -212,7 +214,7 @@ public class PartnerServiceImpl implements PartnerService {
             return false;
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> searchAllField(String value) {
         try {

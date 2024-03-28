@@ -1,6 +1,7 @@
 package com.example.beprojectsem4.controller;
 
 import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
+import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
 import com.example.beprojectsem4.dtos.userDtos.ChangePasswordDto;
 import com.example.beprojectsem4.service.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,12 +31,22 @@ public class UserController {
     }
 
     @PostMapping("/create-account-admin")
-    public void createAdminAccount(RegisterDto registerDto){
+    public void createAdminAccount(@RequestBody RegisterDto registerDto){
         userService.createAccountAdmin(registerDto);
     }
 
     @GetMapping("/toggle-lock-user")
     public ResponseEntity<?> toggleLockUser(String email,String value){
         return userService.toggleLockUser(email,value);
+    }
+
+    @GetMapping("/get-by-id/{id}")
+    public ResponseEntity<?> getById(@PathVariable("id") Long id){
+        return userService.getUserById(id);
+    }
+
+    @GetMapping("/get-all-user")
+    public ResponseEntity<?> getAllUser(PaginateAndSearchByNameDto paginate){
+        return userService.getAllUser(paginate);
     }
 }

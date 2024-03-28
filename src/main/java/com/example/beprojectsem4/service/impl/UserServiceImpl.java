@@ -1,5 +1,6 @@
 package com.example.beprojectsem4.service.impl;
 
+import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
 import com.example.beprojectsem4.dtos.userDtos.*;
 import com.example.beprojectsem4.dtos.authDtos.JwtResponseDto;
 import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
@@ -7,19 +8,22 @@ import com.example.beprojectsem4.dtos.authDtos.TokenResponseDto;
 import com.example.beprojectsem4.entities.*;
 import com.example.beprojectsem4.helper.EntityDtoConverter;
 import com.example.beprojectsem4.repository.PartnerRepository;
-import com.example.beprojectsem4.repository.RoleRepository;
 import com.example.beprojectsem4.repository.UserAttachmentRepository;
 import com.example.beprojectsem4.repository.UserRepository;
-import com.example.beprojectsem4.service.PartnerService;
 import com.example.beprojectsem4.service.RoleService;
 import com.example.beprojectsem4.service.UserService;
 import com.example.beprojectsem4.service.jwt.JwtAuthenticationFilter;
 import com.example.beprojectsem4.service.jwt.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,7 +33,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -72,7 +75,7 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.internalServerError().body(ex.getMessage());
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> createAccountAdmin(RegisterDto registerDto) {
         try {
@@ -82,10 +85,10 @@ public class UserServiceImpl implements UserService {
             }
             UserEntity user = EntityDtoConverter.convertToEntity(registerDto, UserEntity.class);
             user.setPassword(bCryptPasswordEncoder.encode(registerDto.getPassword()));
-            RoleEntity userRole = roleService.findRoleByRoleName("ADMIN");
-            if (roleService.findRoleByRoleName("ADMIN") == null) {
-                roleService.createRole("ADMIN");
-                userRole = roleService.findRoleByRoleName("ADMIN");
+            RoleEntity userRole = roleService.findRoleByRoleName("ROLE_ADMIN");
+            if (userRole == null) {
+                roleService.createRole("ROLE_ADMIN");
+                userRole = roleService.findRoleByRoleName("ROLE_ADMIN");
             }
             user.getRoles().add(userRole);
             user.setStatus("Activate");
@@ -96,6 +99,7 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An error occurred");
         }
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> createAccountPartner(RegisterDto registerDto) {
         try {
@@ -105,10 +109,10 @@ public class UserServiceImpl implements UserService {
             }
             UserEntity user = EntityDtoConverter.convertToEntity(registerDto, UserEntity.class);
             user.setPassword(bCryptPasswordEncoder.encode(registerDto.getPassword()));
-            RoleEntity userRole = roleService.findRoleByRoleName("PARTNER");
+            RoleEntity userRole = roleService.findRoleByRoleName("ROLE_PARTNER");
             if (userRole == null) {
-               roleService.createRole("PARTNER");
-                userRole = roleService.findRoleByRoleName("PARTNER");
+               roleService.createRole("ROLE_PARTNER");
+                userRole = roleService.findRoleByRoleName("ROLE_PARTNER");
             }
             user.getRoles().add(userRole);
             user.setStatus("Activate");
@@ -213,7 +217,7 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.internalServerError().body(ex.getMessage());
         }
     }
-
+    @PreAuthorize("hasRole('USER')")
     @Override
     public String updateUser(HttpServletRequest request, UpdateUserDto updateUserDto) {
         try{
@@ -230,7 +234,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> toggleLockUser(String email,String value) {
         try{
@@ -255,10 +259,10 @@ public class UserServiceImpl implements UserService {
             if (user == null) {
                 return false;
             } else {
-                RoleEntity userRole = roleService.findRoleByRoleName("USER");
+                RoleEntity userRole = roleService.findRoleByRoleName("ROLE_USER");
                 if (userRole == null) {
-                    roleService.createRole("USER");
-                    userRole = roleService.findRoleByRoleName("USER");
+                    roleService.createRole("ROLE_USER");
+                    userRole = roleService.findRoleByRoleName("ROLE_USER");
                 }
                 user.getRoles().add(userRole);
                 user.setStatus("Activate");
@@ -301,24 +305,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean resetPassword(String email, ResetPasswordDto resetPasswordDto) {
+    public String resetPassword(String email) {
         try{
-            UserEntity user = checkUser(email);
+            UserEntity user = repository.findUserByEmail(email);
             if(user == null){
-                return false;
-            }else{
-                if(resetPasswordDto.getNewPassword().equals(resetPasswordDto.getConfirmPassword())){
-                    String hashPassword = bCryptPasswordEncoder.encode(resetPasswordDto.getNewPassword());
-                    user.setPassword(hashPassword);
-                    repository.save(user);
-                    return true;
-                }else{
-                    return false;
-                }
+                return "Not found user";
             }
-        }catch (Exception ex){
-            System.out.println(ex.getMessage());
-            return false;
+            String password = RandomStringUtils.random(8,true,true);
+            String hashPassword = bCryptPasswordEncoder.encode(password);
+            user.setPassword(hashPassword);
+            repository.save(user);
+            return password;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return e.getMessage();
         }
     }
 
@@ -331,5 +331,43 @@ public class UserServiceImpl implements UserService {
             System.out.println(e.getMessage());
             return null;
         }
+    }
+
+    @Override
+    public ResponseEntity<?> getUserById(Long id) {
+        try{
+            UserEntity user = findUserById(id);
+            if(user == null){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not Found");
+            }
+            GetMeDto gm = EntityDtoConverter.convertToDto(user, GetMeDto.class);
+            return ResponseEntity.ok().body(gm);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public ResponseEntity<?> getAllUser(PaginateAndSearchByNameDto paginateAndSearchByNameDto) {
+        try {
+            PaginateAndSearchByNameDto paginate = new PaginateAndSearchByNameDto(paginateAndSearchByNameDto.getPage(), paginateAndSearchByNameDto.getSize());
+            Sort sort = Sort.by(Sort.Order.desc("createdAt"));
+            PageRequest pageRequest = PageRequest.of(paginate.getPage(),paginate.getSize(),sort);
+            Page<UserEntity> users = repository.findAll(pageRequest);
+            if(users.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found user");
+            }
+            List<GetMeDto> getMeDtos = new ArrayList<>();
+            for(UserEntity user : users){
+                GetMeDto gm = EntityDtoConverter.convertToDto(user, GetMeDto.class);
+                getMeDtos.add(gm);
+            }
+            return ResponseEntity.ok().body(getMeDtos);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+
     }
 }

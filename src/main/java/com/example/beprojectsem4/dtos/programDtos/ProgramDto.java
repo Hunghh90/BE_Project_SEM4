@@ -22,7 +22,6 @@ public class ProgramDto {
     private Date finishDate;
     private String description;
     private String status;
-    private boolean finishSoon;
     private boolean recruitCollaborators;
     private List<ProgramAttachmentEntity> attachment;
     private Double totalMoney;

@@ -51,14 +51,9 @@ public class FeedBackServiceImpl implements FeedBackService {
             }
         }
         if(user != null && program != null){
-            for(DonationEntity donate : program.getDonations()){
-                Long id = donate.getUser().getUserId();
-                if(user.getUserId().compareTo(id) == 0){
-                    FeedBackEntity feedBack = new FeedBackEntity(createCommentDto.getContent(), user,program);
-                    feedBackRepository.save(feedBack);
-                    return ResponseEntity.ok().body("Comment success");
-                }
-            }
+            FeedBackEntity feedBack = new FeedBackEntity(createCommentDto.getContent(), user,program);
+            feedBackRepository.save(feedBack);
+            return ResponseEntity.ok().body("Comment success");
         }
         return ResponseEntity.badRequest().body("Comment not success");
         }catch (Exception e){

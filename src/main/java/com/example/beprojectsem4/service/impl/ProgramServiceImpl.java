@@ -379,13 +379,13 @@ public class ProgramServiceImpl implements ProgramService {
             return null;
         }
     }
-    @PreAuthorize("isAnonymous()")
     public List<DonateDto> listDonate(ProgramEntity program) {
         try {
             List<DonateDto> donateDtoList = new ArrayList<>();
             for (DonationEntity getDonate : program.getDonations()) {
                 DonateDto donateDto = EntityDtoConverter.convertToDto(getDonate, DonateDto.class);
                 GetMeDto gm = EntityDtoConverter.convertToDto(getDonate.getUser(), GetMeDto.class);
+                gm.setDonations(null);
                 donateDto.setUser(gm);
                 donateDtoList.add(donateDto);
             }

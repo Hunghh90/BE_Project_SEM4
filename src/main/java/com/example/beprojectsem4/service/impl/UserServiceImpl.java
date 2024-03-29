@@ -189,7 +189,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
     }
-
+@PreAuthorize("hasRole('USER')")
     @Override
     public ResponseEntity<?> getMe(HttpServletRequest request) {
         try{

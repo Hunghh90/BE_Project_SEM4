@@ -1,7 +1,7 @@
 package com.example.beprojectsem4.service.impl;
 
-import com.example.beprojectsem4.dtos.DonationDtos.CreateDonateDto;
-import com.example.beprojectsem4.dtos.DonationDtos.DonateDto;
+import com.example.beprojectsem4.dtos.donationDtos.CreateDonateDto;
+import com.example.beprojectsem4.dtos.donationDtos.DonateDto;
 import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
 import com.example.beprojectsem4.dtos.programDtos.*;
 import com.example.beprojectsem4.dtos.userDtos.GetMeDto;
@@ -12,14 +12,13 @@ import com.example.beprojectsem4.helper.TransferValuesIfNull;
 import com.example.beprojectsem4.repository.DynamicSpecification;
 import com.example.beprojectsem4.repository.ProgramAttachmentRepository;
 import com.example.beprojectsem4.repository.ProgramRepository;
-import com.example.beprojectsem4.service.PartnerService;
-import com.example.beprojectsem4.service.ProgramService;
-import com.example.beprojectsem4.service.SendEmailService;
-import com.example.beprojectsem4.service.UserService;
+import com.example.beprojectsem4.repository.SubProgramRepository;
+import com.example.beprojectsem4.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -47,6 +46,12 @@ public class ProgramServiceImpl implements ProgramService {
     private PartnerService partnerService;
     @Autowired
     private SendEmailService sendEmailService;
+
+    private final SubProgramService subProgramService;
+    @Autowired
+    public ProgramServiceImpl(@Lazy SubProgramService subProgramService){
+        this.subProgramService = subProgramService;
+    }
     @PreAuthorize("hasRole('PARTNER')")
     @Override
     public ResponseEntity<?> createProgram(HttpServletRequest request, CreateProgramDto createProgramDto) {
@@ -76,6 +81,7 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+    @PreAuthorize("isAnonymous()")
     @Override
     public ResponseEntity<?> listProgram(PaginateAndSearchByNameDto paginateDto) {
         try {
@@ -196,7 +202,7 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-
+    @PreAuthorize("isAnonymous()")
     @Override
     public boolean checkProgramByProgramName(String programName) {
         try {
@@ -207,7 +213,7 @@ public class ProgramServiceImpl implements ProgramService {
             return false;
         }
     }
-
+    @PreAuthorize("isAnonymous()")
     @Override
     public ResponseEntity<?> searchAllField(String value) {
         try {
@@ -231,7 +237,7 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-
+    @PreAuthorize("isAnonymous()")
     @Override
     public ResponseEntity<?> listProgramByStatus(PaginateAndSearchByNameDto paginateDto) {
         try {
@@ -246,9 +252,9 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-
+//    @PreAuthorize("isAnonymous()or isAuthenticated()")
     @Override
-    public ResponseEntity<?> detailProgram(Long id) {
+    public ResponseEntity<?> detailProgram(HttpServletRequest request,Long id) {
         try {
             ProgramEntity program = findById(id);
             if (program != null) {
@@ -258,6 +264,16 @@ public class ProgramServiceImpl implements ProgramService {
                 program.setDescription(normalData);
                 ProgramDto programDto = EntityDtoConverter.convertToDto(program, ProgramDto.class);
                 programDto.setDonations(donateDtoList);
+                UserEntity user = userService.findUserByToken(request);
+                if (user != null) {
+                    SubProgramEntity subProgram = subProgramService.getByUserAndProgramAndType(user,program,"volunteer");
+                    if(subProgram!=null){
+                        programDto.setVolunteer(true);
+
+                    }
+                }
+                List<SubProgramEntity> subProgramEntityList = subProgramService.getAllByProgramAndStatus(program,"Active");
+                programDto.setCountVolunteer(subProgramEntityList.size());
                 return ResponseEntity.ok().body(programDto);
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found program");
@@ -363,7 +379,7 @@ public class ProgramServiceImpl implements ProgramService {
             return null;
         }
     }
-
+    @PreAuthorize("isAnonymous()")
     public List<DonateDto> listDonate(ProgramEntity program) {
         try {
             List<DonateDto> donateDtoList = new ArrayList<>();

@@ -1,5 +1,6 @@
 package com.example.beprojectsem4.dtos.userDtos;
 
+import com.example.beprojectsem4.dtos.subProgramDtos.SubProgramDto;
 import com.example.beprojectsem4.entities.UserAttachmentEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Temporal;
@@ -30,6 +31,7 @@ public class GetMeDto {
     private String role;
     private Date updatedAt;
     private List<DonateByUserDto> donations;
+    private List<SubProgramDto> subPrograms;
     @Nullable
     private Long partnerId;
 }

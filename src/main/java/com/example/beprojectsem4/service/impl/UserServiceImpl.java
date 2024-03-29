@@ -1,6 +1,7 @@
 package com.example.beprojectsem4.service.impl;
 
 import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
+import com.example.beprojectsem4.dtos.subProgramDtos.SubProgramDto;
 import com.example.beprojectsem4.dtos.userDtos.*;
 import com.example.beprojectsem4.dtos.authDtos.JwtResponseDto;
 import com.example.beprojectsem4.dtos.authDtos.RegisterDto;
@@ -203,6 +204,11 @@ public class UserServiceImpl implements UserService {
                 donate.setProgramName(donation.getProgram().getProgramName());
                 donations.add(donate);
             }
+            List<SubProgramDto> subPrograms = new ArrayList<>();
+            for(SubProgramEntity subProgram : user.getSubPrograms()){
+                SubProgramDto subProgramDto = EntityDtoConverter.convertToDto(subProgram, SubProgramDto.class);
+                subPrograms.add(subProgramDto);
+            }
             GetMeDto gm = EntityDtoConverter.convertToDto(user, GetMeDto.class);
             if(userRole.equals("PARTNER")){
                 PartnerEntity partner = partnerRepository.findByEmail(user.getEmail());
@@ -211,6 +217,7 @@ public class UserServiceImpl implements UserService {
             }
             gm.setRole(userRole);
             gm.setDonations(donations);
+            gm.setSubPrograms(subPrograms);
             return ResponseEntity.ok().body(gm);
         }catch (Exception ex){
             System.out.println(ex.getMessage());

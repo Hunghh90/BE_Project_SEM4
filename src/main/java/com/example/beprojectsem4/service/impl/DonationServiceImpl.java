@@ -2,8 +2,8 @@ package com.example.beprojectsem4.service.impl;
 
 import com.example.beprojectsem4.dto.request.RequestDonate;
 import com.example.beprojectsem4.dto.response.ResponseDonate;
-import com.example.beprojectsem4.dtos.DonationDtos.CreateDonateDto;
-import com.example.beprojectsem4.dtos.DonationDtos.DonateDto;
+import com.example.beprojectsem4.dtos.donationDtos.CreateDonateDto;
+import com.example.beprojectsem4.dtos.donationDtos.DonateDto;
 import com.example.beprojectsem4.dtos.programDtos.ProgramDto;
 import com.example.beprojectsem4.entities.DonationEntity;
 import com.example.beprojectsem4.entities.ProgramEntity;
@@ -149,9 +149,9 @@ public class DonationServiceImpl implements DonationService {
 //    }
 
     @Override
-    public ResponseEntity<byte[]> generateDonationPDF(Long programId) throws  IOException {
+    public ResponseEntity<byte[]> generateDonationPDF(HttpServletRequest request,Long programId) throws  IOException {
         XWPFDocument doc = new XWPFDocument(new FileInputStream("src/main/resources/templates/ListDonates.docx"));
-        ResponseEntity<?> programDetail = programService.detailProgram(programId);
+        ResponseEntity<?> programDetail = programService.detailProgram(request,programId);
         if(programDetail.getStatusCode().is2xxSuccessful()){
             ProgramDto program = (ProgramDto) programDetail.getBody();
             assert program != null;

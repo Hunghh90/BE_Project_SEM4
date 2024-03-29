@@ -1,11 +1,12 @@
 package com.example.beprojectsem4.dtos.programDtos;
 
-import com.example.beprojectsem4.dtos.DonationDtos.DonateDto;
+import com.example.beprojectsem4.dtos.donationDtos.DonateDto;
 import com.example.beprojectsem4.entities.PartnerEntity;
 import com.example.beprojectsem4.entities.ProgramAttachmentEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import java.util.Date;
 import java.util.List;
@@ -29,4 +30,6 @@ public class ProgramDto {
     private List<DonateDto> donations;
     private String reasonRejection;
     private int share;
+    private int countVolunteer;
+    private boolean isVolunteer;
 }

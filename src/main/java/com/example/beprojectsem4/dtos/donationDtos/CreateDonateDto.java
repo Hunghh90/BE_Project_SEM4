@@ -1,4 +1,4 @@
-package com.example.beprojectsem4.dtos.DonationDtos;
+package com.example.beprojectsem4.dtos.donationDtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

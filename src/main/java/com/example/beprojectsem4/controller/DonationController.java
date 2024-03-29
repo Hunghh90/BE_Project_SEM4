@@ -1,7 +1,7 @@
 package com.example.beprojectsem4.controller;
 
 import com.example.beprojectsem4.dto.request.RequestDonate;
-import com.example.beprojectsem4.dtos.DonationDtos.CreateDonateDto;
+import com.example.beprojectsem4.dtos.donationDtos.CreateDonateDto;
 import com.example.beprojectsem4.service.DonationService;
 import com.itextpdf.text.DocumentException;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,7 +40,7 @@ public class DonationController {
 //    }
 
     @GetMapping("/download-donations")
-    public ResponseEntity<byte[]> generateDonationPDF(Long programId) throws DocumentException, IOException {
-        return donationService.generateDonationPDF(programId);
+    public ResponseEntity<byte[]> generateDonationPDF(HttpServletRequest request,Long programId) throws DocumentException, IOException {
+        return donationService.generateDonationPDF(request,programId);
     }
 }

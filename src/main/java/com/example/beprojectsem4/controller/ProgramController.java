@@ -51,8 +51,8 @@ public class ProgramController {
     }
 
     @GetMapping("/detail-program/{id}")
-    public ResponseEntity<?> detailProgram(@PathVariable("id") Long id){
-        return programService.detailProgram(id);
+    public ResponseEntity<?> detailProgram(HttpServletRequest request,@PathVariable("id") Long id){
+        return programService.detailProgram(request,id);
     }
 
     @PostMapping("/finish-program/{id}")

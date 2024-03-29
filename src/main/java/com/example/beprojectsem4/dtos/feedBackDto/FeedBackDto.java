@@ -1,4 +1,4 @@
-package com.example.beprojectsem4.dtos.FeedBackDto;
+package com.example.beprojectsem4.dtos.feedBackDto;
 
 import com.example.beprojectsem4.entities.UserEntity;
 import lombok.AllArgsConstructor;

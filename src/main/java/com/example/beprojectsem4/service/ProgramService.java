@@ -1,6 +1,6 @@
 package com.example.beprojectsem4.service;
 
-import com.example.beprojectsem4.dtos.DonationDtos.CreateDonateDto;
+import com.example.beprojectsem4.dtos.donationDtos.CreateDonateDto;
 import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
 import com.example.beprojectsem4.dtos.programDtos.*;
 import com.example.beprojectsem4.entities.ProgramEntity;
@@ -19,7 +19,7 @@ public interface ProgramService {
     boolean checkProgramByProgramName(String programName);
 
     ResponseEntity<?> searchAllField(String value);
-    ResponseEntity<?> detailProgram(Long id);
+    ResponseEntity<?> detailProgram(HttpServletRequest request,Long id);
     ProgramEntity addMoneyDonate(CreateDonateDto donateDto);
 
     ResponseEntity<?> deleteCertify(ListUrlDto files, Long id);

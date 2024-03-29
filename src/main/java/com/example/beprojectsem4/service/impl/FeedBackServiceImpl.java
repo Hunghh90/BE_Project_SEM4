@@ -1,8 +1,8 @@
 package com.example.beprojectsem4.service.impl;
 
-import com.example.beprojectsem4.dtos.FeedBackDto.CreateCommentDto;
-import com.example.beprojectsem4.dtos.FeedBackDto.EditFeedBackDto;
-import com.example.beprojectsem4.dtos.FeedBackDto.FeedBackDto;
+import com.example.beprojectsem4.dtos.feedBackDto.CreateCommentDto;
+import com.example.beprojectsem4.dtos.feedBackDto.EditFeedBackDto;
+import com.example.beprojectsem4.dtos.feedBackDto.FeedBackDto;
 import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
 import com.example.beprojectsem4.entities.DonationEntity;
 import com.example.beprojectsem4.entities.FeedBackEntity;
@@ -76,13 +76,11 @@ public class FeedBackServiceImpl implements FeedBackService {
             ProgramEntity program = programService.findById(programId);
             Page<FeedBackEntity> feedBackEntityPage = feedBackRepository.findAllByProgram(program,pageRequest);
             if(feedBackEntityPage.isEmpty()){
-                return ResponseEntity.badRequest().body("Not found comment in program");
+                return ResponseEntity.ok().body(feedBackEntityPage);
             }
             List<FeedBackDto> feedBackDtoList = new ArrayList<>();
             for(FeedBackEntity feedBack : feedBackEntityPage){
                 FeedBackDto feedBackDto = EntityDtoConverter.convertToDto(feedBack,FeedBackDto.class);
-//                feedBackDto.setUserName(feedBack.getUser().getDisplayName());
-//                feedBackDto.setUserId(feedBack.getUser().getUserId());
                 feedBackDtoList.add(feedBackDto);
             }
             return ResponseEntity.ok().body(feedBackDtoList);

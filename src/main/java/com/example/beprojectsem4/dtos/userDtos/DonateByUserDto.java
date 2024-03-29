@@ -19,4 +19,5 @@ public class DonateByUserDto {
     private String description;
     private Date createdAt;
     private String programName;
+    private Long programId;
 }

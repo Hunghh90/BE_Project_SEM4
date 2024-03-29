@@ -211,4 +211,24 @@ public class SubProgramServiceImpl implements SubProgramService {
            return ResponseEntity.internalServerError().body(e.getMessage());
        }
     }
+
+    @Override
+    public SubProgramEntity getByUserAndProgramAndType(UserEntity user, ProgramEntity program, String type) {
+        try {
+            return repository.findByUserAndProgramAndType(user,program,"volunteer");
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public List<SubProgramEntity> getAllByProgramAndStatus(ProgramEntity program, String status) {
+        try{
+            return repository.findAllByProgramAndStatus(program,status);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 }

@@ -1,7 +1,7 @@
 package com.example.beprojectsem4.controller;
 
-import com.example.beprojectsem4.dtos.FeedBackDto.CreateCommentDto;
-import com.example.beprojectsem4.dtos.FeedBackDto.EditFeedBackDto;
+import com.example.beprojectsem4.dtos.feedBackDto.CreateCommentDto;
+import com.example.beprojectsem4.dtos.feedBackDto.EditFeedBackDto;
 import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
 import com.example.beprojectsem4.service.FeedBackService;
 import jakarta.servlet.http.HttpServletRequest;

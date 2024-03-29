@@ -202,6 +202,7 @@ public class UserServiceImpl implements UserService {
             for(DonationEntity donation : user.getDonations()){
                 DonateByUserDto donate = EntityDtoConverter.convertToDto(donation, DonateByUserDto.class);
                 donate.setProgramName(donation.getProgram().getProgramName());
+                donate.setProgramId(donation.getProgram().getProgramId());
                 donations.add(donate);
             }
             List<SubProgramDto> subPrograms = new ArrayList<>();

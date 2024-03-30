@@ -266,7 +266,7 @@ public class ProgramServiceImpl implements ProgramService {
                 UserEntity user = userService.findUserByToken(request);
                 if (user != null) {
                     SubProgramEntity subProgram = subProgramService.getByUserAndProgramAndType(user,program,"volunteer");
-                    if(subProgram!=null){
+                    if(subProgram.getStatus().equals("Active")){
                         programDto.setVolunteer(true);
 
                     }else {

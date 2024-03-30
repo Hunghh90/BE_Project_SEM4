@@ -10,9 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SubProgramDto {
-    private Long id;
+    private Long subProgramId;
     private String type;
     private String note;
     private ProgramDto program;
     private GetMeDto user;
+    private String status;
 }

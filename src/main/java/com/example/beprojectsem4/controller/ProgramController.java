@@ -6,6 +6,7 @@ import com.example.beprojectsem4.service.ProgramService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,8 +17,8 @@ public class ProgramController {
     @Autowired
     private ProgramService programService;
     @GetMapping("/get-all-programs")
-    public ResponseEntity<?> getAllProgram( PaginateAndSearchByNameDto paginateAndSearchByNameDto){
-        return programService.listProgram(paginateAndSearchByNameDto);
+    public ResponseEntity<?> getAllProgram(@Nullable Long partnerId, PaginateAndSearchByNameDto paginateAndSearchByNameDto){
+        return programService.listProgram(partnerId,paginateAndSearchByNameDto);
     }
 
     @PostMapping("/create-program")
@@ -41,13 +42,13 @@ public class ProgramController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchAllField( String search){
-        return programService.searchAllField(search);
+    public ResponseEntity<?> searchAllField( String search,@Nullable Long partnerId){
+        return programService.searchAllField(search,partnerId);
     }
 
     @GetMapping("/list-program-by-status")
-    public ResponseEntity<?> listProgramByStatus( PaginateAndSearchByNameDto paginateAndSearchByNameDto){
-        return programService.listProgramByStatus(paginateAndSearchByNameDto);
+    public ResponseEntity<?> listProgramByStatus(@Nullable Long partnerId,  PaginateAndSearchByNameDto paginateAndSearchByNameDto){
+        return programService.listProgramByStatus(partnerId,paginateAndSearchByNameDto);
     }
 
     @GetMapping("/detail-program/{id}")

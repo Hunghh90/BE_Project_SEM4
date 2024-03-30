@@ -18,6 +18,6 @@ public interface SubProgramService {
     ResponseEntity<?> getAllByUser(HttpServletRequest request, PaginateAndSearchByNameDto paginateAndSearchByNameDto);
     ResponseEntity<?> getAllByProgramAndStatus(Long programId, PaginateAndSearchByNameDto paginateAndSearchByNameDto);
     ResponseEntity<?> getByAllField(String search);
-    SubProgramEntity getByUserAndProgramAndType(UserEntity user, ProgramEntity program, String type);
+    SubProgramEntity getByUserAndProgram(UserEntity user, ProgramEntity program,String type);
     List<SubProgramEntity> getAllByProgramAndStatus(ProgramEntity program, String status);
 }

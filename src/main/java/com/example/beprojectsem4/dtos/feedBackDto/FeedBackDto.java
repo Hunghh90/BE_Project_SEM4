@@ -1,5 +1,6 @@
 package com.example.beprojectsem4.dtos.feedBackDto;
 
+import com.example.beprojectsem4.dtos.userDtos.GetMeDto;
 import com.example.beprojectsem4.entities.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,6 @@ import java.util.Date;
 public class FeedBackDto {
     private Long feedBackId;
     private String content;
-    private UserEntity user;
+    private GetMeDto user;
     private Date createdAt;
 }

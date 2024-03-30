@@ -48,10 +48,12 @@ public class ProgramServiceImpl implements ProgramService {
     private SendEmailService sendEmailService;
 
     private final SubProgramService subProgramService;
+
     @Autowired
-    public ProgramServiceImpl(@Lazy SubProgramService subProgramService){
+    public ProgramServiceImpl(@Lazy SubProgramService subProgramService) {
         this.subProgramService = subProgramService;
     }
+
     @PreAuthorize("hasRole('PARTNER')")
     @Override
     public ResponseEntity<?> createProgram(HttpServletRequest request, CreateProgramDto createProgramDto) {
@@ -81,21 +83,22 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-    @PreAuthorize("isAnonymous()")
+
     @Override
-    public ResponseEntity<?> listProgram(PaginateAndSearchByNameDto paginateDto) {
+    public ResponseEntity<?> listProgram(Long partnerId,PaginateAndSearchByNameDto paginateDto) {
         try {
-            PaginateAndSearchByNameDto paginateAndSearchByNameDto = new PaginateAndSearchByNameDto( paginateDto.getPage(), paginateDto.getSize());
+            PaginateAndSearchByNameDto paginateAndSearchByNameDto = new PaginateAndSearchByNameDto(paginateDto.getPage(), paginateDto.getSize());
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
             PageRequest pageable = PageRequest.of(paginateAndSearchByNameDto.getPage() - 1, paginateAndSearchByNameDto.getSize(), sort);
             Page<ProgramEntity> programs = programRepository.findByProgramNameContaining(paginateDto.getName(), pageable);
-            List<ProgramDto> programDtoList = convertToProgramDto(programs.getContent());
+            List<ProgramDto> programDtoList = convertToProgramDto(programs.getContent(),partnerId);
             return ResponseEntity.ok().body(programDtoList);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
     @PreAuthorize("hasRole('PARTNER')")
     @Override
     public ResponseEntity<?> updateProgram(Long id, UpdateProgramDto updateProgramDto) {
@@ -110,7 +113,7 @@ public class ProgramServiceImpl implements ProgramService {
                     program.setDescription(escapedData);
                 }
                 ProgramEntity up = TransferValuesIfNull.transferValuesIfNull(program, updateProgram);
-                if(program.getStatus().equals("Active")){
+                if (program.getStatus().equals("Active")) {
                     program.setStatus("DeActive");
                 }
                 if (updateProgramDto.getImageUrl() != null && !updateProgramDto.getImageUrl().isEmpty()) {
@@ -146,6 +149,7 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> approveProgram(Long id, RejectProgramDto rejectProgramDto) {
@@ -157,19 +161,19 @@ public class ProgramServiceImpl implements ProgramService {
                 if (rejectProgramDto.getValue().equals("Active")) {
                     program.setTotalMoney(0.0);
                     Resource resource = new ClassPathResource("templates/ApproveProgram.html");
-                        String htmlContent = new String(FileCopyUtils.copyToByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
-                        String processedHtmlContent = htmlContent
-                                .replace("[[Recipient_Name]]",program.getPartner().getPartnerName())
-                                .replace("[[Program_Name]]", program.getProgramName());
-                        sendEmailService.sendEmail(program.getPartner().getEmail(),
-                                "Notification Regarding Approval Status of Your Charity Program : " + program.getProgramName(),
-                                processedHtmlContent);
+                    String htmlContent = new String(FileCopyUtils.copyToByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
+                    String processedHtmlContent = htmlContent
+                            .replace("[[Recipient_Name]]", program.getPartner().getPartnerName())
+                            .replace("[[Program_Name]]", program.getProgramName());
+                    sendEmailService.sendEmail(program.getPartner().getEmail(),
+                            "Notification Regarding Approval Status of Your Charity Program : " + program.getProgramName(),
+                            processedHtmlContent);
                 } else {
                     program.setReasonRejection(rejectProgramDto.getReasonRejection());
                     Resource resource = new ClassPathResource("templates/RejectProgram.html");
                     String htmlContent = new String(FileCopyUtils.copyToByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
                     String processedHtmlContent = htmlContent
-                            .replace("[[Recipient_Name]]",program.getPartner().getPartnerName())
+                            .replace("[[Recipient_Name]]", program.getPartner().getPartnerName())
                             .replace("[[Reason_Reject]]", program.getReasonRejection());
                     sendEmailService.sendEmail(program.getPartner().getEmail(),
                             "Notification Regarding Approval Status of Your Charity Program : " + program.getProgramName(),
@@ -186,6 +190,7 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
     @PreAuthorize("hasAnyRole('PARTNER','ADMIN')")
     @Override
     public ResponseEntity<?> toggleLockProgram(Long id, String value) {
@@ -202,6 +207,7 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
     @Override
     public boolean checkProgramByProgramName(String programName) {
         try {
@@ -212,45 +218,40 @@ public class ProgramServiceImpl implements ProgramService {
             return false;
         }
     }
+
     @Override
-    public ResponseEntity<?> searchAllField(String value) {
+    public ResponseEntity<?> searchAllField(String value,Long partnerId) {
         try {
             Specification<ProgramEntity> spec = new DynamicSpecification<>(value);
             List<ProgramEntity> programs = programRepository.findAll(spec);
             if (programs.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No program found for the given search criteria");
             }
-            List<ProgramDto> programDtoList = new ArrayList<>();
-            for (ProgramEntity p : programs) {
-                List<DonateDto> donateDtoList = listDonate(p);
-                String normalData = StringEscapeUtils.unescapeHtml4(p.getDescription());
-                p.setDescription(normalData);
-                ProgramDto programDto = EntityDtoConverter.convertToDto(p, ProgramDto.class);
-                programDto.setDonations(donateDtoList);
-                programDtoList.add(programDto);
-            }
+            List<ProgramDto> programDtoList = convertToProgramDto(programs,partnerId);
             return ResponseEntity.ok().body(programDtoList);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
     @Override
-    public ResponseEntity<?> listProgramByStatus(PaginateAndSearchByNameDto paginateDto) {
+    public ResponseEntity<?> listProgramByStatus(Long partnerId,PaginateAndSearchByNameDto paginateDto) {
         try {
-            PaginateAndSearchByNameDto paginateAndSearchByNameDto = new PaginateAndSearchByNameDto( paginateDto.getPage(), paginateDto.getSize());
+            PaginateAndSearchByNameDto paginateAndSearchByNameDto = new PaginateAndSearchByNameDto(paginateDto.getPage(), paginateDto.getSize());
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
             PageRequest pageable = PageRequest.of(paginateAndSearchByNameDto.getPage() - 1, paginateAndSearchByNameDto.getSize(), sort);
             Page<ProgramEntity> programs = programRepository.findByStatus(paginateDto.getName(), pageable);
-            List<ProgramDto> programDtoList = convertToProgramDto(programs.getContent());
+            List<ProgramDto> programDtoList = convertToProgramDto(programs.getContent(),partnerId);
             return ResponseEntity.ok().body(programDtoList);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
     @Override
-    public ResponseEntity<?> detailProgram(HttpServletRequest request,Long id) {
+    public ResponseEntity<?> detailProgram(HttpServletRequest request, Long id) {
         try {
             ProgramEntity program = findById(id);
             if (program != null) {
@@ -262,25 +263,41 @@ public class ProgramServiceImpl implements ProgramService {
                 programDto.setDonations(donateDtoList);
                 UserEntity user = userService.findUserByToken(request);
                 if (user != null) {
-                    SubProgramEntity subProgram = subProgramService.getByUserAndProgramAndType(user,program,"volunteer");
-                    if(subProgram !=null){
-                        if(subProgram.getStatus().equals("Active")||subProgram.getStatus().equals("Pending")){
+                    SubProgramEntity volunteer = subProgramService.getByUserAndProgram(user, program, "volunteer");
+                    if (volunteer != null) {
+                        if (volunteer.getStatus().equals("Active") || volunteer.getStatus().equals("Pending")) {
                             programDto.setVolunteer(true);
 
-                        }else if(subProgram.getStatus().equals("Cancel")){
+                        } else if (volunteer.getStatus().equals("Cancel")) {
                             programDto.setVolunteer(false);
                         }
                     }
+                    SubProgramEntity subscribe = subProgramService.getByUserAndProgram(user, program, "subscribe");
+                    if (subscribe != null) {
+                        if (subscribe.getStatus().equals("Active")) {
+                            programDto.setSubscribe(true);
+
+                        } else if (subscribe.getStatus().equals("Cancel")) {
+                            programDto.setSubscribe(false);
+                        }
+                    }
                 }
-                List<SubProgramEntity> subProgramEntityList = subProgramService.getAllByProgramAndStatus(program,"Active");
-                programDto.setCountVolunteer(subProgramEntityList.size());
+                List<SubProgramEntity> subProgramEntityList = subProgramService.getAllByProgramAndStatus(program, "Active");
+                int volunteer = 0;
+                for (SubProgramEntity subProgram : subProgramEntityList) {
+                    if (subProgram.getType().equals("volunteer")) {
+                        volunteer += 1;
+                    }
+                }
+                programDto.setCountVolunteer(volunteer);
                 return ResponseEntity.ok().body(programDto);
             }
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found program");
+            return ResponseEntity.ok().body(new ArrayList<>());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
     @PreAuthorize("isAuthenticated()")
     @Override
     public ProgramEntity addMoneyDonate(CreateDonateDto donateDto) {
@@ -300,7 +317,7 @@ public class ProgramServiceImpl implements ProgramService {
         }
     }
 
-//    @Scheduled(cron = "0 0 0 * * ?")
+    //    @Scheduled(cron = "0 0 0 * * ?")
 //    public void changeStatusProgram(){
 //        try{
 //            List<ProgramEntity> programEntityList = programRepository.findAll();
@@ -317,7 +334,7 @@ public class ProgramServiceImpl implements ProgramService {
 //            System.out.println(e.getMessage());
 //        }
 //    }
-@PreAuthorize("hasRole('PARTNER')")
+    @PreAuthorize("hasRole('PARTNER')")
     @Override
     public ResponseEntity<?> deleteCertify(ListUrlDto listUrlDto, Long id) {
         try {
@@ -333,6 +350,7 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
     @PreAuthorize("hasRole('PARTNER')")
     @Override
     public ResponseEntity<?> finishProgram(ListUrlDto listUrlDto, Long id) {
@@ -347,19 +365,19 @@ public class ProgramServiceImpl implements ProgramService {
             }
             program.setStatus("End");
             programRepository.save(program);
-            List<SubProgramEntity> sp = subProgramService.getAllByProgramAndStatus(program,"");
+            List<SubProgramEntity> sp = subProgramService.getAllByProgramAndStatus(program, "");
             Set<UserEntity> listUser = new HashSet<>();
-            for(SubProgramEntity subProgram : sp){
+            for (SubProgramEntity subProgram : sp) {
                 UserEntity user = subProgram.getUser();
                 listUser.add(user);
             }
-            for (DonationEntity donate : program.getDonations()){
+            for (DonationEntity donate : program.getDonations()) {
                 UserEntity user = donate.getUser();
                 listUser.add(user);
             }
-            List<UserEntity> users =new ArrayList<>(listUser);
+            List<UserEntity> users = new ArrayList<>(listUser);
             Resource resource = new ClassPathResource("templates/donateSuccess.html");
-            for (UserEntity user : users){
+            for (UserEntity user : users) {
                 String email = user.getEmail();
                 String htmlContent = new String(FileCopyUtils.copyToByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
                 StringBuilder imagesHtml = new StringBuilder();
@@ -389,6 +407,7 @@ public class ProgramServiceImpl implements ProgramService {
             return null;
         }
     }
+
     public List<DonateDto> listDonate(ProgramEntity program) {
         try {
             List<DonateDto> donateDtoList = new ArrayList<>();
@@ -396,6 +415,7 @@ public class ProgramServiceImpl implements ProgramService {
                 DonateDto donateDto = EntityDtoConverter.convertToDto(getDonate, DonateDto.class);
                 GetMeDto gm = EntityDtoConverter.convertToDto(getDonate.getUser(), GetMeDto.class);
                 gm.setDonations(null);
+                gm.setSubPrograms(null);
                 donateDto.setUser(gm);
                 donateDtoList.add(donateDto);
             }
@@ -406,16 +426,29 @@ public class ProgramServiceImpl implements ProgramService {
         }
     }
 
-    public List<ProgramDto> convertToProgramDto(List<ProgramEntity> programs) {
+    public List<ProgramDto> convertToProgramDto(List<ProgramEntity> programs,Long parnerId) {
         try {
             List<ProgramDto> programDtoList = new ArrayList<>();
             for (ProgramEntity p : programs) {
-                List<DonateDto> donateDtoList = listDonate(p);
-                String normalData = StringEscapeUtils.unescapeHtml4(p.getDescription());
-                p.setDescription(normalData);
-                ProgramDto pd = EntityDtoConverter.convertToDto(p, ProgramDto.class);
-                pd.setDonations(donateDtoList);
-                programDtoList.add(pd);
+                if(parnerId!=null){
+                    if(Objects.equals(p.getPartner().getPartnerId(), parnerId)){
+                        List<DonateDto> donateDtoList = listDonate(p);
+                        String normalData = StringEscapeUtils.unescapeHtml4(p.getDescription());
+                        p.setDescription(normalData);
+                        ProgramDto pd = EntityDtoConverter.convertToDto(p, ProgramDto.class);
+                        pd.setDonations(donateDtoList);
+                        pd.setCountDonation(donateDtoList.size());
+                        programDtoList.add(pd);
+                    }
+                }else {
+                    List<DonateDto> donateDtoList = listDonate(p);
+                    String normalData = StringEscapeUtils.unescapeHtml4(p.getDescription());
+                    p.setDescription(normalData);
+                    ProgramDto pd = EntityDtoConverter.convertToDto(p, ProgramDto.class);
+                    pd.setDonations(donateDtoList);
+                    pd.setCountDonation(donateDtoList.size());
+                    programDtoList.add(pd);
+                }
             }
             return programDtoList;
         } catch (Exception e) {
@@ -423,6 +456,7 @@ public class ProgramServiceImpl implements ProgramService {
             return new ArrayList<>();
         }
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> extendFinishProgram(Long id, UpdateProgramDto updateProgramDto) {
@@ -458,7 +492,7 @@ public class ProgramServiceImpl implements ProgramService {
                         processedHtmlContent);
             }
             int count = program.getShare();
-            count = count +1;
+            count = count + 1;
             program.setShare(count);
             programRepository.save(program);
             return ResponseEntity.ok().body("Share program success");

@@ -60,14 +60,26 @@ public class SubProgramServiceImpl implements SubProgramService {
             }
             SubProgramEntity existsSubProgram = repository.findByUserAndProgramAndType(user,program,createSubProgramDto.getType());
             if(existsSubProgram !=null){
-                if(existsSubProgram.getStatus().equals("Pending") || existsSubProgram.getStatus().equals("Active")){
-                    existsSubProgram.setStatus("Cancel");
-                    repository.save(existsSubProgram);
-                    return ResponseEntity.ok().body("Cancel success");
-                } else if (existsSubProgram.getStatus().equals("Cancel") ) {
-                    existsSubProgram.setStatus("Pending");
-                    repository.save(existsSubProgram);
-                    return ResponseEntity.ok().body("Registered collaborator successfully");
+                if(existsSubProgram.getType().equals("volunteer")){
+                    if(existsSubProgram.getStatus().equals("Pending") || existsSubProgram.getStatus().equals("Active")){
+                        existsSubProgram.setStatus("Cancel");
+                        repository.save(existsSubProgram);
+                        return ResponseEntity.ok().body("Cancel success");
+                    } else if (existsSubProgram.getStatus().equals("Cancel") ) {
+                        existsSubProgram.setStatus("Pending");
+                        repository.save(existsSubProgram);
+                        return ResponseEntity.ok().body("Registered collaborator successfully");
+                    }
+                }else{
+                    if( existsSubProgram.getStatus().equals("Active")){
+                        existsSubProgram.setStatus("Cancel");
+                        repository.save(existsSubProgram);
+                        return ResponseEntity.ok().body("Cancel success");
+                    } else if (existsSubProgram.getStatus().equals("Cancel") ) {
+                        existsSubProgram.setStatus("Active");
+                        repository.save(existsSubProgram);
+                        return ResponseEntity.ok().body("Subscribe program successfully");
+                    }
                 }
             }
             if(createSubProgramDto.getType().equals("volunteer")){
@@ -220,9 +232,9 @@ public class SubProgramServiceImpl implements SubProgramService {
     }
 
     @Override
-    public SubProgramEntity getByUserAndProgramAndType(UserEntity user, ProgramEntity program, String type) {
+    public SubProgramEntity getByUserAndProgram(UserEntity user, ProgramEntity program,String type) {
         try {
-            return repository.findByUserAndProgramAndType(user,program,"volunteer");
+            return repository.findByUserAndProgramAndType(user,program,type);
         }catch (Exception e){
             System.out.println(e.getMessage());
             return null;

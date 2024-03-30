@@ -31,4 +31,6 @@ public class ProgramDto {
     private int share;
     private int countVolunteer;
     private boolean isVolunteer;
+    private boolean isSubscribe;
+    private int countDonation;
 }

@@ -4,6 +4,7 @@ import com.example.beprojectsem4.dtos.feedBackDto.CreateCommentDto;
 import com.example.beprojectsem4.dtos.feedBackDto.EditFeedBackDto;
 import com.example.beprojectsem4.dtos.feedBackDto.FeedBackDto;
 import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
+import com.example.beprojectsem4.dtos.userDtos.GetMeDto;
 import com.example.beprojectsem4.entities.DonationEntity;
 import com.example.beprojectsem4.entities.FeedBackEntity;
 import com.example.beprojectsem4.entities.ProgramEntity;
@@ -77,6 +78,8 @@ public class FeedBackServiceImpl implements FeedBackService {
             List<FeedBackDto> feedBackDtoList = new ArrayList<>();
             for(FeedBackEntity feedBack : feedBackEntityPage){
                 FeedBackDto feedBackDto = EntityDtoConverter.convertToDto(feedBack,FeedBackDto.class);
+                GetMeDto gm = EntityDtoConverter.convertToDto(feedBack.getUser(), GetMeDto.class);
+                feedBackDto.setUser(gm);
                 feedBackDtoList.add(feedBackDto);
             }
             return ResponseEntity.ok().body(feedBackDtoList);

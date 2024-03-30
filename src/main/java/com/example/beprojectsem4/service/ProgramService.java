@@ -10,15 +10,15 @@ import org.springframework.http.ResponseEntity;
 public interface ProgramService {
     ResponseEntity<?> createProgram(HttpServletRequest request, CreateProgramDto createProgramDto);
 
-    ResponseEntity<?> listProgram(PaginateAndSearchByNameDto paginateAndSearchByNameDto);
+    ResponseEntity<?> listProgram(Long partnerId,PaginateAndSearchByNameDto paginateAndSearchByNameDto);
     ResponseEntity<?> updateProgram(Long id, UpdateProgramDto updateProgramDto);
 
     ResponseEntity<?> toggleLockProgram(Long id,String value);
     ResponseEntity<?> approveProgram(Long id, RejectProgramDto rejectProgramDto);
-    ResponseEntity<?> listProgramByStatus(PaginateAndSearchByNameDto paginateAndSearchByNameDto);
+    ResponseEntity<?> listProgramByStatus(Long partnerId,PaginateAndSearchByNameDto paginateAndSearchByNameDto);
     boolean checkProgramByProgramName(String programName);
 
-    ResponseEntity<?> searchAllField(String value);
+    ResponseEntity<?> searchAllField(String value,Long partnerId);
     ResponseEntity<?> detailProgram(HttpServletRequest request,Long id);
     ProgramEntity addMoneyDonate(CreateDonateDto donateDto);
 

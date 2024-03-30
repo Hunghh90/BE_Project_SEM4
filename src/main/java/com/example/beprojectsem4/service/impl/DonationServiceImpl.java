@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -150,22 +152,44 @@ public class DonationServiceImpl implements DonationService {
 
     @Override
     public ResponseEntity<byte[]> generateDonationPDF(HttpServletRequest request,Long programId) throws  IOException {
-        XWPFDocument doc = new XWPFDocument(new FileInputStream("src/main/resources/templates/ListDonates.docx"));
+        XWPFDocument doc = new XWPFDocument(new FileInputStream("src/main/resources/templates/ListDonate.docx"));
         ResponseEntity<?> programDetail = programService.detailProgram(request,programId);
         if(programDetail.getStatusCode().is2xxSuccessful()){
             ProgramDto program = (ProgramDto) programDetail.getBody();
             assert program != null;
             List<DonateDto> donations = program.getDonations();
+            Double totalMoney = 0.0;
+            int totalDonate = 0;
+            DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("vi", "VN"));
+            symbols.setGroupingSeparator('.');
+            symbols.setDecimalSeparator('.');
+            DecimalFormat decimalFormat = new DecimalFormat("#,##0.00", symbols);
             XWPFTable table = doc.getTables().get(0);
             for (DonateDto donation : donations) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
                 XWPFTableRow row = table.createRow();
                 row.getCell(0).setText(donation.getUser().getDisplayName());
-                row.getCell(1).setText(NumberFormat.getCurrencyInstance(new Locale("vi", "VN")).format(donation.getAmount()));
+                row.getCell(1).setText(decimalFormat.format(donation.getAmount()));
                 row.getCell(2).setText(donation.getPaymentMethod());
                 row.getCell(3).setText(dateFormat.format(donation.getCreatedAt()));
+                totalMoney +=donation.getAmount();
+                totalDonate +=1;
             }
-
+            for (XWPFParagraph p : doc.getParagraphs()) {
+                for (XWPFRun r : p.getRuns()) {
+                    String text = r.getText(0);
+                    if (text != null && text.contains("program_name")) {
+                        text = text.replace("program_name", program.getProgramName());
+                        r.setText(text, 0);
+                    } else if (text != null && text.contains("totalmoney")) {
+                        text = text.replace("totalmoney", decimalFormat.format(totalMoney)+"VND");
+                        r.setText(text, 0);
+                    } else if (text != null && text.contains("totaldonate")) {
+                        text = text.replace("totaldonate", String.valueOf(totalDonate));
+                        r.setText(text, 0);
+                    }
+                }
+            }
             FileOutputStream out = new FileOutputStream("ListDonate_modified.docx");
             doc.write(out);
             out.close();

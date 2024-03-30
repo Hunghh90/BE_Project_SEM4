@@ -71,7 +71,7 @@ public class FeedBackServiceImpl implements FeedBackService {
             ProgramEntity program = programService.findById(programId);
             Page<FeedBackEntity> feedBackEntityPage = feedBackRepository.findAllByProgram(program,pageRequest);
             if(feedBackEntityPage.isEmpty()){
-                return ResponseEntity.ok().body(feedBackEntityPage);
+                return ResponseEntity.ok().body(new ArrayList<>());
             }
             List<FeedBackDto> feedBackDtoList = new ArrayList<>();
             for(FeedBackEntity feedBack : feedBackEntityPage){

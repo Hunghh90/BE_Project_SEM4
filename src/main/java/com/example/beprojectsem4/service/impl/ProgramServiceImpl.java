@@ -202,7 +202,6 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-    @PreAuthorize("isAnonymous()")
     @Override
     public boolean checkProgramByProgramName(String programName) {
         try {
@@ -213,7 +212,7 @@ public class ProgramServiceImpl implements ProgramService {
             return false;
         }
     }
-    @PreAuthorize("isAnonymous()")
+    @PreAuthorize("isAnonymous() or isAuthenticated()")
     @Override
     public ResponseEntity<?> searchAllField(String value) {
         try {
@@ -237,7 +236,7 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-    @PreAuthorize("isAnonymous()")
+    @PreAuthorize("isAnonymous() or isAuthenticated()")
     @Override
     public ResponseEntity<?> listProgramByStatus(PaginateAndSearchByNameDto paginateDto) {
         try {
@@ -252,7 +251,7 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-//    @PreAuthorize("isAnonymous()or isAuthenticated()")
+    @PreAuthorize("isAnonymous()or isAuthenticated()")
     @Override
     public ResponseEntity<?> detailProgram(HttpServletRequest request,Long id) {
         try {
@@ -410,7 +409,7 @@ public class ProgramServiceImpl implements ProgramService {
             return programDtoList;
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return null;
+            return new ArrayList<>();
         }
     }
     @PreAuthorize("hasRole('ADMIN')")

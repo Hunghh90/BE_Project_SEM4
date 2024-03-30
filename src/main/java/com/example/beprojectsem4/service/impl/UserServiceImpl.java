@@ -189,7 +189,6 @@ public class UserServiceImpl implements UserService {
             return null;
         }
     }
-@PreAuthorize("hasRole('USER')")
     @Override
     public ResponseEntity<?> getMe(HttpServletRequest request) {
         try{
@@ -364,7 +363,7 @@ public class UserServiceImpl implements UserService {
             PageRequest pageRequest = PageRequest.of(paginate.getPage(),paginate.getSize(),sort);
             Page<UserEntity> users = repository.findAll(pageRequest);
             if(users.isEmpty()){
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found user");
+                return ResponseEntity.ok().body(new ArrayList<>());
             }
             List<GetMeDto> getMeDtos = new ArrayList<>();
             for(UserEntity user : users){

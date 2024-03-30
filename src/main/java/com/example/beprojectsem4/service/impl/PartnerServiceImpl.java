@@ -122,7 +122,7 @@ public class PartnerServiceImpl implements PartnerService {
             PageRequest pageRequest = PageRequest.of(paginateAndSearchByNameDto.getPage()-1, paginateAndSearchByNameDto.getSize(),sort);
             Page<PartnerEntity> partners = partnerRepository.findByPartnerNameContaining(paginateDto.getName(),pageRequest);
             if (partners.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found partner");
+                return ResponseEntity.ok().body(new ArrayList<>());
             }
             List<PartnerDto> partnerDto = new ArrayList<>();
             for (PartnerEntity p : partners){
@@ -221,7 +221,7 @@ public class PartnerServiceImpl implements PartnerService {
             Specification<PartnerEntity> spec = new DynamicSpecification<>(value);
             List<PartnerEntity> partners = partnerRepository.findAll(spec);
             if (partners.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No partners found for the given search criteria");
+                return ResponseEntity.ok().body(new ArrayList<>());
             }
             List<PartnerDto> partnerDtoList = new ArrayList<>();
             for(PartnerEntity p:partners){
@@ -258,7 +258,7 @@ public class PartnerServiceImpl implements PartnerService {
                 partnerDto.setPrograms(total);
                 return ResponseEntity.ok().body(partnerDto);
             }
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found partner");
+            return ResponseEntity.ok().body(new ArrayList<>());
         }catch (Exception e){
             System.out.println(e.getMessage());
             return ResponseEntity.internalServerError().body(e.getMessage());

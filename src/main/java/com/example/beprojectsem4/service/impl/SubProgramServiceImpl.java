@@ -144,7 +144,7 @@ public class SubProgramServiceImpl implements SubProgramService {
             UserEntity user = userService.findUserByToken(request);
             Page<SubProgramEntity> subProgramEntityPage = repository.findAllByUser(user,pageRequest);
             if(subProgramEntityPage.isEmpty()){
-                return ResponseEntity.badRequest().body("Not found subprogram");
+                return ResponseEntity.ok().body(new ArrayList<>());
             }
             List<SubProgramDto> subProgramDtoList = new ArrayList<>();
             for(SubProgramEntity subProgram : subProgramEntityPage.getContent()){
@@ -171,7 +171,7 @@ public class SubProgramServiceImpl implements SubProgramService {
             ProgramEntity program = programService.findById(programId);
             Page<SubProgramEntity> subProgramEntityPage = repository.findAllByProgramAndStatus(program, paginateDto.getName(), pageRequest);
             if(subProgramEntityPage.isEmpty()){
-                return ResponseEntity.badRequest().body("Not found subprogram");
+                return ResponseEntity.ok().body(new ArrayList<>());
             }
             List<SubProgramDto> subProgramDtoList = new ArrayList<>();
             for(SubProgramEntity subProgram : subProgramEntityPage.getContent()){
@@ -195,7 +195,7 @@ public class SubProgramServiceImpl implements SubProgramService {
            Specification<SubProgramEntity> spec = new DynamicSpecification<>(search);
            List<SubProgramEntity> subProgramEntityList = repository.findAll(spec);
            if (subProgramEntityList.isEmpty()) {
-               return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No subprogram found for the given search criteria");
+               return ResponseEntity.ok().body(new ArrayList<>());
            }
            List<SubProgramDto> subProgramDtoList = new ArrayList<>();
            for(SubProgramEntity subProgram : subProgramEntityList){

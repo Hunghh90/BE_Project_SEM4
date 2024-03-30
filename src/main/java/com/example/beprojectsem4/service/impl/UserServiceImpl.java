@@ -86,10 +86,10 @@ public class UserServiceImpl implements UserService {
             }
             UserEntity user = EntityDtoConverter.convertToEntity(registerDto, UserEntity.class);
             user.setPassword(bCryptPasswordEncoder.encode(registerDto.getPassword()));
-            RoleEntity userRole = roleService.findRoleByRoleName("ROLE_ADMIN");
+            RoleEntity userRole = roleService.findRoleByRoleName("ADMIN");
             if (userRole == null) {
-                roleService.createRole("ROLE_ADMIN");
-                userRole = roleService.findRoleByRoleName("ROLE_ADMIN");
+                roleService.createRole("ADMIN");
+                userRole = roleService.findRoleByRoleName("ADMIN");
             }
             user.getRoles().add(userRole);
             user.setStatus("Activate");
@@ -110,10 +110,10 @@ public class UserServiceImpl implements UserService {
             }
             UserEntity user = EntityDtoConverter.convertToEntity(registerDto, UserEntity.class);
             user.setPassword(bCryptPasswordEncoder.encode(registerDto.getPassword()));
-            RoleEntity userRole = roleService.findRoleByRoleName("ROLE_PARTNER");
+            RoleEntity userRole = roleService.findRoleByRoleName("PARTNER");
             if (userRole == null) {
-               roleService.createRole("ROLE_PARTNER");
-                userRole = roleService.findRoleByRoleName("ROLE_PARTNER");
+               roleService.createRole("PARTNER");
+                userRole = roleService.findRoleByRoleName("PARTNER");
             }
             user.getRoles().add(userRole);
             user.setStatus("Activate");
@@ -267,10 +267,10 @@ public class UserServiceImpl implements UserService {
             if (user == null) {
                 return false;
             } else {
-                RoleEntity userRole = roleService.findRoleByRoleName("ROLE_USER");
+                RoleEntity userRole = roleService.findRoleByRoleName("USER");
                 if (userRole == null) {
-                    roleService.createRole("ROLE_USER");
-                    userRole = roleService.findRoleByRoleName("ROLE_USER");
+                    roleService.createRole("USER");
+                    userRole = roleService.findRoleByRoleName("USER");
                 }
                 user.getRoles().add(userRole);
                 user.setStatus("Activate");

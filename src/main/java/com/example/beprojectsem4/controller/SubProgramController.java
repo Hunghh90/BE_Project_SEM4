@@ -31,8 +31,8 @@ public class SubProgramController {
     }
 
     @GetMapping("/get-all-by-program/{programId}")
-    public ResponseEntity<?> getAllByProgram(@PathVariable Long programId,PaginateAndSearchByNameDto paginateAndSearchByNameDto){
-        return subProgramService.getAllByProgram(programId,paginateAndSearchByNameDto);
+    public ResponseEntity<?> getAllByProgramAndStatus(@PathVariable Long programId,PaginateAndSearchByNameDto paginateAndSearchByNameDto){
+        return subProgramService.getAllByProgramAndStatus(programId,paginateAndSearchByNameDto);
     }
 
     @GetMapping("/get-all-field")

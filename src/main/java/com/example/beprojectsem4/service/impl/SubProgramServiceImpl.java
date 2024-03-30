@@ -22,6 +22,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -162,13 +163,13 @@ public class SubProgramServiceImpl implements SubProgramService {
     }
 
     @Override
-    public ResponseEntity<?> getAllByProgram(Long programId, PaginateAndSearchByNameDto paginateDto) {
+    public ResponseEntity<?> getAllByProgramAndStatus(Long programId, PaginateAndSearchByNameDto paginateDto) {
         try {
             PaginateAndSearchByNameDto paginate = new PaginateAndSearchByNameDto(paginateDto.getPage(), paginateDto.getSize());
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
             PageRequest pageRequest = PageRequest.of(paginate.getPage()-1, paginate.getSize(),sort);
             ProgramEntity program = programService.findById(programId);
-            Page<SubProgramEntity> subProgramEntityPage = repository.findAllByProgram(program,pageRequest);
+            Page<SubProgramEntity> subProgramEntityPage = repository.findAllByProgramAndStatus(program, paginateDto.getName(), pageRequest);
             if(subProgramEntityPage.isEmpty()){
                 return ResponseEntity.badRequest().body("Not found subprogram");
             }
@@ -225,7 +226,7 @@ public class SubProgramServiceImpl implements SubProgramService {
     @Override
     public List<SubProgramEntity> getAllByProgramAndStatus(ProgramEntity program, String status) {
         try{
-            return repository.findAllByProgramAndStatus(program,status);
+            return repository.findAllByProgramAndStatus(program,status,null).getContent();
         }catch (Exception e){
             System.out.println(e.getMessage());
             return null;

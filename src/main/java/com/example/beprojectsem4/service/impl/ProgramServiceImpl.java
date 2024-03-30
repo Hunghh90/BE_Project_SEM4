@@ -270,6 +270,7 @@ public class ProgramServiceImpl implements ProgramService {
                         programDto.setVolunteer(true);
 
                     }
+                    programDto.setVolunteer(false);
                 }
                 List<SubProgramEntity> subProgramEntityList = subProgramService.getAllByProgramAndStatus(program,"Active");
                 programDto.setCountVolunteer(subProgramEntityList.size());

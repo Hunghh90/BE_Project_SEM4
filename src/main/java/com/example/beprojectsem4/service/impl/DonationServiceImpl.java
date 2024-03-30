@@ -22,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -48,6 +49,7 @@ public class DonationServiceImpl implements DonationService {
 
     @Autowired
     private PaypalService paypalService;
+    @PreAuthorize("isAuthenticated()")
     @Override
     public ResponseEntity<?> donationSuccess(HttpServletRequest request, CreateDonateDto donateDto) {
         try{
@@ -160,8 +162,8 @@ public class DonationServiceImpl implements DonationService {
             List<DonateDto> donations = program.getDonations();
             Double totalMoney = 0.0;
             int totalDonate = 0;
-            DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("vi", "VN"));
-            symbols.setGroupingSeparator('.');
+            DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("en", "en"));
+            symbols.setGroupingSeparator(',');
             symbols.setDecimalSeparator('.');
             DecimalFormat decimalFormat = new DecimalFormat("#,##0.00", symbols);
             XWPFTable table = doc.getTables().get(0);
@@ -171,6 +173,11 @@ public class DonationServiceImpl implements DonationService {
                 row.getCell(0).setText(donation.getUser().getDisplayName());
                 row.getCell(1).setText(decimalFormat.format(donation.getAmount()));
                 row.getCell(2).setText(donation.getPaymentMethod());
+//                if(donation.getPaymentMethod().equals("VNPay")){
+//                    row.getCell(3).setText(program.getPartner().getVnpayAccount());
+//                }else {
+//                    row.getCell(3).setText(program.getPartner().getPaypalAccount());
+//                }
                 row.getCell(3).setText(dateFormat.format(donation.getCreatedAt()));
                 totalMoney +=donation.getAmount();
                 totalDonate +=1;
@@ -178,11 +185,11 @@ public class DonationServiceImpl implements DonationService {
             for (XWPFParagraph p : doc.getParagraphs()) {
                 for (XWPFRun r : p.getRuns()) {
                     String text = r.getText(0);
-                    if (text != null && text.contains("program_name")) {
-                        text = text.replace("program_name", program.getProgramName());
+                    if (text != null && text.contains("programname")) {
+                        text = text.replace("programname", program.getProgramName());
                         r.setText(text, 0);
                     } else if (text != null && text.contains("totalmoney")) {
-                        text = text.replace("totalmoney", decimalFormat.format(totalMoney)+"VND");
+                        text = text.replace("totalmoney", decimalFormat.format(totalMoney)+" $");
                         r.setText(text, 0);
                     } else if (text != null && text.contains("totaldonate")) {
                         text = text.replace("totaldonate", String.valueOf(totalDonate));
@@ -208,7 +215,7 @@ public class DonationServiceImpl implements DonationService {
         }
         return ResponseEntity.notFound().build();
     }
-
+    @PreAuthorize("isAuthenticated()")
     @Override
     public ResponseEntity<Object> makePayment(RequestDonate paymentRequest) {
         try{

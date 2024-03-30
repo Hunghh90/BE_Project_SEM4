@@ -186,7 +186,7 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-    @PreAuthorize("hasRole('PARTNER')")
+    @PreAuthorize("hasAnyRole('PARTNER','ADMIN')")
     @Override
     public ResponseEntity<?> toggleLockProgram(Long id, String value) {
         try {
@@ -212,7 +212,6 @@ public class ProgramServiceImpl implements ProgramService {
             return false;
         }
     }
-    @PreAuthorize("isAnonymous() or isAuthenticated()")
     @Override
     public ResponseEntity<?> searchAllField(String value) {
         try {
@@ -236,7 +235,6 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-    @PreAuthorize("isAnonymous() or isAuthenticated()")
     @Override
     public ResponseEntity<?> listProgramByStatus(PaginateAndSearchByNameDto paginateDto) {
         try {
@@ -251,7 +249,6 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-    @PreAuthorize("isAnonymous()or isAuthenticated()")
     @Override
     public ResponseEntity<?> detailProgram(HttpServletRequest request,Long id) {
         try {
@@ -284,7 +281,7 @@ public class ProgramServiceImpl implements ProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-
+    @PreAuthorize("isAuthenticated()")
     @Override
     public ProgramEntity addMoneyDonate(CreateDonateDto donateDto) {
         try {
@@ -350,17 +347,27 @@ public class ProgramServiceImpl implements ProgramService {
             }
             program.setStatus("End");
             programRepository.save(program);
-            Resource resource = new ClassPathResource("templates/donateSuccess.html");
-            String imageUrlJson = new ObjectMapper().writeValueAsString(listUrlDto.getUrl());
+            List<SubProgramEntity> sp = subProgramService.getAllByProgramAndStatus(program,"");
+            Set<UserEntity> listUser = new HashSet<>();
+            for(SubProgramEntity subProgram : sp){
+                UserEntity user = subProgram.getUser();
+                listUser.add(user);
+            }
             for (DonationEntity donate : program.getDonations()){
-               String email = donate.getUser().getEmail();
+                UserEntity user = donate.getUser();
+                listUser.add(user);
+            }
+            List<UserEntity> users =new ArrayList<>(listUser);
+            Resource resource = new ClassPathResource("templates/donateSuccess.html");
+            for (UserEntity user : users){
+                String email = user.getEmail();
                 String htmlContent = new String(FileCopyUtils.copyToByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
                 StringBuilder imagesHtml = new StringBuilder();
                 for (String imageUrl : listUrlDto.getUrl()) {
                     imagesHtml.append("<img src='").append(imageUrl).append("' style='width: 100px; height: 100px;' />");
                 }
                 String processedHtmlContent = htmlContent
-                        .replace("[[Recipient_Name]]", donate.getUser().getDisplayName())
+                        .replace("[[Recipient_Name]]", user.getDisplayName())
                         .replace("[[Images]]", imagesHtml.toString());
                 sendEmailService.sendEmail(email,
                         "Thank You for Your Support to Our Charity Program: " + program.getProgramName(),

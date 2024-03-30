@@ -12,7 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-@PreAuthorize("hasRole('ADMIN')")
+
 @Service
 public class RoleServiceImpl implements RoleService {
     @Autowired
@@ -37,6 +37,7 @@ public class RoleServiceImpl implements RoleService {
             return false;
         }
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> createRole(String roleName) {
         try {
@@ -59,7 +60,7 @@ public class RoleServiceImpl implements RoleService {
         List<RoleEntity> roles = repository.findAll();
         return ResponseEntity.ok().body(roles);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> updateRole(UpdateRoleDto updateRoleDto) {
         try {
@@ -76,7 +77,7 @@ public class RoleServiceImpl implements RoleService {
             return ResponseEntity.internalServerError().body("An error occurred");
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> deleteRole(String roleName) {
         try{

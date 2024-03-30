@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
@@ -36,7 +37,7 @@ public class FeedBackServiceImpl implements FeedBackService {
     @Autowired
     private ProgramService programService;
 
-
+    @PreAuthorize("isAuthenticated()")
     @Override
     public ResponseEntity<?> createComment(HttpServletRequest request, CreateCommentDto createCommentDto) {
         Set<String> blacklist = new HashSet<>();
@@ -84,7 +85,7 @@ public class FeedBackServiceImpl implements FeedBackService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-
+    @PreAuthorize("isAuthenticated()")
     @Override
     public ResponseEntity<?> editComment(HttpServletRequest request, EditFeedBackDto edit) {
         try {
@@ -105,7 +106,7 @@ public class FeedBackServiceImpl implements FeedBackService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-
+    @PreAuthorize("isAuthenticated()")
     @Override
     public ResponseEntity<?> deleteComment(HttpServletRequest request, Long id) {
         try{

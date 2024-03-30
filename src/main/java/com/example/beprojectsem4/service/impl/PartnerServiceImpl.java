@@ -49,7 +49,6 @@ public class PartnerServiceImpl implements PartnerService {
         this.programService = programService;
     };
 
- @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> getPartnerByEmail(String email) {
         try{
@@ -113,7 +112,6 @@ public class PartnerServiceImpl implements PartnerService {
         }
 
     }
-    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public ResponseEntity<?> listPartner(PaginateAndSearchByNameDto paginateDto) {
         try {
@@ -214,7 +212,7 @@ public class PartnerServiceImpl implements PartnerService {
             return false;
         }
     }
-    @PreAuthorize("hasRole('ADMIN')")
+
     @Override
     public ResponseEntity<?> searchAllField(String value) {
         try {

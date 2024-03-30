@@ -46,7 +46,7 @@ public class SubProgramServiceImpl implements SubProgramService {
     private SubProgramRepository repository;
     @Autowired
     private SendEmailService sendEmailService;
-
+    @PreAuthorize("isAuthenticated()")
     @Override
     public ResponseEntity<?> registerOrCancel(HttpServletRequest request, CreateSubProgramDto createSubProgramDto) {
         try {
@@ -59,14 +59,16 @@ public class SubProgramServiceImpl implements SubProgramService {
                 return ResponseEntity.badRequest().body("Program not found");
             }
             SubProgramEntity existsSubProgram = repository.findByUserAndProgramAndType(user,program,createSubProgramDto.getType());
-            if(existsSubProgram.getStatus().equals("Pending") || existsSubProgram.getStatus().equals("Active")){
-                existsSubProgram.setStatus("Cancel");
-                repository.save(existsSubProgram);
-                return ResponseEntity.ok().body("Cancel success");
-            } else if (existsSubProgram.getStatus().equals("Cancel") ) {
-                existsSubProgram.setStatus("Pending");
-                repository.save(existsSubProgram);
-                return ResponseEntity.ok().body("Registered collaborator successfully");
+            if(existsSubProgram !=null){
+                if(existsSubProgram.getStatus().equals("Pending") || existsSubProgram.getStatus().equals("Active")){
+                    existsSubProgram.setStatus("Cancel");
+                    repository.save(existsSubProgram);
+                    return ResponseEntity.ok().body("Cancel success");
+                } else if (existsSubProgram.getStatus().equals("Cancel") ) {
+                    existsSubProgram.setStatus("Pending");
+                    repository.save(existsSubProgram);
+                    return ResponseEntity.ok().body("Registered collaborator successfully");
+                }
             }
             if(createSubProgramDto.getType().equals("volunteer")){
                 if(!program.isRecruitCollaborators()){
@@ -138,7 +140,7 @@ public class SubProgramServiceImpl implements SubProgramService {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
-
+    @PreAuthorize("isAuthenticated()")
     @Override
     public ResponseEntity<?> getAllByUser(HttpServletRequest request, PaginateAndSearchByNameDto paginateDto) {
         try {

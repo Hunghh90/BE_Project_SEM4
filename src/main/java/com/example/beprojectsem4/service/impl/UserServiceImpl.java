@@ -189,6 +189,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
     }
+    @PreAuthorize("isAuthenticated()")
     @Override
     public ResponseEntity<?> getMe(HttpServletRequest request) {
         try{

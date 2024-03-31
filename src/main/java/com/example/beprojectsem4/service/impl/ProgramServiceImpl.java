@@ -261,6 +261,7 @@ public class ProgramServiceImpl implements ProgramService {
                 program.setDescription(normalData);
                 ProgramDto programDto = EntityDtoConverter.convertToDto(program, ProgramDto.class);
                 programDto.setDonations(donateDtoList);
+                programDto.setCountDonation(donateDtoList.size());
                 UserEntity user = userService.findUserByToken(request);
                 if (user != null) {
                     SubProgramEntity volunteer = subProgramService.getByUserAndProgram(user, program, "volunteer");
@@ -436,6 +437,14 @@ public class ProgramServiceImpl implements ProgramService {
                         String normalData = StringEscapeUtils.unescapeHtml4(p.getDescription());
                         p.setDescription(normalData);
                         ProgramDto pd = EntityDtoConverter.convertToDto(p, ProgramDto.class);
+                        List<SubProgramEntity> subProgramEntityList = subProgramService.getAllByProgramAndStatus(p, "Active");
+                        int volunteer = 0;
+                        for (SubProgramEntity subProgram : subProgramEntityList) {
+                            if (subProgram.getType().equals("volunteer")) {
+                                volunteer += 1;
+                            }
+                        }
+                        pd.setCountVolunteer(volunteer);
                         pd.setDonations(donateDtoList);
                         pd.setCountDonation(donateDtoList.size());
                         programDtoList.add(pd);
@@ -445,6 +454,14 @@ public class ProgramServiceImpl implements ProgramService {
                     String normalData = StringEscapeUtils.unescapeHtml4(p.getDescription());
                     p.setDescription(normalData);
                     ProgramDto pd = EntityDtoConverter.convertToDto(p, ProgramDto.class);
+                    List<SubProgramEntity> subProgramEntityList = subProgramService.getAllByProgramAndStatus(p, "Active");
+                    int volunteer = 0;
+                    for (SubProgramEntity subProgram : subProgramEntityList) {
+                        if (subProgram.getType().equals("volunteer")) {
+                            volunteer += 1;
+                        }
+                    }
+                    pd.setCountVolunteer(volunteer);
                     pd.setDonations(donateDtoList);
                     pd.setCountDonation(donateDtoList.size());
                     programDtoList.add(pd);

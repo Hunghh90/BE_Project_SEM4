@@ -361,14 +361,17 @@ public class UserServiceImpl implements UserService {
         try {
             PaginateAndSearchByNameDto paginate = new PaginateAndSearchByNameDto(paginateAndSearchByNameDto.getPage(), paginateAndSearchByNameDto.getSize());
             Sort sort = Sort.by(Sort.Order.desc("createdAt"));
-            PageRequest pageRequest = PageRequest.of(paginate.getPage(),paginate.getSize(),sort);
+            PageRequest pageRequest = PageRequest.of(paginate.getPage()-1,paginate.getSize(),sort);
             Page<UserEntity> users = repository.findAll(pageRequest);
             if(users.isEmpty()){
                 return ResponseEntity.ok().body(new ArrayList<>());
             }
             List<GetMeDto> getMeDtos = new ArrayList<>();
             for(UserEntity user : users){
+                String userRole = user.getRoles().iterator().next().getRoleName();
                 GetMeDto gm = EntityDtoConverter.convertToDto(user, GetMeDto.class);
+                gm.setSubPrograms(new ArrayList<>());
+                gm.setRole(userRole);
                 getMeDtos.add(gm);
             }
             return ResponseEntity.ok().body(getMeDtos);

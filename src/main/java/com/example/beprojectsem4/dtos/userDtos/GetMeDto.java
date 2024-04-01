@@ -30,7 +30,9 @@ public class GetMeDto {
     private String status;
     private String role;
     private Date updatedAt;
+    @Nullable
     private List<DonateByUserDto> donations;
+    @Nullable
     private List<SubProgramDto> subPrograms;
     @Nullable
     private Long partnerId;

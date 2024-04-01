@@ -36,7 +36,7 @@ public class PartnerController {
     }
 
     @GetMapping("/toggle-lock-partner/{id}")
-    public ResponseEntity<?> blockPartner( Long id,String value){
+    public ResponseEntity<?> blockPartner(@PathVariable Long id,String value){
         return partnerService.toggleLockPartner(id,value);
     }
 

@@ -197,9 +197,15 @@ public class ProgramServiceImpl implements ProgramService {
         try {
             ProgramEntity program = findById(id);
             if (program != null) {
-                program.setStatus(value);
-                programRepository.save(program);
-                return ResponseEntity.ok().body(value + " program success");
+               if(value.equals("Block")){
+                   program.setStatus(value+"_"+program.getStatus());
+                   programRepository.save(program);
+                   return ResponseEntity.ok().body(value + " program success");
+               }else{
+                   program.setStatus(program.getStatus().substring("Block_".length()));
+                   programRepository.save(program);
+                   return ResponseEntity.ok().body(value + " program success");
+               }
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found program");
         } catch (Exception e) {

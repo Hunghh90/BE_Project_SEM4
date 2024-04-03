@@ -14,4 +14,7 @@ public class GetDashBoardDto {
     private int newPartnerInMonth;
     private int totalUser;
     private int newUserInMonth;
+    private int programActive;
+    private int programFinish;
+    private int programPending;
 }

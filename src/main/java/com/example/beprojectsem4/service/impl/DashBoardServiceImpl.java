@@ -40,14 +40,25 @@ public class DashBoardServiceImpl implements DashboardSevice {
             int totalUserInMonth = 0;
             int totalPartnerInMonth = 0;
             int totalProgramInMonth = 0;
+            int programPending = 0;
+            int programActive = 0;
+            int programFinish = 0;
+            int totalPartner = 0;
+            int totalUser = 0;
             for(UserEntity user : users){
                 LocalDate createdAt = user.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                if(user.getStatus().equals("Activate")){
+                    totalUser +=1;
+                }
                 if(createdAt.isAfter(firstDayOfMonth) && createdAt.isBefore(lastDayOfMonth)){
                     totalUserInMonth +=1;
                 }
             }
             for(PartnerEntity partner : partners){
                 LocalDate createdAt = partner.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                if(partner.getStatus().equals("Active")){
+                    totalPartner +=1;
+                }
                 if(createdAt.isAfter(firstDayOfMonth) && createdAt.isBefore(lastDayOfMonth)){
                     totalPartnerInMonth +=1;
                 }
@@ -57,8 +68,15 @@ public class DashBoardServiceImpl implements DashboardSevice {
                 if(createdAt.isAfter(firstDayOfMonth) && createdAt.isBefore(lastDayOfMonth)){
                     totalProgramInMonth +=1;
                 }
+                if(program.getStatus().equals("Active")){
+                    programActive +=1;
+                } else if (program.getStatus().equals("End")) {
+                    programFinish +=1;
+                } else if (program.getStatus().equals("DeActive")) {
+                    programPending +=1;
+                }
             }
-            GetDashBoardDto dashBoardDto = new GetDashBoardDto(programs.size(),totalProgramInMonth,partners.size(),totalPartnerInMonth,users.size(),totalUserInMonth);
+            GetDashBoardDto dashBoardDto = new GetDashBoardDto(programs.size(),totalProgramInMonth,totalPartner,totalPartnerInMonth,totalUser,totalUserInMonth,programActive,programFinish,programPending);
             return ResponseEntity.ok().body(dashBoardDto);
         }catch (Exception e){
             System.out.println(e.getMessage());

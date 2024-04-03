@@ -22,8 +22,8 @@ public class SubProgramEntity {
     private UserEntity user;
     private String type;
     private String note;
-    @ManyToOne
-    @JoinColumn(name = "program_id")
+    @ManyToOne()
+    @JoinColumn(name = "program_id",referencedColumnName = "id")
     private ProgramEntity program;
     private String status;
     @Column(name = "created_at")

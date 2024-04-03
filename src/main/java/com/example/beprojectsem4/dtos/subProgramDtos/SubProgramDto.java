@@ -13,7 +13,8 @@ public class SubProgramDto {
     private Long subProgramId;
     private String type;
     private String note;
-    private ProgramDto program;
+    private Long programId;
+    private String programName;
     private GetMeDto user;
     private String status;
 }

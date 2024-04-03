@@ -167,10 +167,10 @@ public class SubProgramServiceImpl implements SubProgramService {
             List<SubProgramDto> subProgramDtoList = new ArrayList<>();
             for(SubProgramEntity subProgram : subProgramEntityPage.getContent()){
                 GetMeDto gm = EntityDtoConverter.convertToDto(subProgram.getUser(), GetMeDto.class);
-                ProgramDto programDto = EntityDtoConverter.convertToDto(subProgram.getProgram(), ProgramDto.class);
                 SubProgramDto subProgramDto = EntityDtoConverter.convertToDto(subProgram, SubProgramDto.class);
                 subProgramDto.setUser(gm);
-                subProgramDto.setProgram(programDto);
+                subProgramDto.setProgramId(subProgram.getProgram().getProgramId());
+                subProgramDto.setProgramName(subProgram.getProgram().getProgramName());
                 subProgramDtoList.add(subProgramDto);
             }
             return ResponseEntity.ok().body(subProgramDtoList);
@@ -194,10 +194,10 @@ public class SubProgramServiceImpl implements SubProgramService {
             List<SubProgramDto> subProgramDtoList = new ArrayList<>();
             for(SubProgramEntity subProgram : subProgramEntityPage.getContent()){
                 GetMeDto gm = EntityDtoConverter.convertToDto(subProgram.getUser(), GetMeDto.class);
-                ProgramDto programDto = EntityDtoConverter.convertToDto(subProgram.getProgram(), ProgramDto.class);
                 SubProgramDto subProgramDto = EntityDtoConverter.convertToDto(subProgram, SubProgramDto.class);
                 subProgramDto.setUser(gm);
-                subProgramDto.setProgram(programDto);
+                subProgramDto.setProgramId(subProgram.getProgram().getProgramId());
+                subProgramDto.setProgramName(subProgram.getProgram().getProgramName());
                 subProgramDtoList.add(subProgramDto);
             }
             return ResponseEntity.ok().body(subProgramDtoList);
@@ -218,10 +218,10 @@ public class SubProgramServiceImpl implements SubProgramService {
            List<SubProgramDto> subProgramDtoList = new ArrayList<>();
            for(SubProgramEntity subProgram : subProgramEntityList){
                GetMeDto gm = EntityDtoConverter.convertToDto(subProgram.getUser(), GetMeDto.class);
-               ProgramDto programDto = EntityDtoConverter.convertToDto(subProgram.getProgram(), ProgramDto.class);
                SubProgramDto subProgramDto = EntityDtoConverter.convertToDto(subProgram, SubProgramDto.class);
                subProgramDto.setUser(gm);
-               subProgramDto.setProgram(programDto);
+               subProgramDto.setProgramId(subProgram.getProgram().getProgramId());
+               subProgramDto.setProgramName(subProgram.getProgram().getProgramName());
                subProgramDtoList.add(subProgramDto);
            }
            return ResponseEntity.ok().body(subProgramDtoList);

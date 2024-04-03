@@ -17,6 +17,7 @@ import com.example.beprojectsem4.service.UserService;
 import com.example.beprojectsem4.service.jwt.JwtAuthenticationFilter;
 import com.example.beprojectsem4.service.jwt.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -360,8 +361,8 @@ public class UserServiceImpl implements UserService {
             List<SubProgramDto> subPrograms = new ArrayList<>();
             for(SubProgramEntity subProgram : user.getSubPrograms()){
                 SubProgramDto subProgramDto = EntityDtoConverter.convertToDto(subProgram, SubProgramDto.class);
-                ProgramDto program = EntityDtoConverter.convertToDto(subProgram.getProgram(), ProgramDto.class);
-                subProgramDto.setProgram(program);
+                subProgramDto.setProgramId(subProgram.getProgram().getProgramId());
+                subProgramDto.setProgramName(subProgram.getProgram().getProgramName());
                 subPrograms.add(subProgramDto);
             }
             GetMeDto gm = EntityDtoConverter.convertToDto(user, GetMeDto.class);

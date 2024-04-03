@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-@JsonIgnoreProperties({"user","partner","attachment","donations"})
+@JsonIgnoreProperties({"user","partner","attachment","donations","subPrograms"})
 public class ProgramEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,6 +60,8 @@ public class ProgramEntity {
     private Double totalMoney;
     @OneToMany(mappedBy = "program")
     private List<DonationEntity> donations;
+    @OneToMany(mappedBy = "program")
+    private List<SubProgramEntity> subPrograms;
 
     @PrePersist
     protected void onCreate() {

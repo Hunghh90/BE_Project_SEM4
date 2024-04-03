@@ -26,10 +26,10 @@ public class DonationEntity {
     private Date updatedAt;
     private String paymentMethod;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
     private UserEntity user;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "program_id")
+    @JoinColumn(name = "program_id",referencedColumnName = "id")
     private ProgramEntity program;
 
     @PrePersist

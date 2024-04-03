@@ -17,7 +17,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"avatarUrl","roles","programs","donations","subPrograms"})
+@JsonIgnoreProperties({"avatarUrl","roles","donations","subPrograms"})
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

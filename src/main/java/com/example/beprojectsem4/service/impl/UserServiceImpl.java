@@ -348,7 +348,28 @@ public class UserServiceImpl implements UserService {
             if(user == null){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not Found");
             }
+            String userRole = user.getRoles().iterator().next().getRoleName();
+            List<DonateByUserDto> donations = new ArrayList<>();
+            for(DonationEntity donation : user.getDonations()){
+                DonateByUserDto donate = EntityDtoConverter.convertToDto(donation, DonateByUserDto.class);
+                donate.setProgramName(donation.getProgram().getProgramName());
+                donate.setProgramId(donation.getProgram().getProgramId());
+                donations.add(donate);
+            }
+            List<SubProgramDto> subPrograms = new ArrayList<>();
+            for(SubProgramEntity subProgram : user.getSubPrograms()){
+                SubProgramDto subProgramDto = EntityDtoConverter.convertToDto(subProgram, SubProgramDto.class);
+                subPrograms.add(subProgramDto);
+            }
             GetMeDto gm = EntityDtoConverter.convertToDto(user, GetMeDto.class);
+            if(userRole.equals("PARTNER")){
+                PartnerEntity partner = partnerRepository.findByEmail(user.getEmail());
+                assert partner != null;
+                gm.setPartnerId(partner.getPartnerId());
+            }
+            gm.setRole(userRole);
+            gm.setDonations(donations);
+            gm.setSubPrograms(subPrograms);
             return ResponseEntity.ok().body(gm);
         }catch (Exception e){
             System.out.println(e.getMessage());
@@ -368,14 +389,14 @@ public class UserServiceImpl implements UserService {
             }
             List<GetMeDto> getMeDtos = new ArrayList<>();
             for(UserEntity user : users){
-                String userRole = user.getRoles().iterator().next().getRoleName();
+                String userRole = "USER";
+
+                if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                    userRole = user.getRoles().iterator().next().getRoleName();
+                }
                 GetMeDto gm = EntityDtoConverter.convertToDto(user, GetMeDto.class);
                 gm.setSubPrograms(new ArrayList<>());
-                if(userRole != null){
-                    gm.setRole(userRole);
-                }else{
-                    gm.setRole(null);
-                }
+                gm.setRole(userRole);
                 getMeDtos.add(gm);
             }
             return ResponseEntity.ok().body(getMeDtos);

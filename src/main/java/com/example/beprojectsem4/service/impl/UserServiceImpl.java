@@ -371,7 +371,11 @@ public class UserServiceImpl implements UserService {
                 String userRole = user.getRoles().iterator().next().getRoleName();
                 GetMeDto gm = EntityDtoConverter.convertToDto(user, GetMeDto.class);
                 gm.setSubPrograms(new ArrayList<>());
-                gm.setRole(userRole);
+                if(userRole != null){
+                    gm.setRole(userRole);
+                }else{
+                    gm.setRole(null);
+                }
                 getMeDtos.add(gm);
             }
             return ResponseEntity.ok().body(getMeDtos);

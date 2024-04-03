@@ -1,6 +1,7 @@
 package com.example.beprojectsem4.service.impl;
 
 import com.example.beprojectsem4.dtos.common.PaginateAndSearchByNameDto;
+import com.example.beprojectsem4.dtos.programDtos.ProgramDto;
 import com.example.beprojectsem4.dtos.subProgramDtos.SubProgramDto;
 import com.example.beprojectsem4.dtos.userDtos.*;
 import com.example.beprojectsem4.dtos.authDtos.JwtResponseDto;
@@ -359,6 +360,8 @@ public class UserServiceImpl implements UserService {
             List<SubProgramDto> subPrograms = new ArrayList<>();
             for(SubProgramEntity subProgram : user.getSubPrograms()){
                 SubProgramDto subProgramDto = EntityDtoConverter.convertToDto(subProgram, SubProgramDto.class);
+                ProgramDto program = EntityDtoConverter.convertToDto(subProgram.getProgram(), ProgramDto.class);
+                subProgramDto.setProgram(program);
                 subPrograms.add(subProgramDto);
             }
             GetMeDto gm = EntityDtoConverter.convertToDto(user, GetMeDto.class);

@@ -13,7 +13,7 @@ public class DashBoardController {
     @Autowired
     private DashboardSevice dashboardSevice;
     @GetMapping("/get")
-    public ResponseEntity<?> getDashBoard(){
-        return dashboardSevice.getDashBoard();
+    public ResponseEntity<?> getDashBoard(int year){
+        return dashboardSevice.getDashBoard(year);
     }
 }

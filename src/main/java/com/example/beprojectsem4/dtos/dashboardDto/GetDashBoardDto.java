@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.*;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,4 +20,5 @@ public class GetDashBoardDto {
     private int programActive;
     private int programFinish;
     private int programPending;
+    private List<Map<String, Object>> combinedData;
 }

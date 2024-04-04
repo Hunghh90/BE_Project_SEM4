@@ -17,9 +17,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class DashBoardServiceImpl implements DashboardSevice {
@@ -30,8 +34,26 @@ public class DashBoardServiceImpl implements DashboardSevice {
     @Autowired
     private ProgramRepository programRepository;
     @Override
-    public ResponseEntity<?> getDashBoard() {
+    public ResponseEntity<?> getDashBoard(int year) {
         try {
+            Map<Integer, Long> userCountsMap = userRepository.countUsersByMonth(year).stream()
+                    .collect(Collectors.toMap(row -> (Integer) row[0], row -> (Long) row[1]));
+            Map<Integer, Long> partnerCountsMap = partnerRepository.countPartnersByMonth(year).stream()
+                    .collect(Collectors.toMap(row -> (Integer) row[0], row -> (Long) row[1]));
+            Map<Integer, Long> programCountsMap = programRepository.countProgramsByMonth(year).stream()
+                    .collect(Collectors.toMap(row -> (Integer) row[0], row -> (Long) row[1]));
+
+            // Kết hợp dữ liệu từ các Map
+            List<Map<String, Object>> combinedData = IntStream.rangeClosed(1, 12).mapToObj(month -> {
+                Map<String, Object> monthData = new HashMap<>();
+                String monthName = Month.of(month).name();
+                monthData.put("month", monthName);
+                monthData.put("user", Map.of("key", "user", "title", "User", "value", userCountsMap.getOrDefault(month, 0L)));
+                monthData.put("partner", Map.of("key", "partner", "title", "Partner", "value", partnerCountsMap.getOrDefault(month, 0L)));
+                monthData.put("program", Map.of("key", "program", "title", "Program", "value", programCountsMap.getOrDefault(month, 0L)));
+                return monthData;
+            }).collect(Collectors.toList());
+
             LocalDate firstDayOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
             LocalDate lastDayOfMonth = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
             List<UserEntity> users = userRepository.findAll();
@@ -76,11 +98,12 @@ public class DashBoardServiceImpl implements DashboardSevice {
                     programPending +=1;
                 }
             }
-            GetDashBoardDto dashBoardDto = new GetDashBoardDto(programs.size(),totalProgramInMonth,totalPartner,totalPartnerInMonth,totalUser,totalUserInMonth,programActive,programFinish,programPending);
+            GetDashBoardDto dashBoardDto = new GetDashBoardDto(programs.size(),totalProgramInMonth,totalPartner,totalPartnerInMonth,totalUser,totalUserInMonth,programActive,programFinish,programPending,combinedData);
             return ResponseEntity.ok().body(dashBoardDto);
         }catch (Exception e){
             System.out.println(e.getMessage());
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
 }
